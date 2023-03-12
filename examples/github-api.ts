@@ -76,6 +76,13 @@ export interface paths {
      */
     post: operations["apps/redeliver-webhook-delivery"];
   };
+  "/app/installation-requests": {
+    /**
+     * List installation requests for the authenticated app 
+     * @description Lists all the pending installation requests for the authenticated GitHub App.
+     */
+    get: operations["apps/list-installation-requests-for-authenticated-app"];
+  };
   "/app/installations": {
     /**
      * List installations for the authenticated app 
@@ -129,32 +136,32 @@ export interface paths {
   "/applications/{client_id}/grant": {
     /**
      * Delete an app authorization 
-     * @description OAuth application owners can revoke a grant for their OAuth application and a specific user. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the OAuth application's `client_id` and `client_secret` as the username and password. You must also provide a valid OAuth `access_token` as an input parameter and the grant for the token's owner will be deleted.
-     * Deleting an OAuth application's grant will also delete all OAuth tokens associated with the application for the user. Once deleted, the application will have no access to the user's account and will no longer be listed on [the application authorizations settings screen within GitHub](https://github.com/settings/applications#authorized).
+     * @description OAuth and GitHub application owners can revoke a grant for their application and a specific user. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the OAuth application's `client_id` and `client_secret` as the username and password. You must also provide a valid OAuth `access_token` as an input parameter and the grant for the token's owner will be deleted.
+     * Deleting an application's grant will also delete all OAuth tokens associated with the application for the user. Once deleted, the application will have no access to the user's account and will no longer be listed on [the application authorizations settings screen within GitHub](https://github.com/settings/applications#authorized).
      */
     delete: operations["apps/delete-authorization"];
   };
   "/applications/{client_id}/token": {
     /**
      * Check a token 
-     * @description OAuth applications can use a special API method for checking OAuth token validity without exceeding the normal rate limits for failed login attempts. Authentication works differently with this particular endpoint. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) to use this endpoint, where the username is the OAuth application `client_id` and the password is its `client_secret`. Invalid tokens will return `404 NOT FOUND`.
+     * @description OAuth applications and GitHub applications with OAuth authorizations can use this API method for checking OAuth token validity without exceeding the normal rate limits for failed login attempts. Authentication works differently with this particular endpoint. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) to use this endpoint, where the username is the application `client_id` and the password is its `client_secret`. Invalid tokens will return `404 NOT FOUND`.
      */
     post: operations["apps/check-token"];
     /**
      * Delete an app token 
-     * @description OAuth application owners can revoke a single token for an OAuth application. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the OAuth application's `client_id` and `client_secret` as the username and password.
+     * @description OAuth  or GitHub application owners can revoke a single token for an OAuth application or a GitHub application with an OAuth authorization. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the application's `client_id` and `client_secret` as the username and password.
      */
     delete: operations["apps/delete-token"];
     /**
      * Reset a token 
-     * @description OAuth applications can use this API method to reset a valid OAuth token without end-user involvement. Applications must save the "token" property in the response because changes take effect immediately. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the OAuth application's `client_id` and `client_secret` as the username and password. Invalid tokens will return `404 NOT FOUND`.
+     * @description OAuth applications and GitHub applications with OAuth authorizations can use this API method to reset a valid OAuth token without end-user involvement. Applications must save the "token" property in the response because changes take effect immediately. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the application's `client_id` and `client_secret` as the username and password. Invalid tokens will return `404 NOT FOUND`.
      */
     patch: operations["apps/reset-token"];
   };
   "/applications/{client_id}/token/scoped": {
     /**
      * Create a scoped access token 
-     * @description Use a non-scoped user-to-server OAuth access token to create a repository scoped and/or permission scoped user-to-server OAuth access token. You can specify which repositories the token can access and which permissions are granted to the token. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the OAuth application's `client_id` and `client_secret` as the username and password. Invalid tokens will return `404 NOT FOUND`.
+     * @description Use a non-scoped user-to-server access token to create a repository scoped and/or permission scoped user-to-server access token. You can specify which repositories the token can access and which permissions are granted to the token. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the `client_id` and `client_secret` of the GitHub App as the username and password. Invalid tokens will return `404 NOT FOUND`.
      */
     post: operations["apps/scope-token"];
   };
@@ -182,344 +189,6 @@ export interface paths {
      */
     get: operations["emojis/get"];
   };
-  "/enterprise-installation/{enterprise_or_org}/server-statistics": {
-    /**
-     * Get GitHub Enterprise Server statistics 
-     * @description Returns aggregate usage metrics for your GitHub Enterprise Server 3.5+ instance for a specified time period up to 365 days.
-     * 
-     * To use this endpoint, your GitHub Enterprise Server instance must be connected to GitHub Enterprise Cloud using GitHub Connect. You must enable Server Statistics, and for the API request provide your enterprise account name or organization name connected to the GitHub Enterprise Server. For more information, see "[Enabling Server Statistics for your enterprise](/admin/configuration/configuring-github-connect/enabling-server-statistics-for-your-enterprise)" in the GitHub Enterprise Server documentation.
-     * 
-     * You'll need to use a personal access token:
-     *   - If you connected your GitHub Enterprise Server to an enterprise account and enabled Server Statistics, you'll need a personal access token with the `read:enterprise` permission.
-     *   - If you connected your GitHub Enterprise Server to an organization account and enabled Server Statistics, you'll need a personal access token with the `read:org` permission.
-     * 
-     * For more information on creating a personal access token, see "[Creating a personal access token](/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)."
-     */
-    get: operations["enterprise-admin/get-server-statistics"];
-  };
-  "/enterprises/{enterprise}/actions/cache/usage": {
-    /**
-     * Get GitHub Actions cache usage for an enterprise 
-     * @description Gets the total GitHub Actions cache usage for an enterprise.
-     * The data fetched using this API is refreshed approximately every 5 minutes, so values returned from this endpoint may take at least 5 minutes to get updated.
-     * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-     */
-    get: operations["actions/get-actions-cache-usage-for-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/permissions": {
-    /**
-     * Get GitHub Actions permissions for an enterprise 
-     * @description Gets the GitHub Actions permissions policy for organizations and allowed actions and reusable workflows in an enterprise.
-     * 
-     * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-     */
-    get: operations["enterprise-admin/get-github-actions-permissions-enterprise"];
-    /**
-     * Set GitHub Actions permissions for an enterprise 
-     * @description Sets the GitHub Actions permissions policy for organizations and allowed actions and reusable workflows in an enterprise.
-     * 
-     * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-     */
-    put: operations["enterprise-admin/set-github-actions-permissions-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/permissions/organizations": {
-    /**
-     * List selected organizations enabled for GitHub Actions in an enterprise 
-     * @description Lists the organizations that are selected to have GitHub Actions enabled in an enterprise. To use this endpoint, the enterprise permission policy for `enabled_organizations` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for an enterprise](#set-github-actions-permissions-for-an-enterprise)."
-     * 
-     * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-     */
-    get: operations["enterprise-admin/list-selected-organizations-enabled-github-actions-enterprise"];
-    /**
-     * Set selected organizations enabled for GitHub Actions in an enterprise 
-     * @description Replaces the list of selected organizations that are enabled for GitHub Actions in an enterprise. To use this endpoint, the enterprise permission policy for `enabled_organizations` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for an enterprise](#set-github-actions-permissions-for-an-enterprise)."
-     * 
-     * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-     */
-    put: operations["enterprise-admin/set-selected-organizations-enabled-github-actions-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/permissions/organizations/{org_id}": {
-    /**
-     * Enable a selected organization for GitHub Actions in an enterprise 
-     * @description Adds an organization to the list of selected organizations that are enabled for GitHub Actions in an enterprise. To use this endpoint, the enterprise permission policy for `enabled_organizations` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for an enterprise](#set-github-actions-permissions-for-an-enterprise)."
-     * 
-     * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-     */
-    put: operations["enterprise-admin/enable-selected-organization-github-actions-enterprise"];
-    /**
-     * Disable a selected organization for GitHub Actions in an enterprise 
-     * @description Removes an organization from the list of selected organizations that are enabled for GitHub Actions in an enterprise. To use this endpoint, the enterprise permission policy for `enabled_organizations` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for an enterprise](#set-github-actions-permissions-for-an-enterprise)."
-     * 
-     * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-     */
-    delete: operations["enterprise-admin/disable-selected-organization-github-actions-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/permissions/selected-actions": {
-    /**
-     * Get allowed actions and reusable workflows for an enterprise 
-     * @description Gets the selected actions and reusable workflows that are allowed in an enterprise. To use this endpoint, the enterprise permission policy for `allowed_actions` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for an enterprise](#set-github-actions-permissions-for-an-enterprise)."
-     * 
-     * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-     */
-    get: operations["enterprise-admin/get-allowed-actions-enterprise"];
-    /**
-     * Set allowed actions and reusable workflows for an enterprise 
-     * @description Sets the actions and reusable workflows that are allowed in an enterprise. To use this endpoint, the enterprise permission policy for `allowed_actions` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for an enterprise](#set-github-actions-permissions-for-an-enterprise)."
-     * 
-     * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-     */
-    put: operations["enterprise-admin/set-allowed-actions-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/permissions/workflow": {
-    /**
-     * Get default workflow permissions for an enterprise 
-     * @description Gets the default workflow permissions granted to the `GITHUB_TOKEN` when running workflows in an enterprise,
-     * as well as whether GitHub Actions can submit approving pull request reviews. For more information, see
-     * "[Enforcing a policy for workflow permissions in your enterprise](https://docs.github.com/enterprise-cloud@latest/admin/policies/enforcing-policies-for-your-enterprise/enforcing-policies-for-github-actions-in-your-enterprise#enforcing-a-policy-for-workflow-permissions-in-your-enterprise)."
-     * 
-     * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-     * GitHub Apps must have the `enterprise_administration:write` permission to use this endpoint.
-     */
-    get: operations["actions/get-github-actions-default-workflow-permissions-enterprise"];
-    /**
-     * Set default workflow permissions for an enterprise 
-     * @description Sets the default workflow permissions granted to the `GITHUB_TOKEN` when running workflows in an enterprise, and sets
-     * whether GitHub Actions can submit approving pull request reviews. For more information, see
-     * "[Enforcing a policy for workflow permissions in your enterprise](https://docs.github.com/enterprise-cloud@latest/admin/policies/enforcing-policies-for-your-enterprise/enforcing-policies-for-github-actions-in-your-enterprise#enforcing-a-policy-for-workflow-permissions-in-your-enterprise)."
-     * 
-     * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-     * GitHub Apps must have the `enterprise_administration:write` permission to use this endpoint.
-     */
-    put: operations["actions/set-github-actions-default-workflow-permissions-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/runner-groups": {
-    /**
-     * List self-hosted runner groups for an enterprise 
-     * @description Lists all self-hosted runner groups for an enterprise.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    get: operations["enterprise-admin/list-self-hosted-runner-groups-for-enterprise"];
-    /**
-     * Create a self-hosted runner group for an enterprise 
-     * @description Creates a new self-hosted runner group for an enterprise.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    post: operations["enterprise-admin/create-self-hosted-runner-group-for-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/runner-groups/{runner_group_id}": {
-    /**
-     * Get a self-hosted runner group for an enterprise 
-     * @description Gets a specific self-hosted runner group for an enterprise.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    get: operations["enterprise-admin/get-self-hosted-runner-group-for-enterprise"];
-    /**
-     * Delete a self-hosted runner group from an enterprise 
-     * @description Deletes a self-hosted runner group for an enterprise.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    delete: operations["enterprise-admin/delete-self-hosted-runner-group-from-enterprise"];
-    /**
-     * Update a self-hosted runner group for an enterprise 
-     * @description Updates the `name` and `visibility` of a self-hosted runner group in an enterprise.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    patch: operations["enterprise-admin/update-self-hosted-runner-group-for-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/runner-groups/{runner_group_id}/organizations": {
-    /**
-     * List organization access to a self-hosted runner group in an enterprise 
-     * @description Lists the organizations with access to a self-hosted runner group.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    get: operations["enterprise-admin/list-org-access-to-self-hosted-runner-group-in-enterprise"];
-    /**
-     * Set organization access for a self-hosted runner group in an enterprise 
-     * @description Replaces the list of organizations that have access to a self-hosted runner configured in an enterprise.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    put: operations["enterprise-admin/set-org-access-to-self-hosted-runner-group-in-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/runner-groups/{runner_group_id}/organizations/{org_id}": {
-    /**
-     * Add organization access to a self-hosted runner group in an enterprise 
-     * @description Adds an organization to the list of selected organizations that can access a self-hosted runner group. The runner group must have `visibility` set to `selected`. For more information, see "[Create a self-hosted runner group for an enterprise](#create-a-self-hosted-runner-group-for-an-enterprise)."
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    put: operations["enterprise-admin/add-org-access-to-self-hosted-runner-group-in-enterprise"];
-    /**
-     * Remove organization access to a self-hosted runner group in an enterprise 
-     * @description Removes an organization from the list of selected organizations that can access a self-hosted runner group. The runner group must have `visibility` set to `selected`. For more information, see "[Create a self-hosted runner group for an enterprise](#create-a-self-hosted-runner-group-for-an-enterprise)."
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    delete: operations["enterprise-admin/remove-org-access-to-self-hosted-runner-group-in-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/runner-groups/{runner_group_id}/runners": {
-    /**
-     * List self-hosted runners in a group for an enterprise 
-     * @description Lists the self-hosted runners that are in a specific enterprise group.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    get: operations["enterprise-admin/list-self-hosted-runners-in-group-for-enterprise"];
-    /**
-     * Set self-hosted runners in a group for an enterprise 
-     * @description Replaces the list of self-hosted runners that are part of an enterprise runner group.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    put: operations["enterprise-admin/set-self-hosted-runners-in-group-for-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/runner-groups/{runner_group_id}/runners/{runner_id}": {
-    /**
-     * Add a self-hosted runner to a group for an enterprise 
-     * @description Adds a self-hosted runner to a runner group configured in an enterprise.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise`
-     * scope to use this endpoint.
-     */
-    put: operations["enterprise-admin/add-self-hosted-runner-to-group-for-enterprise"];
-    /**
-     * Remove a self-hosted runner from a group for an enterprise 
-     * @description Removes a self-hosted runner from a group configured in an enterprise. The runner is then returned to the default group.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    delete: operations["enterprise-admin/remove-self-hosted-runner-from-group-for-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/runners": {
-    /**
-     * List self-hosted runners for an enterprise 
-     * @description Lists all self-hosted runners configured for an enterprise.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    get: operations["enterprise-admin/list-self-hosted-runners-for-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/runners/downloads": {
-    /**
-     * List runner applications for an enterprise 
-     * @description Lists binaries for the runner application that you can download and run.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    get: operations["enterprise-admin/list-runner-applications-for-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/runners/registration-token": {
-    /**
-     * Create a registration token for an enterprise 
-     * @description Returns a token that you can pass to the `config` script. The token expires after one hour.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     * 
-     * #### Example using registration token
-     * 
-     * Configure your self-hosted runner, replacing `TOKEN` with the registration token provided by this endpoint.
-     * 
-     * ```
-     * ./config.sh --url https://github.com/enterprises/octo-enterprise --token TOKEN
-     * ```
-     */
-    post: operations["enterprise-admin/create-registration-token-for-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/runners/remove-token": {
-    /**
-     * Create a remove token for an enterprise 
-     * @description Returns a token that you can pass to the `config` script to remove a self-hosted runner from an enterprise. The token expires after one hour.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     * 
-     * #### Example using remove token
-     * 
-     * To remove your self-hosted runner from an enterprise, replace `TOKEN` with the remove token provided by this
-     * endpoint.
-     * 
-     * ```
-     * ./config.sh remove --token TOKEN
-     * ```
-     */
-    post: operations["enterprise-admin/create-remove-token-for-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/runners/{runner_id}": {
-    /**
-     * Get a self-hosted runner for an enterprise 
-     * @description Gets a specific self-hosted runner configured in an enterprise.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    get: operations["enterprise-admin/get-self-hosted-runner-for-enterprise"];
-    /**
-     * Delete a self-hosted runner from an enterprise 
-     * @description Forces the removal of a self-hosted runner from an enterprise. You can use this endpoint to completely remove the runner when the machine you were using no longer exists.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    delete: operations["enterprise-admin/delete-self-hosted-runner-from-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/runners/{runner_id}/labels": {
-    /**
-     * List labels for a self-hosted runner for an enterprise 
-     * @description Lists all labels for a self-hosted runner configured in an enterprise.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    get: operations["enterprise-admin/list-labels-for-self-hosted-runner-for-enterprise"];
-    /**
-     * Set custom labels for a self-hosted runner for an enterprise 
-     * @description Remove all previous custom labels and set the new custom labels for a specific
-     * self-hosted runner configured in an enterprise.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    put: operations["enterprise-admin/set-custom-labels-for-self-hosted-runner-for-enterprise"];
-    /**
-     * Add custom labels to a self-hosted runner for an enterprise 
-     * @description Add custom labels to a self-hosted runner configured in an enterprise.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    post: operations["enterprise-admin/add-custom-labels-to-self-hosted-runner-for-enterprise"];
-    /**
-     * Remove all custom labels from a self-hosted runner for an enterprise 
-     * @description Remove all custom labels from a self-hosted runner configured in an
-     * enterprise. Returns the remaining read-only labels from the runner.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    delete: operations["enterprise-admin/remove-all-custom-labels-from-self-hosted-runner-for-enterprise"];
-  };
-  "/enterprises/{enterprise}/actions/runners/{runner_id}/labels/{name}": {
-    /**
-     * Remove a custom label from a self-hosted runner for an enterprise 
-     * @description Remove a custom label from a self-hosted runner configured
-     * in an enterprise. Returns the remaining labels from the runner.
-     * 
-     * This endpoint returns a `404 Not Found` status if the custom label is not
-     * present on the runner.
-     * 
-     * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-     */
-    delete: operations["enterprise-admin/remove-custom-label-from-self-hosted-runner-for-enterprise"];
-  };
-  "/enterprises/{enterprise}/code-scanning/alerts": {
-    /**
-     * List code scanning alerts for an enterprise 
-     * @description Lists code scanning alerts for the default branch for all eligible repositories in an enterprise. Eligible repositories are repositories that are owned by organizations that you own or for which you are a security manager. For more information, see "[Managing security managers in your organization](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization)."
-     * 
-     * To use this endpoint, you must be a member of the enterprise,
-     * and you must use an access token with the `repo` scope or `security_events` scope.
-     */
-    get: operations["code-scanning/list-alerts-for-enterprise"];
-  };
   "/enterprises/{enterprise}/dependabot/alerts": {
     /**
      * List Dependabot alerts for an enterprise 
@@ -537,17 +206,6 @@ export interface paths {
      * To use this endpoint, you must be a member of the enterprise, and you must use an access token with the `repo` scope or `security_events` scope. Alerts are only returned for organizations in the enterprise for which you are an organization owner or a [security manager](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization).
      */
     get: operations["secret-scanning/list-alerts-for-enterprise"];
-  };
-  "/enterprises/{enterprise}/settings/billing/advanced-security": {
-    /**
-     * Get GitHub Advanced Security active committers for an enterprise 
-     * @description Gets the GitHub Advanced Security active committers for an enterprise per repository.
-     * 
-     * Each distinct user login across all repositories is counted as a single Advanced Security seat, so the `total_advanced_security_committers` is not the sum of active_users for each repository.
-     * 
-     * The total number of repositories with committer information is tracked by the `total_count` field.
-     */
-    get: operations["billing/get-github-advanced-security-billing-ghe"];
   };
   "/events": {
     /**
@@ -781,6 +439,8 @@ export interface paths {
      * Get GitHub meta information 
      * @description Returns meta information about GitHub, including a list of GitHub's IP addresses. For more information, see "[About GitHub's IP addresses](https://docs.github.com/articles/about-github-s-ip-addresses/)."
      * 
+     * **Note:** This endpoint returns both IPv4 and IPv6 addresses. However, not all features support IPv6. You should refer to the specific documentation for each feature to determine if IPv6 is supported.
+     * 
      * **Note:** The IP addresses shown in the documentation's response are only example values. You must always query the API directly to get the latest list of IP addresses.
      */
     get: operations["meta/get"];
@@ -852,19 +512,6 @@ export interface paths {
      */
     get: operations["orgs/list"];
   };
-  "/organizations/{organization_id}/custom_roles": {
-    /**
-     * List custom repository roles in an organization 
-     * @description List the custom repository roles available in this organization. In order to see custom
-     * repository roles in an organization, the authenticated user must be an organization owner.
-     * 
-     * To use this endpoint the authenticated user must be an administrator for the organization or of an repository of the organizaiton and must use an access token with `admin:org repo` scope.
-     * GitHub Apps must have the `organization_custom_roles:read` organization permission to use this endpoint.
-     * 
-     * For more information on custom repository roles, see "[About custom repository roles](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/about-custom-repository-roles)."
-     */
-    get: operations["orgs/list-custom-roles"];
-  };
   "/orgs/{org}": {
     /**
      * Get an organization 
@@ -899,6 +546,22 @@ export interface paths {
      */
     get: operations["actions/get-actions-cache-usage-by-repo-for-org"];
   };
+  "/orgs/{org}/actions/oidc/customization/sub": {
+    /**
+     * Get the customization template for an OIDC subject claim for an organization 
+     * @description Gets the customization template for an OpenID Connect (OIDC) subject claim.
+     * You must authenticate using an access token with the `read:org` scope to use this endpoint.
+     * GitHub Apps must have the `organization_administration:write` permission to use this endpoint.
+     */
+    get: operations["oidc/get-oidc-custom-sub-template-for-org"];
+    /**
+     * Set the customization template for an OIDC subject claim for an organization 
+     * @description Creates or updates the customization template for an OpenID Connect (OIDC) subject claim.
+     * You must authenticate using an access token with the `write:org` scope to use this endpoint.
+     * GitHub Apps must have the `admin:org` permission to use this endpoint.
+     */
+    put: operations["oidc/update-oidc-custom-sub-template-for-org"];
+  };
   "/orgs/{org}/actions/permissions": {
     /**
      * Get GitHub Actions permissions for an organization 
@@ -910,8 +573,6 @@ export interface paths {
     /**
      * Set GitHub Actions permissions for an organization 
      * @description Sets the GitHub Actions permissions policy for repositories and allowed actions and reusable workflows in an organization.
-     * 
-     * If the organization belongs to an enterprise that has set restrictive permissions at the enterprise level, such as `allowed_actions` to `selected` actions and reusable workflows, then you cannot override them for the organization.
      * 
      * You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `administration` organization permission to use this API.
      */
@@ -961,10 +622,6 @@ export interface paths {
      * Set allowed actions and reusable workflows for an organization 
      * @description Sets the actions and reusable workflows that are allowed in an organization. To use this endpoint, the organization permission policy for `allowed_actions` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for an organization](#set-github-actions-permissions-for-an-organization)."
      * 
-     * If the organization belongs to an enterprise that has `selected` actions and reusable workflows set at the enterprise level, then you cannot override any of the enterprise's allowed actions and reusable workflows settings.
-     * 
-     * To use the `patterns_allowed` setting for private repositories, the organization must belong to an enterprise. If the organization does not belong to an enterprise, then the `patterns_allowed` setting only applies to public repositories in the organization.
-     * 
      * You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `administration` organization permission to use this API.
      */
     put: operations["actions/set-allowed-actions-organization"];
@@ -989,129 +646,94 @@ export interface paths {
      */
     put: operations["actions/set-github-actions-default-workflow-permissions-organization"];
   };
-  "/orgs/{org}/actions/runner-groups": {
+  "/orgs/{org}/actions/required_workflows": {
     /**
-     * List self-hosted runner groups for an organization 
-     * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
+     * List required workflows 
+     * @description List all required workflows in an organization.
      * 
-     * Lists all self-hosted runner groups configured in an organization and inherited from an enterprise.
+     * You must authenticate using an access token with the `read:org` scope to use this endpoint.
+     * 
+     * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
+     */
+    get: operations["actions/list-required-workflows"];
+    /**
+     * Create a required workflow 
+     * @description Create a required workflow in an organization.
      * 
      * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
-     */
-    get: operations["actions/list-self-hosted-runner-groups-for-org"];
-    /**
-     * Create a self-hosted runner group for an organization 
-     * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud and GitHub Enterprise Server. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
      * 
-     * Creates a new self-hosted runner group for an organization.
-     * 
-     * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+     * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
      */
-    post: operations["actions/create-self-hosted-runner-group-for-org"];
+    post: operations["actions/create-required-workflow"];
   };
-  "/orgs/{org}/actions/runner-groups/{runner_group_id}": {
+  "/orgs/{org}/actions/required_workflows/{required_workflow_id}": {
     /**
-     * Get a self-hosted runner group for an organization 
-     * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
+     * Get a required workflow 
+     * @description Get a required workflow configured in an organization.
      * 
-     * Gets a specific self-hosted runner group for an organization.
+     * You must authenticate using an access token with the `read:org` scope to use this endpoint.
+     * 
+     * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
+     */
+    get: operations["actions/get-required-workflow"];
+    /**
+     * Delete a required workflow 
+     * @description Deletes a required workflow configured in an organization.
      * 
      * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
-     */
-    get: operations["actions/get-self-hosted-runner-group-for-org"];
-    /**
-     * Delete a self-hosted runner group from an organization 
-     * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
      * 
-     * Deletes a self-hosted runner group for an organization.
+     * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
+     */
+    delete: operations["actions/delete-required-workflow"];
+    /**
+     * Update a required workflow 
+     * @description Update a required workflow in an organization.
      * 
      * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
-     */
-    delete: operations["actions/delete-self-hosted-runner-group-from-org"];
-    /**
-     * Update a self-hosted runner group for an organization 
-     * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
      * 
-     * Updates the `name` and `visibility` of a self-hosted runner group in an organization.
-     * 
-     * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+     * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
      */
-    patch: operations["actions/update-self-hosted-runner-group-for-org"];
+    patch: operations["actions/update-required-workflow"];
   };
-  "/orgs/{org}/actions/runner-groups/{runner_group_id}/repositories": {
+  "/orgs/{org}/actions/required_workflows/{required_workflow_id}/repositories": {
     /**
-     * List repository access to a self-hosted runner group in an organization 
-     * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud and GitHub Enterprise Server. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
+     * List selected repositories for a required workflow 
+     * @description Lists the selected repositories that are configured for a required workflow in an organization. To use this endpoint, the required workflow must be configured to run on selected repositories.
      * 
-     * Lists the repositories with access to a self-hosted runner group configured in an organization.
+     * You must authenticate using an access token with the `read:org` scope to use this endpoint. GitHub Apps must have the `administration` organization permission to use this endpoint.
+     * 
+     * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
+     */
+    get: operations["actions/list-selected-repositories-required-workflow"];
+    /**
+     * Sets repositories for a required workflow 
+     * @description Sets the repositories for a required workflow that is required for selected repositories.
      * 
      * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
-     */
-    get: operations["actions/list-repo-access-to-self-hosted-runner-group-in-org"];
-    /**
-     * Set repository access for a self-hosted runner group in an organization 
-     * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
      * 
-     * Replaces the list of repositories that have access to a self-hosted runner group configured in an organization.
-     * 
-     * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+     * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
      */
-    put: operations["actions/set-repo-access-to-self-hosted-runner-group-in-org"];
+    put: operations["actions/set-selected-repos-to-required-workflow"];
   };
-  "/orgs/{org}/actions/runner-groups/{runner_group_id}/repositories/{repository_id}": {
+  "/orgs/{org}/actions/required_workflows/{required_workflow_id}/repositories/{repository_id}": {
     /**
-     * Remove repository access to a self-hosted runner group in an organization 
-     * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
-     * 
-     * 
-     * Removes a repository from the list of selected repositories that can access a self-hosted runner group. The runner group must have `visibility` set to `selected`. For more information, see "[Create a self-hosted runner group for an organization](#create-a-self-hosted-runner-group-for-an-organization)."
+     * Add a repository to a required workflow 
+     * @description Adds a repository to a required workflow. To use this endpoint, the required workflow must be configured to run on selected repositories.
      * 
      * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
-     */
-    delete: operations["actions/remove-repo-access-to-self-hosted-runner-group-in-org"];
-  };
-  "/orgs/{org}/actions/runner-groups/{runner_group_id}/runners": {
-    /**
-     * List self-hosted runners in a group for an organization 
-     * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
      * 
-     * Lists self-hosted runners that are in a specific organization group.
+     * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
+     */
+    put: operations["actions/add-selected-repo-to-required-workflow"];
+    /**
+     * Remove a selected repository from required workflow 
+     * @description Removes a repository from a required workflow. To use this endpoint, the required workflow must be configured to run on selected repositories.
      * 
      * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+     * 
+     * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
      */
-    get: operations["actions/list-self-hosted-runners-in-group-for-org"];
-    /**
-     * Set self-hosted runners in a group for an organization 
-     * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
-     * 
-     * Replaces the list of self-hosted runners that are part of an organization runner group.
-     * 
-     * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
-     */
-    put: operations["actions/set-self-hosted-runners-in-group-for-org"];
-  };
-  "/orgs/{org}/actions/runner-groups/{runner_group_id}/runners/{runner_id}": {
-    /**
-     * Add a self-hosted runner to a group for an organization 
-     * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
-     * 
-     * 
-     * Adds a self-hosted runner to a runner group configured in an organization.
-     * 
-     * You must authenticate using an access token with the `admin:org`
-     * scope to use this endpoint.
-     */
-    put: operations["actions/add-self-hosted-runner-to-group-for-org"];
-    /**
-     * Remove a self-hosted runner from a group for an organization 
-     * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
-     * 
-     * 
-     * Removes a self-hosted runner from a group configured in an organization. The runner is then returned to the default group.
-     * 
-     * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
-     */
-    delete: operations["actions/remove-self-hosted-runner-from-group-for-org"];
+    delete: operations["actions/remove-selected-repo-from-required-workflow"];
   };
   "/orgs/{org}/actions/runners": {
     /**
@@ -1357,6 +979,65 @@ export interface paths {
      */
     delete: operations["actions/remove-selected-repo-from-org-secret"];
   };
+  "/orgs/{org}/actions/variables": {
+    /**
+     * List organization variables 
+     * @description Lists all organization variables. You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `organization_actions_variables:read` organization permission to use this endpoint.
+     */
+    get: operations["actions/list-org-variables"];
+    /**
+     * Create an organization variable 
+     * @description Creates an organization variable that you can reference in a GitHub Actions workflow.
+     * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+     * GitHub Apps must have the `organization_actions_variables:write` organization permission to use this endpoint.
+     */
+    post: operations["actions/create-org-variable"];
+  };
+  "/orgs/{org}/actions/variables/{name}": {
+    /**
+     * Get an organization variable 
+     * @description Gets a specific variable in an organization. You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `organization_actions_variables:read` organization permission to use this endpoint.
+     */
+    get: operations["actions/get-org-variable"];
+    /**
+     * Delete an organization variable 
+     * @description Deletes an organization variable using the variable name.
+     * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+     * GitHub Apps must have the `organization_actions_variables:write` organization permission to use this endpoint.
+     */
+    delete: operations["actions/delete-org-variable"];
+    /**
+     * Update an organization variable 
+     * @description Updates an organization variable that you can reference in a GitHub Actions workflow.
+     * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+     * GitHub Apps must have the `organization_actions_variables:write` organization permission to use this endpoint.
+     */
+    patch: operations["actions/update-org-variable"];
+  };
+  "/orgs/{org}/actions/variables/{name}/repositories": {
+    /**
+     * List selected repositories for an organization variable 
+     * @description Lists all repositories that can access an organization variable that is available to selected repositories. You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `organization_actions_variables:read` organization permission to use this endpoint.
+     */
+    get: operations["actions/list-selected-repos-for-org-variable"];
+    /**
+     * Set selected repositories for an organization variable 
+     * @description Replaces all repositories for an organization variable that is available to selected repositories. Organization variables that are available to selected repositories have their `visibility` field set to `selected`. You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `organization_actions_variables:write` organization permission to use this endpoint.
+     */
+    put: operations["actions/set-selected-repos-for-org-variable"];
+  };
+  "/orgs/{org}/actions/variables/{name}/repositories/{repository_id}": {
+    /**
+     * Add selected repository to an organization variable 
+     * @description Adds a repository to an organization variable that is available to selected repositories. Organization variables that are available to selected repositories have their `visibility` field set to `selected`. You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `organization_actions_variables:write` organization permission to use this endpoint.
+     */
+    put: operations["actions/add-selected-repo-to-org-variable"];
+    /**
+     * Remove selected repository from an organization variable 
+     * @description Removes a repository from an organization variable that is available to selected repositories. Organization variables that are available to selected repositories have their `visibility` field set to `selected`. You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `organization_actions_variables:write` organization permission to use this endpoint.
+     */
+    delete: operations["actions/remove-selected-repo-from-org-variable"];
+  };
   "/orgs/{org}/blocks": {
     /**
      * List users blocked by an organization 
@@ -1401,6 +1082,20 @@ export interface paths {
      * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
      */
     put: operations["codespaces/set-codespaces-billing"];
+  };
+  "/orgs/{org}/codespaces/billing/selected_users": {
+    /**
+     * Add users to Codespaces billing for an organization 
+     * @description Codespaces for the specified users will be billed to the organization.
+     * To use this endpoint, the billing settings for the organization must be set to `selected_members`. For information on how to change this setting please see [these docs].(https://docs.github.com/rest/codespaces/organizations#manage-access-control-for-organization-codespaces) You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+     */
+    post: operations["codespaces/set-codespaces-billing-users"];
+    /**
+     * Removes users from Codespaces billing for an organization 
+     * @description Codespaces for the specified users will no longer be billed to the organization.
+     * To use this endpoint, the billing settings for the organization must be set to `selected_members`. For information on how to change this setting please see [these docs].(https://docs.github.com/rest/codespaces/organizations#manage-access-control-for-organization-codespaces) You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+     */
+    delete: operations["codespaces/delete-codespaces-billing-users"];
   };
   "/orgs/{org}/codespaces/secrets": {
     /**
@@ -1532,59 +1227,6 @@ export interface paths {
      * @description Removes a repository from an organization secret when the `visibility` for repository access is set to `selected`. The visibility is set when you [Create or update an organization secret](https://docs.github.com/rest/reference/codespaces#create-or-update-an-organization-secret). You must authenticate using an access token with the `admin:org` scope to use this endpoint.
      */
     delete: operations["codespaces/remove-selected-repo-from-org-secret"];
-  };
-  "/orgs/{org}/custom_roles": {
-    /**
-     * Create a custom role 
-     * @description **Note**: This operation is in beta and is subject to change.
-     * 
-     * Creates a custom repository role that can be used by all repositories owned by the organization.
-     * 
-     * To use this endpoint the authenticated user must be an administrator for the organization and must use an access token with `admin:org` scope.
-     * GitHub Apps must have the `organization_custom_roles:write` organization permission to use this endpoint.
-     * 
-     * For more information on custom repository roles, see "[About custom repository roles](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/about-custom-repository-roles)."
-     */
-    post: operations["orgs/create-custom-role"];
-  };
-  "/orgs/{org}/custom_roles/{role_id}": {
-    /**
-     * Get a custom role 
-     * @description **Note**: This operation is in beta and is subject to change.
-     * 
-     * Gets a custom repository role that is available to all repositories owned by the organization.
-     * 
-     * To use this operation, the authenticated user must be an administrator for the organization and must use an access token with `admin:org` scope.
-     * GitHub Apps must have the `organization_custom_roles:write` organization permission to use this endpoint.
-     * 
-     * For more information on custom repository roles, see "[About custom repository roles](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/about-custom-repository-roles)."
-     */
-    get: operations["orgs/get-custom-role"];
-    /**
-     * Delete a custom role 
-     * @description **Note**: This operation is in beta and is subject to change.
-     * 
-     * Deletes a custom role from an organization. Once the custom role has been deleted, any
-     * user, team, or invitation with the deleted custom role will be reassigned the inherited role.
-     * 
-     * To use this endpoint the authenticated user must be an administrator for the organization and must use an access token with `admin:org` scope.
-     * GitHub Apps must have the `organization_custom_roles:write` organization permission to use this endpoint.
-     * 
-     * For more information about custom repository roles, see "[About custom repository roles](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/about-custom-repository-roles)."
-     */
-    delete: operations["orgs/delete-custom-role"];
-    /**
-     * Update a custom role 
-     * @description **Note**: This operation is in beta and subject to change.
-     * 
-     * Updates a custom repository role that can be used by all repositories owned by the organization.
-     * 
-     * To use this endpoint the authenticated user must be an administrator for the organization and must use an access token with `admin:org` scope.
-     * GitHub Apps must have the `organization_custom_roles:write` organization permission to use this endpoint.
-     * 
-     * For more information about custom repository roles, see "[About custom repository roles](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/about-custom-repository-roles)."
-     */
-    patch: operations["orgs/update-custom-role"];
   };
   "/orgs/{org}/dependabot/alerts": {
     /**
@@ -1740,18 +1382,6 @@ export interface paths {
      */
     get: operations["orgs/list-failed-invitations"];
   };
-  "/orgs/{org}/fine_grained_permissions": {
-    /**
-     * List fine-grained permissions for an organization 
-     * @description **Note**: This operation is in beta and subject to change.
-     * 
-     * Lists the fine-grained permissions available for an organization.
-     * 
-     * To use this endpoint the authenticated user must be an administrator for the organization or of an repository of the organizaiton and must use an access token with `admin:org repo` scope.
-     * GitHub Apps must have the `organization_custom_roles:read` organization permission to use this endpoint.
-     */
-    get: operations["orgs/list-fine-grained-permissions"];
-  };
   "/orgs/{org}/hooks": {
     /** List organization webhooks */
     get: operations["orgs/list-webhooks"];
@@ -1855,7 +1485,7 @@ export interface paths {
   "/orgs/{org}/invitations": {
     /**
      * List pending organization invitations 
-     * @description The return hash contains a `role` field which refers to the Organization Invitation role and will be one of the following values: `direct_member`, `admin`, `billing_manager`, `hiring_manager`, or `reinstate`. If the invitee is not a GitHub member, the `login` field in the return hash will be `null`.
+     * @description The return hash contains a `role` field which refers to the Organization Invitation role and will be one of the following values: `direct_member`, `admin`, `billing_manager`, or `hiring_manager`. If the invitee is not a GitHub member, the `login` field in the return hash will be `null`.
      */
     get: operations["orgs/list-pending-invitations"];
     /**
@@ -1970,7 +1600,9 @@ export interface paths {
   "/orgs/{org}/migrations": {
     /**
      * List organization migrations 
-     * @description Lists the most recent migrations.
+     * @description Lists the most recent migrations, including both exports (which can be started through the REST API) and imports (which cannot be started using the REST API).
+     * 
+     * A list of `repositories` is only returned for export migrations.
      */
     get: operations["migrations/list-for-org"];
     /**
@@ -2008,7 +1640,7 @@ export interface paths {
   "/orgs/{org}/migrations/{migration_id}/repos/{repo_name}/lock": {
     /**
      * Unlock an organization repository 
-     * @description Unlocks a repository that was locked for migration. You should unlock each migrated repository and [delete them](https://docs.github.com/rest/reference/repos#delete-a-repository) when the migration is complete and you no longer need the source data.
+     * @description Unlocks a repository that was locked for migration. You should unlock each migrated repository and [delete them](https://docs.github.com/rest/repos/repos#delete-a-repository) when the migration is complete and you no longer need the source data.
      */
     delete: operations["migrations/unlock-repo-for-org"];
   };
@@ -2029,7 +1661,7 @@ export interface paths {
   "/orgs/{org}/outside_collaborators/{username}": {
     /**
      * Convert an organization member to outside collaborator 
-     * @description When an organization member is converted to an outside collaborator, they'll only have access to the repositories that their current team membership allows. The user will no longer be a member of the organization. For more information, see "[Converting an organization member to an outside collaborator](https://docs.github.com/articles/converting-an-organization-member-to-an-outside-collaborator/)". Converting an organization member to an outside collaborator may be restricted by enterprise administrators. For more information, see "[Enforcing repository management policies in your enterprise](https://docs.github.com/enterprise-cloud@latest/admin/policies/enforcing-policies-for-your-enterprise/enforcing-repository-management-policies-in-your-enterprise#enforcing-a-policy-for-inviting-outside-collaborators-to-repositories)."
+     * @description When an organization member is converted to an outside collaborator, they'll only have access to the repositories that their current team membership allows. The user will no longer be a member of the organization. For more information, see "[Converting an organization member to an outside collaborator](https://docs.github.com/articles/converting-an-organization-member-to-an-outside-collaborator/)". Converting an organization member to an outside collaborator may be restricted by enterprise administrators. For more information, see "[Enforcing repository management policies in your enterprise](https://docs.github.com/admin/policies/enforcing-policies-for-your-enterprise/enforcing-repository-management-policies-in-your-enterprise#enforcing-a-policy-for-inviting-outside-collaborators-to-repositories)."
      */
     put: operations["orgs/convert-member-to-outside-collaborator"];
     /**
@@ -2041,10 +1673,9 @@ export interface paths {
   "/orgs/{org}/packages": {
     /**
      * List packages for an organization 
-     * @description Lists all packages in an organization readable by the user.
+     * @description Lists packages in an organization readable by the user.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-     * If `package_type` is not `container`, your token must also include the `repo` scope.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     get: operations["packages/list-packages-for-organization"];
   };
@@ -2053,17 +1684,16 @@ export interface paths {
      * Get a package for an organization 
      * @description Gets a specific package in an organization.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-     * If `package_type` is not `container`, your token must also include the `repo` scope.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     get: operations["packages/get-package-for-organization"];
     /**
      * Delete a package for an organization 
      * @description Deletes an entire package in an organization. You cannot delete a public package if any version of the package has more than 5,000 downloads. In this scenario, contact GitHub support for further assistance.
      * 
-     * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `packages:read` and `packages:delete` scopes. In addition:
-     * - If `package_type` is not `container`, your token must also include the `repo` scope.
-     * - If `package_type` is `container`, you must also have admin permissions to the container you want to delete.
+     * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `read:packages` and `delete:packages` scopes. In addition:
+     * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+     * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package you want to delete. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
      */
     delete: operations["packages/delete-package-for-org"];
   };
@@ -2076,9 +1706,9 @@ export interface paths {
      *   - The package was deleted within the last 30 days.
      *   - The same package namespace and version is still available and not reused for a new package. If the same package namespace is not available, you will not be able to restore your package. In this scenario, to restore the deleted package, you must delete the new package that uses the deleted package's namespace first.
      * 
-     * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `packages:read` and `packages:write` scopes. In addition:
-     * - If `package_type` is not `container`, your token must also include the `repo` scope.
-     * - If `package_type` is `container`, you must also have admin permissions to the container that you want to restore.
+     * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `read:packages` and `write:packages` scopes. In addition:
+     * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+     * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package you want to restore. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
      */
     post: operations["packages/restore-package-for-org"];
   };
@@ -2087,8 +1717,7 @@ export interface paths {
      * List package versions for a package owned by an organization 
      * @description Lists package versions for a package owned by an organization.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-     * If `package_type` is not `container`, your token must also include the `repo` scope.
+     * If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     get: operations["packages/get-all-package-versions-for-package-owned-by-org"];
   };
@@ -2097,17 +1726,16 @@ export interface paths {
      * Get a package version for an organization 
      * @description Gets a specific package version in an organization.
      * 
-     * You must authenticate using an access token with the `packages:read` scope.
-     * If `package_type` is not `container`, your token must also include the `repo` scope.
+     * You must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     get: operations["packages/get-package-version-for-organization"];
     /**
      * Delete package version for an organization 
      * @description Deletes a specific package version in an organization. If the package is public and the package version has more than 5,000 downloads, you cannot delete the package version. In this scenario, contact GitHub support for further assistance.
      * 
-     * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `packages:read` and `packages:delete` scopes. In addition:
-     * - If `package_type` is not `container`, your token must also include the `repo` scope.
-     * - If `package_type` is `container`, you must also have admin permissions to the container you want to delete.
+     * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `read:packages` and `delete:packages` scopes. In addition:
+     * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+     * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package whose version you want to delete. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
      */
     delete: operations["packages/delete-package-version-for-org"];
   };
@@ -2120,9 +1748,9 @@ export interface paths {
      *   - The package was deleted within the last 30 days.
      *   - The same package namespace and version is still available and not reused for a new package. If the same package namespace is not available, you will not be able to restore your package. In this scenario, to restore the deleted package, you must delete the new package that uses the deleted package's namespace first.
      * 
-     * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `packages:read` and `packages:write` scopes. In addition:
-     * - If `package_type` is not `container`, your token must also include the `repo` scope.
-     * - If `package_type` is `container`, you must also have admin permissions to the container that you want to restore.
+     * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `read:packages` and `write:packages` scopes. In addition:
+     * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+     * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package whose version you want to restore. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
      */
     post: operations["packages/restore-package-version-for-org"];
   };
@@ -2162,6 +1790,8 @@ export interface paths {
     /**
      * List organization repositories 
      * @description Lists repositories for the specified organization.
+     * 
+     * **Note:** In order to see the `security_and_analysis` block for a repository you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see "[Managing security managers in your organization](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization)."
      */
     get: operations["repos/list-for-org"];
     /**
@@ -2230,19 +1860,6 @@ export interface paths {
      */
     get: operations["billing/get-github-actions-billing-org"];
   };
-  "/orgs/{org}/settings/billing/advanced-security": {
-    /**
-     * Get GitHub Advanced Security active committers for an organization 
-     * @description Gets the GitHub Advanced Security active committers for an organization per repository.
-     * 
-     * Each distinct user login across all repositories is counted as a single Advanced Security seat, so the `total_advanced_security_committers` is not the sum of advanced_security_committers for each repository.
-     * 
-     * If this organization defers to an enterprise for billing, the `total_advanced_security_committers` returned from the organization API may include some users that are in more than one organization, so they will only consume a single Advanced Security seat at the enterprise level.
-     * 
-     * The total number of repositories with committer information is tracked by the `total_count` field.
-     */
-    get: operations["billing/get-github-advanced-security-billing-org"];
-  };
   "/orgs/{org}/settings/billing/packages": {
     /**
      * Get GitHub Packages billing for an organization 
@@ -2282,7 +1899,7 @@ export interface paths {
   "/orgs/{org}/teams/{team_slug}": {
     /**
      * Get a team by name 
-     * @description Gets a team using the team's `slug`. GitHub generates the `slug` from the team `name`.
+     * @description Gets a team using the team's `slug`. To create the `slug`, GitHub replaces special characters in the `name` string, changes all words to lowercase, and replaces spaces with a `-` separator. For example, `"My TEam Näme"` would become `my-team-name`.
      * 
      * **Note:** You can also specify a team by `org_id` and `team_id` using the route `GET /organizations/{org_id}/team/{team_id}`.
      */
@@ -2471,9 +2088,9 @@ export interface paths {
     get: operations["teams/get-membership-for-user-in-org"];
     /**
      * Add or update team membership for a user 
-     * @description Team synchronization is available for organizations using GitHub Enterprise Cloud. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.
+     * @description Adds an organization member to a team. An authenticated organization owner or team maintainer can add organization members to a team.
      * 
-     * Adds an organization member to a team. An authenticated organization owner or team maintainer can add organization members to a team.
+     * Team synchronization is available for organizations using GitHub Enterprise Cloud. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.
      * 
      * **Note:** When you have team synchronization set up for a team with your organization's identity provider (IdP), you will see an error if you attempt to use the API for making changes to the team's membership. If you have access to manage group membership in your IdP, you can manage GitHub team membership through your identity provider, which automatically adds and removes team members in an organization. For more information, see "[Synchronizing teams between your identity provider and GitHub](https://docs.github.com/articles/synchronizing-teams-between-your-identity-provider-and-github/)."
      * 
@@ -2486,9 +2103,9 @@ export interface paths {
     put: operations["teams/add-or-update-membership-for-user-in-org"];
     /**
      * Remove team membership for a user 
-     * @description Team synchronization is available for organizations using GitHub Enterprise Cloud. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.
+     * @description To remove a membership between a user and a team, the authenticated user must have 'admin' permissions to the team or be an owner of the organization that the team is associated with. Removing team membership does not delete the user, it just removes their membership from the team.
      * 
-     * To remove a membership between a user and a team, the authenticated user must have 'admin' permissions to the team or be an owner of the organization that the team is associated with. Removing team membership does not delete the user, it just removes their membership from the team.
+     * Team synchronization is available for organizations using GitHub Enterprise Cloud. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.
      * 
      * **Note:** When you have team synchronization set up for a team with your organization's identity provider (IdP), you will see an error if you attempt to use the API for making changes to the team's membership. If you have access to manage group membership in your IdP, you can manage GitHub team membership through your identity provider, which automatically adds and removes team members in an organization. For more information, see "[Synchronizing teams between your identity provider and GitHub](https://docs.github.com/articles/synchronizing-teams-between-your-identity-provider-and-github/)."
      * 
@@ -2677,10 +2294,37 @@ export interface paths {
      */
     get: operations["rate-limit/get"];
   };
+  "/repos/{org}/{repo}/actions/required_workflows": {
+    /**
+     * List repository required workflows 
+     * @description Lists the required workflows in a repository. Anyone with read access to the repository can use this endpoint. If the repository is private you must use an access token with the `repo` scope. GitHub Apps must have the `actions:read` permission to use this endpoint. For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
+     */
+    get: operations["actions/list-repo-required-workflows"];
+  };
+  "/repos/{org}/{repo}/actions/required_workflows/{required_workflow_id_for_repo}": {
+    /**
+     * Get a required workflow entity for a repository 
+     * @description Gets a specific required workflow present in a repository. Anyone with read access to the repository can use this endpoint. If the repository is private you must use an access token with the `repo` scope. GitHub Apps must have the `actions:read` permission to use this endpoint. For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
+     */
+    get: operations["actions/get-repo-required-workflow"];
+  };
+  "/repos/{org}/{repo}/actions/required_workflows/{required_workflow_id_for_repo}/timing": {
+    /**
+     * Get required workflow usage 
+     * @description Gets the number of billable minutes used by a specific required workflow during the current billing cycle.
+     * 
+     * Billable minutes only apply to required workflows running in private repositories that use GitHub-hosted runners. Usage is listed for each GitHub-hosted runner operating system in milliseconds. Any job re-runs are also included in the usage. The usage does not include the multiplier for macOS and Windows runners and is not rounded up to the nearest whole minute. For more information, see "[Managing billing for GitHub Actions](https://docs.github.com/github/setting-up-and-managing-billing-and-payments-on-github/managing-billing-for-github-actions)."
+     * 
+     * Anyone with read access to the repository can use this endpoint. If the repository is private you must use an access token with the `repo` scope. GitHub Apps must have the `actions:read` permission to use this endpoint.
+     */
+    get: operations["actions/get-repo-required-workflow-usage"];
+  };
   "/repos/{owner}/{repo}": {
     /**
      * Get a repository 
      * @description The `parent` and `source` objects are present when the repository is a fork. `parent` is the repository this repository was forked from, `source` is the ultimate source for the network.
+     * 
+     * **Note:** In order to see the `security_and_analysis` block for a repository you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see "[Managing security managers in your organization](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization)."
      */
     get: operations["repos/get"];
     /**
@@ -2788,6 +2432,22 @@ export interface paths {
      */
     post: operations["actions/re-run-job-for-workflow-run"];
   };
+  "/repos/{owner}/{repo}/actions/oidc/customization/sub": {
+    /**
+     * Get the customization template for an OIDC subject claim for a repository 
+     * @description Gets the customization template for an OpenID Connect (OIDC) subject claim.
+     * You must authenticate using an access token with the `repo` scope to use this
+     * endpoint. GitHub Apps must have the `organization_administration:read` permission to use this endpoint.
+     */
+    get: operations["actions/get-custom-oidc-sub-claim-for-repo"];
+    /**
+     * Set the customization template for an OIDC subject claim for a repository 
+     * @description Sets the customization template and `opt-in` or `opt-out` flag for an OpenID Connect (OIDC) subject claim for a repository.
+     * You must authenticate using an access token with the `repo` scope to use this
+     * endpoint. GitHub Apps must have the `actions:write` permission to use this endpoint.
+     */
+    put: operations["actions/set-custom-oidc-sub-claim-for-repo"];
+  };
   "/repos/{owner}/{repo}/actions/permissions": {
     /**
      * Get GitHub Actions permissions for a repository 
@@ -2800,8 +2460,6 @@ export interface paths {
      * Set GitHub Actions permissions for a repository 
      * @description Sets the GitHub Actions permissions policy for enabling GitHub Actions and allowed actions and reusable workflows in the repository.
      * 
-     * If the repository belongs to an organization or enterprise that has set restrictive permissions at the organization or enterprise levels, such as `allowed_actions` to `selected` actions and reusable workflows, then you cannot override them for the repository.
-     * 
      * You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `administration` repository permission to use this API.
      */
     put: operations["actions/set-github-actions-permissions-repository"];
@@ -2810,7 +2468,8 @@ export interface paths {
     /**
      * Get the level of access for workflows outside of the repository 
      * @description Gets the level of access that workflows outside of the repository have to actions and reusable workflows in the repository.
-     * This endpoint only applies to internal repositories. For more information, see "[Managing GitHub Actions settings for a repository](https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#allowing-access-to-components-in-an-internal-repository)."
+     * This endpoint only applies to private repositories.
+     * For more information, see "[Allowing access to components in a private repository](https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#allowing-access-to-components-in-a-private-repository)."
      * 
      * You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the
      * repository `administration` permission to use this endpoint.
@@ -2819,7 +2478,8 @@ export interface paths {
     /**
      * Set the level of access for workflows outside of the repository 
      * @description Sets the level of access that workflows outside of the repository have to actions and reusable workflows in the repository.
-     * This endpoint only applies to internal repositories. For more information, see "[Managing GitHub Actions settings for a repository](https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#allowing-access-to-components-in-an-internal-repository)."
+     * This endpoint only applies to private repositories.
+     * For more information, see "[Allowing access to components in a private repository](https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#allowing-access-to-components-in-a-private-repository)".
      * 
      * You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the
      * repository `administration` permission to use this endpoint.
@@ -2837,10 +2497,6 @@ export interface paths {
     /**
      * Set allowed actions and reusable workflows for a repository 
      * @description Sets the actions and reusable workflows that are allowed in a repository. To use this endpoint, the repository permission policy for `allowed_actions` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for a repository](#set-github-actions-permissions-for-a-repository)."
-     * 
-     * If the repository belongs to an organization or enterprise that has `selected` actions and reusable workflows set at the organization or enterprise levels, then you cannot override any of the allowed actions and reusable workflows settings.
-     * 
-     * To use the `patterns_allowed` setting for private repositories, the repository must belong to an enterprise. If the repository does not belong to an enterprise, then the `patterns_allowed` setting only applies to public repositories.
      * 
      * You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `administration` repository permission to use this API.
      */
@@ -2865,6 +2521,15 @@ export interface paths {
      * You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the repository `administration` permission to use this API.
      */
     put: operations["actions/set-github-actions-default-workflow-permissions-repository"];
+  };
+  "/repos/{owner}/{repo}/actions/required_workflows/{required_workflow_id_for_repo}/runs": {
+    /**
+     * List workflow runs for a required workflow 
+     * @description List all workflow runs for a required workflow. You can use parameters to narrow the list of results. For more information about using parameters, see [Parameters](https://docs.github.com/rest/overview/resources-in-the-rest-api#parameters).
+     * 
+     * Anyone with read access to the repository can use this endpoint. If the repository is private you must use an access token with the `repo` scope. For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
+     */
+    get: operations["actions/list-required-workflow-runs"];
   };
   "/repos/{owner}/{repo}/actions/runners": {
     /**
@@ -3229,6 +2894,41 @@ export interface paths {
      */
     delete: operations["actions/delete-repo-secret"];
   };
+  "/repos/{owner}/{repo}/actions/variables": {
+    /**
+     * List repository variables 
+     * @description Lists all repository variables. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `actions_variables:read` repository permission to use this endpoint.
+     */
+    get: operations["actions/list-repo-variables"];
+    /**
+     * Create a repository variable 
+     * @description Creates a repository variable that you can reference in a GitHub Actions workflow.
+     * You must authenticate using an access token with the `repo` scope to use this endpoint.
+     * GitHub Apps must have the `actions_variables:write` repository permission to use this endpoint.
+     */
+    post: operations["actions/create-repo-variable"];
+  };
+  "/repos/{owner}/{repo}/actions/variables/{name}": {
+    /**
+     * Get a repository variable 
+     * @description Gets a specific variable in a repository. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `actions_variables:read` repository permission to use this endpoint.
+     */
+    get: operations["actions/get-repo-variable"];
+    /**
+     * Delete a repository variable 
+     * @description Deletes a repository variable using the variable name.
+     * You must authenticate using an access token with the `repo` scope to use this endpoint.
+     * GitHub Apps must have the `actions_variables:write` repository permission to use this endpoint.
+     */
+    delete: operations["actions/delete-repo-variable"];
+    /**
+     * Update a repository variable 
+     * @description Updates a repository variable that you can reference in a GitHub Actions workflow.
+     * You must authenticate using an access token with the `repo` scope to use this endpoint.
+     * GitHub Apps must have the `actions_variables:write` repository permission to use this endpoint.
+     */
+    patch: operations["actions/update-repo-variable"];
+  };
   "/repos/{owner}/{repo}/actions/workflows": {
     /**
      * List repository workflows 
@@ -3550,10 +3250,6 @@ export interface paths {
      * @description Protected branches are available in public repositories with GitHub Free and GitHub Free for organizations, and in public and private repositories with GitHub Pro, GitHub Team, GitHub Enterprise Cloud, and GitHub Enterprise Server. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.
      * 
      * Replaces the list of teams that have push access to this branch. This removes all teams that previously had push access and grants push access to the new list of teams. Team restrictions include child teams.
-     * 
-     * | Type    | Description                                                                                                                                |
-     * | ------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-     * | `array` | The teams that can have push access. Use the team's `slug`. **Note**: The list of users, apps, and teams in total is limited to 100 items. |
      */
     put: operations["repos/set-team-access-restrictions"];
     /**
@@ -3561,10 +3257,6 @@ export interface paths {
      * @description Protected branches are available in public repositories with GitHub Free and GitHub Free for organizations, and in public and private repositories with GitHub Pro, GitHub Team, GitHub Enterprise Cloud, and GitHub Enterprise Server. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.
      * 
      * Grants the specified teams push access for this branch. You can also give push access to child teams.
-     * 
-     * | Type    | Description                                                                                                                                |
-     * | ------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-     * | `array` | The teams that can have push access. Use the team's `slug`. **Note**: The list of users, apps, and teams in total is limited to 100 items. |
      */
     post: operations["repos/add-team-access-restrictions"];
     /**
@@ -3572,10 +3264,6 @@ export interface paths {
      * @description Protected branches are available in public repositories with GitHub Free and GitHub Free for organizations, and in public and private repositories with GitHub Pro, GitHub Team, GitHub Enterprise Cloud, and GitHub Enterprise Server. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.
      * 
      * Removes the ability of a team to push to this branch. You can also remove push access for child teams.
-     * 
-     * | Type    | Description                                                                                                                                         |
-     * | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-     * | `array` | Teams that should no longer have push access. Use the team's `slug`. **Note**: The list of users, apps, and teams in total is limited to 100 items. |
      */
     delete: operations["repos/remove-team-access-restrictions"];
   };
@@ -3748,9 +3436,6 @@ export interface paths {
     /**
      * Get a code scanning alert 
      * @description Gets a single code scanning alert. You must use an access token with the `security_events` scope to use this endpoint with private repos, the `public_repo` scope also grants permission to read security events on public repos only. GitHub Apps must have the `security_events` read permission to use this endpoint.
-     * 
-     * **Deprecation notice**:
-     * The instances field is deprecated and will, in future, not be included in the response for this endpoint. The example response reflects this change. The same information can now be retrieved via a GET request to the URL specified by `instances_url`.
      */
     get: operations["code-scanning/get-alert"];
     /**
@@ -3928,11 +3613,24 @@ export interface paths {
      * ```
      * gzip -c analysis-data.sarif | base64 -w0
      * ```
+     * <br>
+     * SARIF upload supports a maximum number of entries per the following data objects, and an analysis will be rejected if any of these objects is above its maximum value. For some objects, there are additional values over which the entries will be ignored while keeping the most important entries whenever applicable.
+     * To get the most out of your analysis when it includes data above the supported limits, try to optimize the analysis configuration. For example, for the CodeQL tool, identify and remove the most noisy queries.
      * 
-     * SARIF upload supports a maximum of 5000 results per analysis run. Any results over this limit are ignored and any SARIF uploads with more than 25,000 results are rejected. Typically, but not necessarily, a SARIF file contains a single run of a single tool. If a code scanning tool generates too many results, you should update the analysis configuration to run only the most important rules or queries.
      * 
-     * The `202 Accepted`, response includes an `id` value.
-     * You can use this ID to check the status of the upload by using this for the `/sarifs/{sarif_id}` endpoint.
+     * | **SARIF data**                   | **Maximum values** | **Additional limits**                                                            |
+     * |----------------------------------|:------------------:|----------------------------------------------------------------------------------|
+     * | Runs per file                    |         20         |                                                                                  |
+     * | Results per run                  |       25,000       | Only the top 5,000 results will be included, prioritized by severity.            |
+     * | Rules per run                    |       25,000       |                                                                                  |
+     * | Tool extensions per run          |        100         |                                                                                  |
+     * | Thread Flow Locations per result |       10,000       | Only the top 1,000 Thread Flow Locations will be included, using prioritization. |
+     * | Location per result	             |       1,000        | Only 100 locations will be included.                                             |
+     * | Tags per rule	                   |         20         | Only 10 tags will be included.                                                   |
+     * 
+     * 
+     * The `202 Accepted` response includes an `id` value.
+     * You can use this ID to check the status of the upload by using it in the `/sarifs/{sarif_id}` endpoint.
      * For more information, see "[Get information about a SARIF upload](/rest/reference/code-scanning#get-information-about-a-sarif-upload)."
      */
     post: operations["code-scanning/upload-sarif"];
@@ -4012,29 +3710,29 @@ export interface paths {
   "/repos/{owner}/{repo}/codespaces/secrets": {
     /**
      * List repository secrets 
-     * @description Lists all secrets available in a repository without revealing their encrypted values. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `codespaces_secrets` repository permission to use this endpoint.
+     * @description Lists all secrets available in a repository without revealing their encrypted values. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have write access to the `codespaces_secrets` repository permission to use this endpoint.
      */
     get: operations["codespaces/list-repo-secrets"];
   };
   "/repos/{owner}/{repo}/codespaces/secrets/public-key": {
     /**
      * Get a repository public key 
-     * @description Gets your public key, which you need to encrypt secrets. You need to encrypt a secret before you can create or update secrets. Anyone with read access to the repository can use this endpoint. If the repository is private you must use an access token with the `repo` scope. GitHub Apps must have the `codespaces_secrets` repository permission to use this endpoint.
+     * @description Gets your public key, which you need to encrypt secrets. You need to encrypt a secret before you can create or update secrets. Anyone with read access to the repository can use this endpoint. If the repository is private you must use an access token with the `repo` scope. GitHub Apps must have write access to the `codespaces_secrets` repository permission to use this endpoint.
      */
     get: operations["codespaces/get-repo-public-key"];
   };
   "/repos/{owner}/{repo}/codespaces/secrets/{secret_name}": {
     /**
      * Get a repository secret 
-     * @description Gets a single repository secret without revealing its encrypted value. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `codespaces_secrets` repository permission to use this endpoint.
+     * @description Gets a single repository secret without revealing its encrypted value. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have write access to the `codespaces_secrets` repository permission to use this endpoint.
      */
     get: operations["codespaces/get-repo-secret"];
     /**
      * Create or update a repository secret 
      * @description Creates or updates a repository secret with an encrypted value. Encrypt your secret using
      * [LibSodium](https://libsodium.gitbook.io/doc/bindings_for_other_languages). You must authenticate using an access
-     * token with the `repo` scope to use this endpoint. GitHub Apps must have the `codespaces_secrets` repository
-     * permission to use this endpoint.
+     * token with the `repo` scope to use this endpoint. GitHub Apps must have write access to the `codespaces_secrets`
+     * repository permission to use this endpoint.
      * 
      * #### Example of encrypting a secret using Node.js
      * 
@@ -4111,7 +3809,7 @@ export interface paths {
     put: operations["codespaces/create-or-update-repo-secret"];
     /**
      * Delete a repository secret 
-     * @description Deletes a secret in a repository using the secret name. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `codespaces_secrets` repository permission to use this endpoint.
+     * @description Deletes a secret in a repository using the secret name. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have write access to the `codespaces_secrets` repository permission to use this endpoint.
      */
     delete: operations["codespaces/delete-repo-secret"];
   };
@@ -4145,7 +3843,7 @@ export interface paths {
      * Add a repository collaborator 
      * @description This endpoint triggers [notifications](https://docs.github.com/github/managing-subscriptions-and-notifications-on-github/about-notifications). Creating content too quickly using this endpoint may result in secondary rate limiting. See "[Secondary rate limits](https://docs.github.com/rest/overview/resources-in-the-rest-api#secondary-rate-limits)" and "[Dealing with secondary rate limits](https://docs.github.com/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits)" for details.
      * 
-     * Adding an outside collaborator may be restricted by enterprise administrators. For more information, see "[Enforcing repository management policies in your enterprise](https://docs.github.com/enterprise-cloud@latest/admin/policies/enforcing-policies-for-your-enterprise/enforcing-repository-management-policies-in-your-enterprise#enforcing-a-policy-for-inviting-outside-collaborators-to-repositories)."
+     * Adding an outside collaborator may be restricted by enterprise administrators. For more information, see "[Enforcing repository management policies in your enterprise](https://docs.github.com/admin/policies/enforcing-policies-for-your-enterprise/enforcing-repository-management-policies-in-your-enterprise#enforcing-a-policy-for-inviting-outside-collaborators-to-repositories)."
      * 
      * For more information on permission levels, see "[Repository permission levels for an organization](https://docs.github.com/github/setting-up-and-managing-organizations-and-teams/repository-permission-levels-for-an-organization#permission-levels-for-repositories-owned-by-an-organization)". There are restrictions on which permissions can be granted to organization members when an organization base role is in place. In this case, the permission being given must be equal to or higher than the org base permission. Otherwise, the request will fail with:
      * 
@@ -4239,7 +3937,7 @@ export interface paths {
      * | `unsigned` | The object does not include a signature. |
      * | `unknown_signature_type` | A non-PGP signature was found in the commit. |
      * | `no_user` | No user was associated with the `committer` email address in the commit. |
-     * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on her/his account. |
+     * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on their account. |
      * | `bad_email` | The `committer` email address in the commit is not included in the identities of the PGP key that made the signature. |
      * | `unknown_key` | The key that made the signature has not been registered with any user's account. |
      * | `malformed_signature` | There was an error parsing the signature. |
@@ -4274,7 +3972,7 @@ export interface paths {
   "/repos/{owner}/{repo}/commits/{commit_sha}/pulls": {
     /**
      * List pull requests associated with a commit 
-     * @description Lists the merged pull request that introduced the commit to the repository. If the commit is not present in the default branch, additionally returns open pull requests associated with the commit. The results only include open pull requests.
+     * @description Lists the merged pull request that introduced the commit to the repository. If the commit is not present in the default branch, will only return open pull requests associated with the commit.
      */
     get: operations["repos/list-pull-requests-associated-with-commit"];
   };
@@ -4311,7 +4009,7 @@ export interface paths {
      * | `unsigned` | The object does not include a signature. |
      * | `unknown_signature_type` | A non-PGP signature was found in the commit. |
      * | `no_user` | No user was associated with the `committer` email address in the commit. |
-     * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on her/his account. |
+     * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on their account. |
      * | `bad_email` | The `committer` email address in the commit is not included in the identities of the PGP key that made the signature. |
      * | `unknown_key` | The key that made the signature has not been registered with any user's account. |
      * | `malformed_signature` | There was an error parsing the signature. |
@@ -4364,7 +4062,7 @@ export interface paths {
   "/repos/{owner}/{repo}/community/profile": {
     /**
      * Get community profile metrics 
-     * @description Returns all community profile metrics for a repository. The repository must be public, and cannot be a fork.
+     * @description Returns all community profile metrics for a repository. The repository cannot be a fork.
      * 
      * The returned metrics include an overall health score, the repository description, the presence of documentation, the
      * detected code of conduct, the detected license, and the presence of ISSUE\_TEMPLATE, PULL\_REQUEST\_TEMPLATE,
@@ -4383,21 +4081,26 @@ export interface paths {
   "/repos/{owner}/{repo}/compare/{basehead}": {
     /**
      * Compare two commits 
-     * @description The `basehead` param is comprised of two parts separated by triple dots: `{base}...{head}`. Both must be branch names in `repo`. To compare branches across other repositories in the same network as `repo`, use the format `<USERNAME>:branch`.
+     * @description Compares two commits against one another. You can compare branches in the same repository, or you can compare branches that exist in different repositories within the same repository network, including fork branches. For more information about how to view a repository's network, see "[Understanding connections between repositories](https://docs.github.com/repositories/viewing-activity-and-data-for-your-repository/understanding-connections-between-repositories)."
      * 
-     * The response from the API is equivalent to running the `git log base..head` command; however, commits are returned in chronological order. Pass the appropriate [media type](https://docs.github.com/rest/overview/media-types/#commits-commit-comparison-and-pull-requests) to fetch diff and patch formats.
+     * This endpoint is equivalent to running the `git log BASE..HEAD` command, but it returns commits in a different order. The `git log BASE..HEAD` command returns commits in reverse chronological order, whereas the API returns commits in chronological order. You can pass the appropriate [media type](https://docs.github.com/rest/overview/media-types/#commits-commit-comparison-and-pull-requests) to fetch diff and patch formats.
      * 
-     * The response also includes details on the files that were changed between the two commits. This includes the status of the change (for example, if a file was added, removed, modified, or renamed), and details of the change itself. For example, files with a `renamed` status have a `previous_filename` field showing the previous filename of the file, and files with a `modified` status have a `patch` field showing the changes made to the file.
+     * The API response includes details about the files that were changed between the two commits. This includes the status of the change (if a file was added, removed, modified, or renamed), and details of the change itself. For example, files with a `renamed` status have a `previous_filename` field showing the previous filename of the file, and files with a `modified` status have a `patch` field showing the changes made to the file.
+     * 
+     * When calling this endpoint without any paging parameter (`per_page` or `page`), the returned list is limited to 250 commits, and the last commit in the list is the most recent of the entire comparison.
      * 
      * **Working with large comparisons**
      * 
-     * To process a response with a large number of commits, you can use (`per_page` or `page`) to paginate the results. When using paging, the list of changed files is only returned with page 1, but includes all changed files for the entire comparison. For more information on working with pagination, see "[Traversing with pagination](/rest/guides/traversing-with-pagination)."
+     * To process a response with a large number of commits, use a query parameter (`per_page` or `page`) to paginate the results. When using pagination:
      * 
-     * When calling this API without any paging parameters (`per_page` or `page`), the returned list is limited to 250 commits and the last commit in the list is the most recent of the entire comparison. When a paging parameter is specified, the first commit in the returned list of each page is the earliest.
+     * - The list of changed files is only shown on the first page of results, but it includes all changed files for the entire comparison.
+     * - The results are returned in chronological order, but the last commit in the returned list may not be the most recent one in the entire set if there are more pages of results.
+     * 
+     * For more information on working with pagination, see "[Using pagination in the REST API](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api)."
      * 
      * **Signature verification object**
      * 
-     * The response will include a `verification` object that describes the result of verifying the commit's signature. The following fields are included in the `verification` object:
+     * The response will include a `verification` object that describes the result of verifying the commit's signature. The `verification` object includes the following fields:
      * 
      * | Name | Type | Description |
      * | ---- | ---- | ----------- |
@@ -4417,7 +4120,7 @@ export interface paths {
      * | `unsigned` | The object does not include a signature. |
      * | `unknown_signature_type` | A non-PGP signature was found in the commit. |
      * | `no_user` | No user was associated with the `committer` email address in the commit. |
-     * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on her/his account. |
+     * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on their account. |
      * | `bad_email` | The `committer` email address in the commit is not included in the identities of the PGP key that made the signature. |
      * | `unknown_key` | The key that made the signature has not been registered with any user's account. |
      * | `malformed_signature` | There was an error parsing the signature. |
@@ -4711,7 +4414,7 @@ export interface paths {
      * *   Create a new deployment that is active so that the system has a record of the current state, then delete the previously active deployment.
      * *   Mark the active deployment as inactive by adding any non-successful deployment status.
      * 
-     * For more information, see "[Create a deployment](https://docs.github.com/rest/reference/repos/#create-a-deployment)" and "[Create a deployment status](https://docs.github.com/rest/reference/repos#create-a-deployment-status)."
+     * For more information, see "[Create a deployment](https://docs.github.com/rest/deployments/deployments/#create-a-deployment)" and "[Create a deployment status](https://docs.github.com/rest/deployments/deployment-statuses#create-a-deployment-status)."
      */
     delete: operations["repos/delete-deployment"];
   };
@@ -4882,7 +4585,7 @@ export interface paths {
      * | `unsigned` | The object does not include a signature. |
      * | `unknown_signature_type` | A non-PGP signature was found in the commit. |
      * | `no_user` | No user was associated with the `committer` email address in the commit. |
-     * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on her/his account. |
+     * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on their account. |
      * | `bad_email` | The `committer` email address in the commit is not included in the identities of the PGP key that made the signature. |
      * | `unknown_key` | The key that made the signature has not been registered with any user's account. |
      * | `malformed_signature` | There was an error parsing the signature. |
@@ -4918,7 +4621,7 @@ export interface paths {
      * | `unsigned` | The object does not include a signature. |
      * | `unknown_signature_type` | A non-PGP signature was found in the commit. |
      * | `no_user` | No user was associated with the `committer` email address in the commit. |
-     * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on her/his account. |
+     * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on their account. |
      * | `bad_email` | The `committer` email address in the commit is not included in the identities of the PGP key that made the signature. |
      * | `unknown_key` | The key that made the signature has not been registered with any user's account. |
      * | `malformed_signature` | There was an error parsing the signature. |
@@ -4989,7 +4692,7 @@ export interface paths {
      * | `unsigned` | The object does not include a signature. |
      * | `unknown_signature_type` | A non-PGP signature was found in the commit. |
      * | `no_user` | No user was associated with the `committer` email address in the commit. |
-     * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on her/his account. |
+     * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on their account. |
      * | `bad_email` | The `committer` email address in the commit is not included in the identities of the PGP key that made the signature. |
      * | `unknown_key` | The key that made the signature has not been registered with any user's account. |
      * | `malformed_signature` | There was an error parsing the signature. |
@@ -5023,7 +4726,7 @@ export interface paths {
      * | `unsigned` | The object does not include a signature. |
      * | `unknown_signature_type` | A non-PGP signature was found in the commit. |
      * | `no_user` | No user was associated with the `committer` email address in the commit. |
-     * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on her/his account. |
+     * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on their account. |
      * | `bad_email` | The `committer` email address in the commit is not included in the identities of the PGP key that made the signature. |
      * | `unknown_key` | The key that made the signature has not been registered with any user's account. |
      * | `malformed_signature` | There was an error parsing the signature. |
@@ -5154,11 +4857,11 @@ export interface paths {
      * 
      * If there are problems, you will see one of these in the `status` field:
      * 
-     * *   `auth_failed` - the import requires authentication in order to connect to the original repository. To update authentication for the import, please see the [Update an import](https://docs.github.com/rest/reference/migrations#update-an-import) section.
+     * *   `auth_failed` - the import requires authentication in order to connect to the original repository. To update authentication for the import, please see the [Update an import](https://docs.github.com/rest/migrations/source-imports#update-an-import) section.
      * *   `error` - the import encountered an error. The import progress response will include the `failed_step` and an error message. Contact [GitHub Support](https://support.github.com/contact?tags=dotcom-rest-api) for more information.
-     * *   `detection_needs_auth` - the importer requires authentication for the originating repository to continue detection. To update authentication for the import, please see the [Update an import](https://docs.github.com/rest/reference/migrations#update-an-import) section.
-     * *   `detection_found_nothing` - the importer didn't recognize any source control at the URL. To resolve, [Cancel the import](https://docs.github.com/rest/reference/migrations#cancel-an-import) and [retry](https://docs.github.com/rest/reference/migrations#start-an-import) with the correct URL.
-     * *   `detection_found_multiple` - the importer found several projects or repositories at the provided URL. When this is the case, the Import Progress response will also include a `project_choices` field with the possible project choices as values. To update project choice, please see the [Update an import](https://docs.github.com/rest/reference/migrations#update-an-import) section.
+     * *   `detection_needs_auth` - the importer requires authentication for the originating repository to continue detection. To update authentication for the import, please see the [Update an import](https://docs.github.com/rest/migrations/source-imports#update-an-import) section.
+     * *   `detection_found_nothing` - the importer didn't recognize any source control at the URL. To resolve, [Cancel the import](https://docs.github.com/rest/migrations/source-imports#cancel-an-import) and [retry](https://docs.github.com/rest/migrations/source-imports#start-an-import) with the correct URL.
+     * *   `detection_found_multiple` - the importer found several projects or repositories at the provided URL. When this is the case, the Import Progress response will also include a `project_choices` field with the possible project choices as values. To update project choice, please see the [Update an import](https://docs.github.com/rest/migrations/source-imports#update-an-import) section.
      * 
      * **The project_choices field**
      * 
@@ -5176,7 +4879,7 @@ export interface paths {
     get: operations["migrations/get-import-status"];
     /**
      * Start an import 
-     * @description Start a source import to a GitHub repository using GitHub Importer.
+     * @description Start a source import to a GitHub repository using GitHub Importer. Importing into a GitHub repository with GitHub Actions enabled is not supported and will return a status `422 Unprocessable Entity` response.
      */
     put: operations["migrations/start-import"];
     /**
@@ -5200,7 +4903,7 @@ export interface paths {
      * Get commit authors 
      * @description Each type of source control system represents authors in a different way. For example, a Git commit author has a display name and an email address, but a Subversion commit author just has a username. The GitHub Importer will make the author information valid, but the author might not be correct. For example, it will change the bare Subversion username `hubot` into something like `hubot <hubot@12341234-abab-fefe-8787-fedcba987654>`.
      * 
-     * This endpoint and the [Map a commit author](https://docs.github.com/rest/reference/migrations#map-a-commit-author) endpoint allow you to provide correct Git author information.
+     * This endpoint and the [Map a commit author](https://docs.github.com/rest/migrations/source-imports#map-a-commit-author) endpoint allow you to provide correct Git author information.
      */
     get: operations["migrations/get-commit-authors"];
   };
@@ -5221,7 +4924,7 @@ export interface paths {
   "/repos/{owner}/{repo}/import/lfs": {
     /**
      * Update Git LFS preference 
-     * @description You can import repositories from Subversion, Mercurial, and TFS that include files larger than 100MB. This ability is powered by [Git LFS](https://git-lfs.github.com). You can learn more about our LFS feature and working with large files [on our help site](https://docs.github.com/articles/versioning-large-files/).
+     * @description You can import repositories from Subversion, Mercurial, and TFS that include files larger than 100MB. This ability is powered by [Git LFS](https://git-lfs.com). You can learn more about our LFS feature and working with large files [on our help site](https://docs.github.com/repositories/working-with-files/managing-large-files).
      */
     patch: operations["migrations/set-lfs-preference"];
   };
@@ -5286,16 +4989,27 @@ export interface paths {
   "/repos/{owner}/{repo}/issues/comments": {
     /**
      * List issue comments for a repository 
-     * @description By default, Issue Comments are ordered by ascending ID.
+     * @description You can use the REST API to list comments on issues and pull requests for a repository. Every pull request is an issue, but not every issue is a pull request.
+     * 
+     * By default, issue comments are ordered by ascending ID.
      */
     get: operations["issues/list-comments-for-repo"];
   };
   "/repos/{owner}/{repo}/issues/comments/{comment_id}": {
-    /** Get an issue comment */
+    /**
+     * Get an issue comment 
+     * @description You can use the REST API to get comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.
+     */
     get: operations["issues/get-comment"];
-    /** Delete an issue comment */
+    /**
+     * Delete an issue comment 
+     * @description You can use the REST API to delete comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.
+     */
     delete: operations["issues/delete-comment"];
-    /** Update an issue comment */
+    /**
+     * Update an issue comment 
+     * @description You can use the REST API to update comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.
+     */
     patch: operations["issues/update-comment"];
   };
   "/repos/{owner}/{repo}/issues/comments/{comment_id}/reactions": {
@@ -5361,15 +5075,35 @@ export interface paths {
      */
     delete: operations["issues/remove-assignees"];
   };
+  "/repos/{owner}/{repo}/issues/{issue_number}/assignees/{assignee}": {
+    /**
+     * Check if a user can be assigned to a issue 
+     * @description Checks if a user has permission to be assigned to a specific issue.
+     * 
+     * If the `assignee` can be assigned to this issue, a `204` status code with no content is returned.
+     * 
+     * Otherwise a `404` status code is returned.
+     */
+    get: operations["issues/check-user-can-be-assigned-to-issue"];
+  };
   "/repos/{owner}/{repo}/issues/{issue_number}/comments": {
     /**
      * List issue comments 
-     * @description Issue Comments are ordered by ascending ID.
+     * @description You can use the REST API to list comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.
+     * 
+     * Issue comments are ordered by ascending ID.
      */
     get: operations["issues/list-comments"];
     /**
      * Create an issue comment 
-     * @description This endpoint triggers [notifications](https://docs.github.com/github/managing-subscriptions-and-notifications-on-github/about-notifications). Creating content too quickly using this endpoint may result in secondary rate limiting. See "[Secondary rate limits](https://docs.github.com/rest/overview/resources-in-the-rest-api#secondary-rate-limits)" and "[Dealing with secondary rate limits](https://docs.github.com/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits)" for details.
+     * @description 
+     * You can use the REST API to create comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.
+     * 
+     * This endpoint triggers [notifications](https://docs.github.com/github/managing-subscriptions-and-notifications-on-github/about-notifications).
+     * Creating content too quickly using this endpoint may result in secondary rate limiting.
+     * See "[Secondary rate limits](https://docs.github.com/rest/overview/resources-in-the-rest-api#secondary-rate-limits)"
+     * and "[Dealing with secondary rate limits](https://docs.github.com/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits)"
+     * for details.
      */
     post: operations["issues/create-comment"];
   };
@@ -5543,16 +5277,22 @@ export interface paths {
     /**
      * Update information about a GitHub Pages site 
      * @description Updates information for a GitHub Pages site. For more information, see "[About GitHub Pages](/github/working-with-github-pages/about-github-pages).
+     * 
+     * To use this endpoint, you must be a repository administrator, maintainer, or have the 'manage GitHub Pages settings' permission. A token with the `repo` scope or Pages write permission is required. GitHub Apps must have the `administration:write` and `pages:write` permissions.
      */
     put: operations["repos/update-information-about-pages-site"];
     /**
      * Create a GitHub Pages site 
-     * @description Configures a GitHub Pages site. For more information, see "[About GitHub Pages](/github/working-with-github-pages/about-github-pages)." You must be an admin of the repository in order to use this operation.
+     * @description Configures a GitHub Pages site. For more information, see "[About GitHub Pages](/github/working-with-github-pages/about-github-pages)."
+     * 
+     * To use this endpoint, you must be a repository administrator, maintainer, or have the 'manage GitHub Pages settings' permission. A token with the `repo` scope or Pages write permission is required. GitHub Apps must have the `administration:write` and `pages:write` permissions.
      */
     post: operations["repos/create-pages-site"];
     /**
      * Delete a GitHub Pages site 
-     * @description Deletes a GitHub Pages site. You must be an admin of the repository in order to use this operation.
+     * @description Deletes a GitHub Pages site. For more information, see "[About GitHub Pages](/github/working-with-github-pages/about-github-pages).
+     * 
+     * To use this endpoint, you must be a repository administrator, maintainer, or have the 'manage GitHub Pages settings' permission. A token with the `repo` scope or Pages write permission is required. GitHub Apps must have the `administration:write` and `pages:write` permissions.
      */
     delete: operations["repos/delete-pages-site"];
   };
@@ -5591,7 +5331,7 @@ export interface paths {
      * 
      * The first request to this endpoint returns a `202 Accepted` status and starts an asynchronous background task to get the results for the domain. After the background task completes, subsequent requests to this endpoint return a `200 OK` status with the health check results in the response.
      * 
-     * Users must have admin or owner permissions. GitHub Apps must have the `pages:write` and `administration:write` permission to use this endpoint.
+     * To use this endpoint, you must be a repository administrator, maintainer, or have the 'manage GitHub Pages settings' permission. A token with the `repo` scope or Pages write permission is required. GitHub Apps must have the `administrative:write` and `pages:write` permissions.
      */
     get: operations["repos/get-pages-health-check"];
   };
@@ -5923,7 +5663,7 @@ export interface paths {
     /**
      * Upload a release asset 
      * @description This endpoint makes use of [a Hypermedia relation](https://docs.github.com/rest/overview/resources-in-the-rest-api#hypermedia) to determine which URL to access. The endpoint you call to upload release assets is specific to your release. Use the `upload_url` returned in
-     * the response of the [Create a release endpoint](https://docs.github.com/rest/reference/repos#create-a-release) to upload a release asset.
+     * the response of the [Create a release endpoint](https://docs.github.com/rest/releases/releases#create-a-release) to upload a release asset.
      * 
      * You need to use an HTTP client which supports [SNI](http://en.wikipedia.org/wiki/Server_Name_Indication) to make calls to this endpoint.
      * 
@@ -5939,6 +5679,7 @@ export interface paths {
      * **Notes:**
      * *   GitHub renames asset filenames that have special characters, non-alphanumeric characters, and leading or trailing periods. The "[List assets for a release](https://docs.github.com/rest/reference/repos#list-assets-for-a-release)"
      * endpoint lists the renamed filenames. For more information and help, contact [GitHub Support](https://support.github.com/contact?tags=dotcom-rest-api).
+     * *   To find the `release_id` query the [`GET /repos/{owner}/{repo}/releases/latest` endpoint](https://docs.github.com/rest/releases/releases#get-the-latest-release). 
      * *   If you upload an asset with the same filename as another uploaded asset, you'll receive an error and must delete the old file before you can re-upload the new asset.
      */
     post: operations["repos/upload-release-asset"];
@@ -6125,7 +5866,7 @@ export interface paths {
     /**
      * Download a repository archive (tar) 
      * @description Gets a redirect URL to download a tar archive for a repository. If you omit `:ref`, the repository’s default branch (usually
-     * `master`) will be used. Please make sure your HTTP framework is configured to follow redirects or you will need to use
+     * `main`) will be used. Please make sure your HTTP framework is configured to follow redirects or you will need to use
      * the `Location` header to make a second `GET` request.
      * **Note**: For private repositories, these links are temporary and expire after five minutes.
      */
@@ -6189,7 +5930,9 @@ export interface paths {
     put: operations["repos/enable-vulnerability-alerts"];
     /**
      * Disable vulnerability alerts 
-     * @description Disables dependency alerts and the dependency graph for a repository. The authenticated user must have admin access to the repository. For more information, see "[About security alerts for vulnerable dependencies](https://docs.github.com/articles/about-security-alerts-for-vulnerable-dependencies)".
+     * @description Disables dependency alerts and the dependency graph for a repository.
+     * The authenticated user must have admin access to the repository. For more information,
+     * see "[About security alerts for vulnerable dependencies](https://docs.github.com/articles/about-security-alerts-for-vulnerable-dependencies)".
      */
     delete: operations["repos/disable-vulnerability-alerts"];
   };
@@ -6197,7 +5940,7 @@ export interface paths {
     /**
      * Download a repository archive (zip) 
      * @description Gets a redirect URL to download a zip archive for a repository. If you omit `:ref`, the repository’s default branch (usually
-     * `master`) will be used. Please make sure your HTTP framework is configured to follow redirects or you will need to use
+     * `main`) will be used. Please make sure your HTTP framework is configured to follow redirects or you will need to use
      * the `Location` header to make a second `GET` request.
      * 
      * **Note**: For private repositories, these links are temporary and expire after five minutes. If the repository is empty, you will receive a 404 when you follow the redirect.
@@ -6335,6 +6078,41 @@ export interface paths {
      */
     delete: operations["actions/delete-environment-secret"];
   };
+  "/repositories/{repository_id}/environments/{environment_name}/variables": {
+    /**
+     * List environment variables 
+     * @description Lists all environment variables. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `environments:read` repository permission to use this endpoint.
+     */
+    get: operations["actions/list-environment-variables"];
+    /**
+     * Create an environment variable 
+     * @description Create an environment variable that you can reference in a GitHub Actions workflow.
+     * You must authenticate using an access token with the `repo` scope to use this endpoint.
+     * GitHub Apps must have the `environment:write` repository permission to use this endpoint.
+     */
+    post: operations["actions/create-environment-variable"];
+  };
+  "/repositories/{repository_id}/environments/{environment_name}/variables/{name}": {
+    /**
+     * Get an environment variable 
+     * @description Gets a specific variable in an environment. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `environments:read` repository permission to use this endpoint.
+     */
+    get: operations["actions/get-environment-variable"];
+    /**
+     * Delete an environment variable 
+     * @description Deletes an environment variable using the variable name.
+     * You must authenticate using an access token with the `repo` scope to use this endpoint.
+     * GitHub Apps must have the `environment:write` repository permission to use this endpoint.
+     */
+    delete: operations["actions/delete-environment-variable"];
+    /**
+     * Update an environment variable 
+     * @description Updates an environment variable that you can reference in a GitHub Actions workflow.
+     * You must authenticate using an access token with the `repo` scope to use this endpoint.
+     * GitHub Apps must have the `environment:write` repository permission to use this endpoint.
+     */
+    patch: operations["actions/update-environment-variable"];
+  };
   "/search/code": {
     /**
      * Search code 
@@ -6362,7 +6140,7 @@ export interface paths {
   "/search/commits": {
     /**
      * Search commits 
-     * @description Find commits via various criteria on the default branch (usually `master`). This method returns up to 100 results [per page](https://docs.github.com/rest/overview/resources-in-the-rest-api#pagination).
+     * @description Find commits via various criteria on the default branch (usually `main`). This method returns up to 100 results [per page](https://docs.github.com/rest/overview/resources-in-the-rest-api#pagination).
      * 
      * When searching for commits, you can get text match metadata for the **message** field when you provide the `text-match` media type. For more details about how to receive highlighted search results, see [Text match
      * metadata](https://docs.github.com/rest/reference/search#text-match-metadata).
@@ -6887,7 +6665,7 @@ export interface paths {
      * 
      * You must authenticate using an access token with the `codespace` or `codespace:secrets` scope to use this endpoint. User must also have Codespaces access to use this endpoint.
      * 
-     * GitHub Apps must have read access to the `codespaces_user_secrets` user permission and `codespaces_secrets` repository permission on all referenced repositories to use this endpoint.
+     * GitHub Apps must have write access to the `codespaces_user_secrets` user permission and `codespaces_secrets` repository permission on all referenced repositories to use this endpoint.
      * 
      * #### Example encrypting a secret using Node.js
      * 
@@ -7044,6 +6822,8 @@ export interface paths {
      * Export a codespace for the authenticated user 
      * @description Triggers an export of the specified codespace and returns a URL and ID where the status of the export can be monitored.
      * 
+     * If changes cannot be pushed to the codespace's repository, they will be pushed to a new or previously-existing fork instead.
+     * 
      * You must authenticate using a personal access token with the `codespace` scope to use this endpoint.
      * 
      * GitHub Apps must have write access to the `codespaces_lifecycle_admin` repository permission to use this endpoint.
@@ -7071,6 +6851,21 @@ export interface paths {
      * GitHub Apps must have read access to the `codespaces_metadata` repository permission to use this endpoint.
      */
     get: operations["codespaces/codespace-machines-for-authenticated-user"];
+  };
+  "/user/codespaces/{codespace_name}/publish": {
+    /**
+     * Create a repository from an unpublished codespace 
+     * @description Publishes an unpublished codespace, creating a new repository and assigning it to the codespace.
+     * 
+     * The codespace's token is granted write permissions to the repository, allowing the user to push their changes.
+     * 
+     * This will fail for a codespace that is already published, meaning it has an associated repository.
+     * 
+     * You must authenticate using a personal access token with the `codespace` scope to use this endpoint.
+     * 
+     * GitHub Apps must have write access to the `codespaces` repository permission to use this endpoint.
+     */
+    post: operations["codespaces/publish-for-authenticated-user"];
   };
   "/user/codespaces/{codespace_name}/start": {
     /**
@@ -7313,7 +7108,7 @@ export interface paths {
      * *   `exported` - the migration finished successfully.
      * *   `failed` - the migration failed.
      * 
-     * Once the migration has been `exported` you can [download the migration archive](https://docs.github.com/rest/reference/migrations#download-a-user-migration-archive).
+     * Once the migration has been `exported` you can [download the migration archive](https://docs.github.com/rest/migrations/users#download-a-user-migration-archive).
      */
     get: operations["migrations/get-status-for-authenticated-user"];
   };
@@ -7345,14 +7140,14 @@ export interface paths {
     get: operations["migrations/get-archive-for-authenticated-user"];
     /**
      * Delete a user migration archive 
-     * @description Deletes a previous migration archive. Downloadable migration archives are automatically deleted after seven days. Migration metadata, which is returned in the [List user migrations](https://docs.github.com/rest/reference/migrations#list-user-migrations) and [Get a user migration status](https://docs.github.com/rest/reference/migrations#get-a-user-migration-status) endpoints, will continue to be available even after an archive is deleted.
+     * @description Deletes a previous migration archive. Downloadable migration archives are automatically deleted after seven days. Migration metadata, which is returned in the [List user migrations](https://docs.github.com/rest/migrations/users#list-user-migrations) and [Get a user migration status](https://docs.github.com/rest/migrations/users#get-a-user-migration-status) endpoints, will continue to be available even after an archive is deleted.
      */
     delete: operations["migrations/delete-archive-for-authenticated-user"];
   };
   "/user/migrations/{migration_id}/repos/{repo_name}/lock": {
     /**
      * Unlock a user repository 
-     * @description Unlocks a repository. You can lock repositories when you [start a user migration](https://docs.github.com/rest/reference/migrations#start-a-user-migration). Once the migration is complete you can unlock each repository to begin using it again or [delete the repository](https://docs.github.com/rest/reference/repos#delete-a-repository) if you no longer need the source data. Returns a status of `404 Not Found` if the repository is not locked.
+     * @description Unlocks a repository. You can lock repositories when you [start a user migration](https://docs.github.com/rest/migrations/users#start-a-user-migration). Once the migration is complete you can unlock each repository to begin using it again or [delete the repository](https://docs.github.com/rest/repos/repos#delete-a-repository) if you no longer need the source data. Returns a status of `404 Not Found` if the repository is not locked.
      */
     delete: operations["migrations/unlock-repo-for-authenticated-user"];
   };
@@ -7379,8 +7174,7 @@ export interface paths {
      * List packages for the authenticated user's namespace 
      * @description Lists packages owned by the authenticated user within the user's namespace.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-     * If `package_type` is not `container`, your token must also include the `repo` scope.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     get: operations["packages/list-packages-for-authenticated-user"];
   };
@@ -7389,16 +7183,15 @@ export interface paths {
      * Get a package for the authenticated user 
      * @description Gets a specific package for a package owned by the authenticated user.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-     * If `package_type` is not `container`, your token must also include the `repo` scope.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     get: operations["packages/get-package-for-authenticated-user"];
     /**
      * Delete a package for the authenticated user 
      * @description Deletes a package owned by the authenticated user. You cannot delete a public package if any version of the package has more than 5,000 downloads. In this scenario, contact GitHub support for further assistance.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` and `packages:delete` scopes.
-     * If `package_type` is not `container`, your token must also include the `repo` scope.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` and `delete:packages` scopes.
+     * If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     delete: operations["packages/delete-package-for-authenticated-user"];
   };
@@ -7411,7 +7204,7 @@ export interface paths {
      *   - The package was deleted within the last 30 days.
      *   - The same package namespace and version is still available and not reused for a new package. If the same package namespace is not available, you will not be able to restore your package. In this scenario, to restore the deleted package, you must delete the new package that uses the deleted package's namespace first.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` and `packages:write` scopes. If `package_type` is not `container`, your token must also include the `repo` scope.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` and `write:packages` scopes. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     post: operations["packages/restore-package-for-authenticated-user"];
   };
@@ -7420,8 +7213,7 @@ export interface paths {
      * List package versions for a package owned by the authenticated user 
      * @description Lists package versions for a package owned by the authenticated user.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-     * If `package_type` is not `container`, your token must also include the `repo` scope.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     get: operations["packages/get-all-package-versions-for-package-owned-by-authenticated-user"];
   };
@@ -7430,16 +7222,15 @@ export interface paths {
      * Get a package version for the authenticated user 
      * @description Gets a specific package version for a package owned by the authenticated user.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-     * If `package_type` is not `container`, your token must also include the `repo` scope.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     get: operations["packages/get-package-version-for-authenticated-user"];
     /**
      * Delete a package version for the authenticated user 
      * @description Deletes a specific package version for a package owned by the authenticated user.  If the package is public and the package version has more than 5,000 downloads, you cannot delete the package version. In this scenario, contact GitHub support for further assistance.
      * 
-     * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `packages:read` and `packages:delete` scopes.
-     * If `package_type` is not `container`, your token must also include the `repo` scope.
+     * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `read:packages` and `delete:packages` scopes.
+     * If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     delete: operations["packages/delete-package-version-for-authenticated-user"];
   };
@@ -7452,7 +7243,7 @@ export interface paths {
      *   - The package was deleted within the last 30 days.
      *   - The same package namespace and version is still available and not reused for a new package. If the same package namespace is not available, you will not be able to restore your package. In this scenario, to restore the deleted package, you must delete the new package that uses the deleted package's namespace first.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` and `packages:write` scopes. If `package_type` is not `container`, your token must also include the `repo` scope.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` and `write:packages` scopes. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     post: operations["packages/restore-package-version-for-authenticated-user"];
   };
@@ -7503,6 +7294,23 @@ export interface paths {
     delete: operations["repos/decline-invitation-for-authenticated-user"];
     /** Accept a repository invitation */
     patch: operations["repos/accept-invitation-for-authenticated-user"];
+  };
+  "/user/social_accounts": {
+    /**
+     * List social accounts for the authenticated user 
+     * @description Lists all of your social accounts.
+     */
+    get: operations["users/list-social-accounts-for-authenticated-user"];
+    /**
+     * Add social accounts for the authenticated user 
+     * @description Add one or more social accounts to the authenticated user's profile. This endpoint is accessible with the `user` scope.
+     */
+    post: operations["users/add-social-account-for-authenticated-user"];
+    /**
+     * Delete social accounts for the authenticated user 
+     * @description Deletes one or more social accounts from the authenticated user's profile. This endpoint is accessible with the `user` scope.
+     */
+    delete: operations["users/delete-social-account-for-authenticated-user"];
   };
   "/user/ssh_signing_keys": {
     /**
@@ -7678,8 +7486,7 @@ export interface paths {
      * List packages for a user 
      * @description Lists all packages in a user's namespace for which the requesting user has access.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-     * If `package_type` is not `container`, your token must also include the `repo` scope.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     get: operations["packages/list-packages-for-user"];
   };
@@ -7688,17 +7495,16 @@ export interface paths {
      * Get a package for a user 
      * @description Gets a specific package metadata for a public package owned by a user.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-     * If `package_type` is not `container`, your token must also include the `repo` scope.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     get: operations["packages/get-package-for-user"];
     /**
      * Delete a package for a user 
      * @description Deletes an entire package for a user. You cannot delete a public package if any version of the package has more than 5,000 downloads. In this scenario, contact GitHub support for further assistance.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` and `packages:delete` scopes. In addition:
-     * - If `package_type` is not `container`, your token must also include the `repo` scope.
-     * - If `package_type` is `container`, you must also have admin permissions to the container you want to delete.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` and `delete:packages` scopes. In addition:
+     * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+     * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package you want to delete. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
      */
     delete: operations["packages/delete-package-for-user"];
   };
@@ -7711,9 +7517,9 @@ export interface paths {
      *   - The package was deleted within the last 30 days.
      *   - The same package namespace and version is still available and not reused for a new package. If the same package namespace is not available, you will not be able to restore your package. In this scenario, to restore the deleted package, you must delete the new package that uses the deleted package's namespace first.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` and `packages:write` scopes. In addition:
-     * - If `package_type` is not `container`, your token must also include the `repo` scope.
-     * - If `package_type` is `container`, you must also have admin permissions to the container that you want to restore.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` and `write:packages` scopes. In addition:
+     * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+     * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package you want to restore. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
      */
     post: operations["packages/restore-package-for-user"];
   };
@@ -7722,8 +7528,7 @@ export interface paths {
      * List package versions for a package owned by a user 
      * @description Lists package versions for a public package owned by a specified user.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-     * If `package_type` is not `container`, your token must also include the `repo` scope.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     get: operations["packages/get-all-package-versions-for-package-owned-by-user"];
   };
@@ -7732,17 +7537,16 @@ export interface paths {
      * Get a package version for a user 
      * @description Gets a specific package version for a public package owned by a specified user.
      * 
-     * At this time, to use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-     * If `package_type` is not `container`, your token must also include the `repo` scope.
+     * At this time, to use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
      */
     get: operations["packages/get-package-version-for-user"];
     /**
      * Delete package version for a user 
      * @description Deletes a specific package version for a user. If the package is public and the package version has more than 5,000 downloads, you cannot delete the package version. In this scenario, contact GitHub support for further assistance.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` and `packages:delete` scopes. In addition:
-     * - If `package_type` is not `container`, your token must also include the `repo` scope.
-     * - If `package_type` is `container`, you must also have admin permissions to the container you want to delete.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` and `delete:packages` scopes. In addition:
+     * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+     * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package whose version you want to delete. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
      */
     delete: operations["packages/delete-package-version-for-user"];
   };
@@ -7755,9 +7559,9 @@ export interface paths {
      *   - The package was deleted within the last 30 days.
      *   - The same package namespace and version is still available and not reused for a new package. If the same package namespace is not available, you will not be able to restore your package. In this scenario, to restore the deleted package, you must delete the new package that uses the deleted package's namespace first.
      * 
-     * To use this endpoint, you must authenticate using an access token with the `packages:read` and `packages:write` scopes. In addition:
-     * - If `package_type` is not `container`, your token must also include the `repo` scope.
-     * - If `package_type` is `container`, you must also have admin permissions to the container that you want to restore.
+     * To use this endpoint, you must authenticate using an access token with the `read:packages` and `write:packages` scopes. In addition:
+     * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+     * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package whose version you want to restore. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
      */
     post: operations["packages/restore-package-version-for-user"];
   };
@@ -7816,6 +7620,13 @@ export interface paths {
      */
     get: operations["billing/get-shared-storage-billing-user"];
   };
+  "/users/{username}/social_accounts": {
+    /**
+     * List social accounts for a user 
+     * @description Lists social media accounts for a user. This endpoint is accessible by anyone.
+     */
+    get: operations["users/list-social-accounts-for-user"];
+  };
   "/users/{username}/ssh_signing_keys": {
     /**
      * List SSH signing keys for a user 
@@ -7838,6 +7649,13 @@ export interface paths {
      * @description Lists repositories a user is watching.
      */
     get: operations["activity/list-repos-watched-by-user"];
+  };
+  "/versions": {
+    /**
+     * Get all API versions 
+     * @description Get all supported GitHub API versions.
+     */
+    get: operations["meta/get-all-versions"];
   };
   "/zen": {
     /**
@@ -8409,6 +8227,26 @@ export interface components {
       avatar_url: string;
     };
     /**
+     * Integration Installation Request 
+     * @description Request to install an integration on a target
+     */
+    "integration-installation-request": {
+      /**
+       * @description Unique identifier of the request installation. 
+       * @example 42
+       */
+      id: number;
+      /** @example MDExOkludGVncmF0aW9uMQ== */
+      node_id?: string;
+      account: components["schemas"]["simple-user"] | components["schemas"]["enterprise"];
+      requester: components["schemas"]["simple-user"];
+      /**
+       * Format: date-time 
+       * @example 2022-07-08T16:18:44-04:00
+       */
+      created_at: string;
+    };
+    /**
      * App Permissions 
      * @description The permissions granted to the user-to-server access token. 
      * @example {
@@ -8535,7 +8373,7 @@ export interface components {
        */
       organization_administration?: "read" | "write";
       /**
-       * @description The level of permission to grant the access token for custom roles management. This property is in beta and is subject to change. 
+       * @description The level of permission to grant the access token for custom repository roles management. This property is in beta and is subject to change. 
        * @enum {string}
        */
       organization_custom_roles?: "read" | "write";
@@ -9319,298 +9157,96 @@ export interface components {
       /** Format: uri */
       html_url: string | null;
     };
-    /**
-     * Server Statistics Proxy Endpoint 
-     * @description Response of S4 Proxy endpoint that provides GHES statistics
-     */
-    "server-statistics": ({
-        server_id?: string;
-        collection_date?: string;
-        schema_version?: string;
-        ghes_version?: string;
-        host_name?: string;
-        github_connect?: {
-          features_enabled?: (string)[];
-        };
-        ghe_stats?: {
-          comments?: {
-            total_commit_comments?: number;
-            total_gist_comments?: number;
-            total_issue_comments?: number;
-            total_pull_request_comments?: number;
-          };
-          gists?: {
-            total_gists?: number;
-            private_gists?: number;
-            public_gists?: number;
-          };
-          hooks?: {
-            total_hooks?: number;
-            active_hooks?: number;
-            inactive_hooks?: number;
-          };
-          issues?: {
-            total_issues?: number;
-            open_issues?: number;
-            closed_issues?: number;
-          };
-          milestones?: {
-            total_milestones?: number;
-            open_milestones?: number;
-            closed_milestones?: number;
-          };
-          orgs?: {
-            total_orgs?: number;
-            disabled_orgs?: number;
-            total_teams?: number;
-            total_team_members?: number;
-          };
-          pages?: {
-            total_pages?: number;
-          };
-          pulls?: {
-            total_pulls?: number;
-            merged_pulls?: number;
-            mergeable_pulls?: number;
-            unmergeable_pulls?: number;
-          };
-          repos?: {
-            total_repos?: number;
-            root_repos?: number;
-            fork_repos?: number;
-            org_repos?: number;
-            total_pushes?: number;
-            total_wikis?: number;
-          };
-          users?: {
-            total_users?: number;
-            admin_users?: number;
-            suspended_users?: number;
-          };
-        };
-        dormant_users?: {
-          total_dormant_users?: number;
-          dormancy_threshold?: string;
-        };
-      })[];
-    "actions-cache-usage-org-enterprise": {
-      /** @description The count of active caches across all repositories of an enterprise or an organization. */
-      total_active_caches_count: number;
-      /** @description The total size in bytes of all active cache items across all repositories of an enterprise or an organization. */
-      total_active_caches_size_in_bytes: number;
-    };
-    /**
-     * @description The policy that controls the organizations in the enterprise that are allowed to run GitHub Actions. 
-     * @enum {string}
-     */
-    "enabled-organizations": "all" | "none" | "selected";
-    /**
-     * @description The permissions policy that controls the actions and reusable workflows that are allowed to run. 
-     * @enum {string}
-     */
-    "allowed-actions": "all" | "local_only" | "selected";
-    /** @description The API URL to use to get or set the actions and reusable workflows that are allowed to run, when `allowed_actions` is set to `selected`. */
-    "selected-actions-url": string;
-    "actions-enterprise-permissions": {
-      enabled_organizations: components["schemas"]["enabled-organizations"];
-      /** @description The API URL to use to get or set the selected organizations that are allowed to run GitHub Actions, when `enabled_organizations` is set to `selected`. */
-      selected_organizations_url?: string;
-      allowed_actions?: components["schemas"]["allowed-actions"];
-      selected_actions_url?: components["schemas"]["selected-actions-url"];
-    };
-    /**
-     * Organization Simple 
-     * @description A GitHub organization.
-     */
-    "organization-simple": {
-      /** @example github */
-      login: string;
-      /** @example 1 */
-      id: number;
-      /** @example MDEyOk9yZ2FuaXphdGlvbjE= */
-      node_id: string;
-      /**
-       * Format: uri 
-       * @example https://api.github.com/orgs/github
-       */
-      url: string;
-      /**
-       * Format: uri 
-       * @example https://api.github.com/orgs/github/repos
-       */
-      repos_url: string;
-      /**
-       * Format: uri 
-       * @example https://api.github.com/orgs/github/events
-       */
-      events_url: string;
-      /** @example https://api.github.com/orgs/github/hooks */
-      hooks_url: string;
-      /** @example https://api.github.com/orgs/github/issues */
-      issues_url: string;
-      /** @example https://api.github.com/orgs/github/members{/member} */
-      members_url: string;
-      /** @example https://api.github.com/orgs/github/public_members{/member} */
-      public_members_url: string;
-      /** @example https://github.com/images/error/octocat_happy.gif */
-      avatar_url: string;
-      /** @example A great organization */
-      description: string | null;
-    };
-    "selected-actions": {
-      /** @description Whether GitHub-owned actions are allowed. For example, this includes the actions in the `actions` organization. */
-      github_owned_allowed?: boolean;
-      /** @description Whether actions from GitHub Marketplace verified creators are allowed. Set to `true` to allow all actions by GitHub Marketplace verified creators. */
-      verified_allowed?: boolean;
-      /** @description Specifies a list of string-matching patterns to allow specific action(s) and reusable workflow(s). Wildcards, tags, and SHAs are allowed. For example, `monalisa/octocat@*`, `monalisa/octocat@v2`, `monalisa/*`." */
-      patterns_allowed?: (string)[];
-    };
-    /**
-     * @description The default workflow permissions granted to the GITHUB_TOKEN when running workflows. 
-     * @enum {string}
-     */
-    "actions-default-workflow-permissions": "read" | "write";
-    /** @description Whether GitHub Actions can approve pull requests. Enabling this can be a security risk. */
-    "actions-can-approve-pull-request-reviews": boolean;
-    "actions-get-default-workflow-permissions": {
-      default_workflow_permissions: components["schemas"]["actions-default-workflow-permissions"];
-      can_approve_pull_request_reviews: components["schemas"]["actions-can-approve-pull-request-reviews"];
-    };
-    "actions-set-default-workflow-permissions": {
-      default_workflow_permissions?: components["schemas"]["actions-default-workflow-permissions"];
-      can_approve_pull_request_reviews?: components["schemas"]["actions-can-approve-pull-request-reviews"];
-    };
-    "runner-groups-enterprise": {
-      id: number;
-      name: string;
-      visibility: string;
-      default: boolean;
-      selected_organizations_url?: string;
-      runners_url: string;
-      allows_public_repositories: boolean;
-      /**
-       * @description If `true`, the `restricted_to_workflows` and `selected_workflows` fields cannot be modified. 
-       * @default false
-       */
-      workflow_restrictions_read_only?: boolean;
-      /**
-       * @description If `true`, the runner group will be restricted to running only the workflows specified in the `selected_workflows` array. 
-       * @default false
-       */
-      restricted_to_workflows?: boolean;
-      /** @description List of workflows the runner group should be allowed to run. This setting will be ignored unless `restricted_to_workflows` is set to `true`. */
-      selected_workflows?: (string)[];
-    };
-    /**
-     * Self hosted runner label 
-     * @description A label for a self hosted runner
-     */
-    "runner-label": {
-      /** @description Unique identifier of the label. */
-      id?: number;
-      /** @description Name of the label. */
-      name: string;
-      /**
-       * @description The type of label. Read-only labels are applied automatically when the runner is configured. 
-       * @enum {string}
-       */
-      type?: "read-only" | "custom";
-    };
-    /**
-     * Self hosted runners 
-     * @description A self hosted runner
-     */
-    runner: {
-      /**
-       * @description The id of the runner. 
-       * @example 5
-       */
-      id: number;
-      /**
-       * @description The name of the runner. 
-       * @example iMac
-       */
-      name: string;
-      /**
-       * @description The Operating System of the runner. 
-       * @example macos
-       */
-      os: string;
-      /**
-       * @description The status of the runner. 
-       * @example online
-       */
-      status: string;
-      busy: boolean;
-      labels: (components["schemas"]["runner-label"])[];
-    };
-    /**
-     * Runner Application 
-     * @description Runner Application
-     */
-    "runner-application": {
-      os: string;
-      architecture: string;
-      download_url: string;
-      filename: string;
-      /** @description A short lived bearer token used to download the runner, if needed. */
-      temp_download_token?: string;
-      sha256_checksum?: string;
-    };
-    /**
-     * Authentication Token 
-     * @description Authentication Token
-     */
-    "authentication-token": {
-      /**
-       * @description The token used for authentication 
-       * @example v1.1f699f1069f60xxx
-       */
-      token: string;
-      /**
-       * Format: date-time 
-       * @description The time this token expires 
-       * @example 2016-07-11T22:14:10Z
-       */
-      expires_at: string;
-      /**
-       * @example {
-       *   "issues": "read",
-       *   "deployments": "write"
-       * }
-       */
-      permissions?: Record<string, never>;
-      /** @description The repositories this token has access to */
-      repositories?: (components["schemas"]["repository"])[];
-      /** @example config.yaml */
-      single_file?: string | null;
-      /**
-       * @description Describe whether all repositories have been selected or there's a selection involved 
-       * @enum {string}
-       */
-      repository_selection?: "all" | "selected";
-    };
-    /** @description The name of the tool used to generate the code scanning analysis. */
-    "code-scanning-analysis-tool-name": string;
-    /** @description The GUID of the tool used to generate the code scanning analysis, if provided in the uploaded SARIF data. */
-    "code-scanning-analysis-tool-guid": string | null;
-    /**
-     * @description State of a code scanning alert. 
-     * @enum {string}
-     */
-    "code-scanning-alert-state": "open" | "closed" | "dismissed" | "fixed";
     /** @description The security alert number. */
     readonly "alert-number": number;
-    /**
-     * Format: date-time 
-     * @description The time that the alert was created in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`.
-     */
-    readonly "alert-created-at": string;
-    /**
-     * Format: date-time 
-     * @description The time that the alert was last updated in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`.
-     */
-    readonly "alert-updated-at": string;
+    /** @description Details for the vulnerable package. */
+    readonly "dependabot-alert-package": {
+      /** @description The package's language or package management ecosystem. */
+      readonly ecosystem: string;
+      /** @description The unique package name within its ecosystem. */
+      readonly name: string;
+    };
+    /** @description Details pertaining to one vulnerable version range for the advisory. */
+    readonly "dependabot-alert-security-vulnerability": {
+      readonly package: components["schemas"]["dependabot-alert-package"];
+      /**
+       * @description The severity of the vulnerability. 
+       * @enum {string}
+       */
+      readonly severity: "low" | "medium" | "high" | "critical";
+      /** @description Conditions that identify vulnerable versions of this vulnerability's package. */
+      readonly vulnerable_version_range: string;
+      /** @description Details pertaining to the package version that patches this vulnerability. */
+      readonly first_patched_version: {
+        /** @description The package version that patches this vulnerability. */
+        readonly identifier: string;
+      } | null;
+    };
+    /** @description Details for the GitHub Security Advisory. */
+    readonly "dependabot-alert-security-advisory": {
+      /** @description The unique GitHub Security Advisory ID assigned to the advisory. */
+      readonly ghsa_id: string;
+      /** @description The unique CVE ID assigned to the advisory. */
+      readonly cve_id: string | null;
+      /** @description A short, plain text summary of the advisory. */
+      readonly summary: string;
+      /** @description A long-form Markdown-supported description of the advisory. */
+      readonly description: string;
+      /** @description Vulnerable version range information for the advisory. */
+      readonly vulnerabilities: readonly (components["schemas"]["dependabot-alert-security-vulnerability"])[];
+      /**
+       * @description The severity of the advisory. 
+       * @enum {string}
+       */
+      readonly severity: "low" | "medium" | "high" | "critical";
+      /** @description Details for the advisory pertaining to the Common Vulnerability Scoring System. */
+      readonly cvss: {
+        /** @description The overall CVSS score of the advisory. */
+        readonly score: number;
+        /** @description The full CVSS vector string for the advisory. */
+        readonly vector_string: string | null;
+      };
+      /** @description Details for the advisory pertaining to Common Weakness Enumeration. */
+      readonly cwes: readonly ({
+          /** @description The unique CWE ID. */
+          readonly cwe_id: string;
+          /** @description The short, plain text name of the CWE. */
+          readonly name: string;
+        })[];
+      /** @description Values that identify this advisory among security information sources. */
+      readonly identifiers: readonly ({
+          /**
+           * @description The type of advisory identifier. 
+           * @enum {string}
+           */
+          readonly type: "CVE" | "GHSA";
+          /** @description The value of the advisory identifer. */
+          readonly value: string;
+        })[];
+      /** @description Links to additional advisory information. */
+      readonly references: readonly ({
+          /**
+           * Format: uri 
+           * @description The URL of the reference.
+           */
+          readonly url: string;
+        })[];
+      /**
+       * Format: date-time 
+       * @description The time that the advisory was published in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`.
+       */
+      readonly published_at: string;
+      /**
+       * Format: date-time 
+       * @description The time that the advisory was last modified in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`.
+       */
+      readonly updated_at: string;
+      /**
+       * Format: date-time 
+       * @description The time that the advisory was withdrawn in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`.
+       */
+      readonly withdrawn_at: string | null;
+    };
     /**
      * Format: uri 
      * @description The REST API URL of the alert resource.
@@ -9622,102 +9258,25 @@ export interface components {
      */
     readonly "alert-html-url": string;
     /**
-     * Format: uri 
-     * @description The REST API URL for fetching the list of instances for an alert.
+     * Format: date-time 
+     * @description The time that the alert was created in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`.
      */
-    readonly "alert-instances-url": string;
+    readonly "alert-created-at": string;
     /**
      * Format: date-time 
-     * @description The time that the alert was no longer detected and was considered fixed in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`.
+     * @description The time that the alert was last updated in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`.
      */
-    readonly "alert-fixed-at": string | null;
+    readonly "alert-updated-at": string;
     /**
      * Format: date-time 
      * @description The time that the alert was dismissed in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`.
      */
     readonly "alert-dismissed-at": string | null;
     /**
-     * @description **Required when the state is dismissed.** The reason for dismissing or closing the alert. 
-     * @enum {string|null}
+     * Format: date-time 
+     * @description The time that the alert was no longer detected and was considered fixed in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`.
      */
-    "code-scanning-alert-dismissed-reason": "" | "false positive" | "won't fix" | "used in tests" | null;
-    /** @description The dismissal comment associated with the dismissal of the alert. */
-    "code-scanning-alert-dismissed-comment": string | null;
-    "code-scanning-alert-rule": {
-      /** @description A unique identifier for the rule used to detect the alert. */
-      id?: string | null;
-      /** @description The name of the rule used to detect the alert. */
-      name?: string;
-      /**
-       * @description The severity of the alert. 
-       * @enum {string|null}
-       */
-      severity?: "none" | "note" | "warning" | "error" | null;
-      /**
-       * @description The security severity of the alert. 
-       * @enum {string|null}
-       */
-      security_severity_level?: "low" | "medium" | "high" | "critical" | null;
-      /** @description A short description of the rule used to detect the alert. */
-      description?: string;
-      /** @description description of the rule used to detect the alert. */
-      full_description?: string;
-      /** @description A set of tags applicable for the rule. */
-      tags?: (string)[] | null;
-      /** @description Detailed documentation for the rule as GitHub Flavored Markdown. */
-      help?: string | null;
-      /** @description A link to the documentation for the rule used to detect the alert. */
-      help_uri?: string | null;
-    };
-    /** @description The version of the tool used to generate the code scanning analysis. */
-    "code-scanning-analysis-tool-version": string | null;
-    "code-scanning-analysis-tool": {
-      name?: components["schemas"]["code-scanning-analysis-tool-name"];
-      version?: components["schemas"]["code-scanning-analysis-tool-version"];
-      guid?: components["schemas"]["code-scanning-analysis-tool-guid"];
-    };
-    /**
-     * @description The full Git reference, formatted as `refs/heads/<branch name>`,
-     * `refs/pull/<number>/merge`, or `refs/pull/<number>/head`.
-     */
-    "code-scanning-ref": string;
-    /** @description Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name. */
-    "code-scanning-analysis-analysis-key": string;
-    /** @description Identifies the variable values associated with the environment in which the analysis that generated this alert instance was performed, such as the language that was analyzed. */
-    "code-scanning-alert-environment": string;
-    /** @description Identifies the configuration under which the analysis was executed. Used to distinguish between multiple analyses for the same tool and commit, but performed on different languages or different parts of the code. */
-    "code-scanning-analysis-category": string;
-    /** @description Describe a region within a file for the alert. */
-    "code-scanning-alert-location": {
-      path?: string;
-      start_line?: number;
-      end_line?: number;
-      start_column?: number;
-      end_column?: number;
-    };
-    /**
-     * @description A classification of the file. For example to identify it as generated. 
-     * @enum {string|null}
-     */
-    "code-scanning-alert-classification": "source" | "generated" | "test" | "library" | null;
-    "code-scanning-alert-instance": {
-      ref?: components["schemas"]["code-scanning-ref"];
-      analysis_key?: components["schemas"]["code-scanning-analysis-analysis-key"];
-      environment?: components["schemas"]["code-scanning-alert-environment"];
-      category?: components["schemas"]["code-scanning-analysis-category"];
-      state?: components["schemas"]["code-scanning-alert-state"];
-      commit_sha?: string;
-      message?: {
-        text?: string;
-      };
-      location?: components["schemas"]["code-scanning-alert-location"];
-      html_url?: string;
-      /**
-       * @description Classifications that have been applied to the file that triggered the alert.
-       * For example identifying it as documentation, or a generated file.
-       */
-      classifications?: (components["schemas"]["code-scanning-alert-classification"])[];
-    };
+    readonly "alert-fixed-at": string | null;
     /**
      * Simple Repository 
      * @description A GitHub repository.
@@ -9959,112 +9518,6 @@ export interface components {
        */
       hooks_url: string;
     };
-    "code-scanning-organization-alert-items": {
-      number: components["schemas"]["alert-number"];
-      created_at: components["schemas"]["alert-created-at"];
-      updated_at?: components["schemas"]["alert-updated-at"];
-      url: components["schemas"]["alert-url"];
-      html_url: components["schemas"]["alert-html-url"];
-      instances_url: components["schemas"]["alert-instances-url"];
-      state: components["schemas"]["code-scanning-alert-state"];
-      fixed_at?: components["schemas"]["alert-fixed-at"];
-      dismissed_by: components["schemas"]["nullable-simple-user"];
-      dismissed_at: components["schemas"]["alert-dismissed-at"];
-      dismissed_reason: components["schemas"]["code-scanning-alert-dismissed-reason"];
-      dismissed_comment?: components["schemas"]["code-scanning-alert-dismissed-comment"];
-      rule: components["schemas"]["code-scanning-alert-rule"];
-      tool: components["schemas"]["code-scanning-analysis-tool"];
-      most_recent_instance: components["schemas"]["code-scanning-alert-instance"];
-      repository: components["schemas"]["simple-repository"];
-    };
-    /** @description Details for the vulnerable package. */
-    readonly "dependabot-alert-package": {
-      /** @description The package's language or package management ecosystem. */
-      readonly ecosystem: string;
-      /** @description The unique package name within its ecosystem. */
-      readonly name: string;
-    };
-    /** @description Details pertaining to one vulnerable version range for the advisory. */
-    readonly "dependabot-alert-security-vulnerability": {
-      readonly package: components["schemas"]["dependabot-alert-package"];
-      /**
-       * @description The severity of the vulnerability. 
-       * @enum {string}
-       */
-      readonly severity: "low" | "medium" | "high" | "critical";
-      /** @description Conditions that identify vulnerable versions of this vulnerability's package. */
-      readonly vulnerable_version_range: string;
-      /** @description Details pertaining to the package version that patches this vulnerability. */
-      readonly first_patched_version: {
-        /** @description The package version that patches this vulnerability. */
-        readonly identifier: string;
-      } | null;
-    };
-    /** @description Details for the GitHub Security Advisory. */
-    readonly "dependabot-alert-security-advisory": {
-      /** @description The unique GitHub Security Advisory ID assigned to the advisory. */
-      readonly ghsa_id: string;
-      /** @description The unique CVE ID assigned to the advisory. */
-      readonly cve_id: string | null;
-      /** @description A short, plain text summary of the advisory. */
-      readonly summary: string;
-      /** @description A long-form Markdown-supported description of the advisory. */
-      readonly description: string;
-      /** @description Vulnerable version range information for the advisory. */
-      readonly vulnerabilities: readonly (components["schemas"]["dependabot-alert-security-vulnerability"])[];
-      /**
-       * @description The severity of the advisory. 
-       * @enum {string}
-       */
-      readonly severity: "low" | "medium" | "high" | "critical";
-      /** @description Details for the advisory pertaining to the Common Vulnerability Scoring System. */
-      readonly cvss: {
-        /** @description The overall CVSS score of the advisory. */
-        readonly score: number;
-        /** @description The full CVSS vector string for the advisory. */
-        readonly vector_string: string | null;
-      };
-      /** @description Details for the advisory pertaining to Common Weakness Enumeration. */
-      readonly cwes: readonly ({
-          /** @description The unique CWE ID. */
-          readonly cwe_id: string;
-          /** @description The short, plain text name of the CWE. */
-          readonly name: string;
-        })[];
-      /** @description Values that identify this advisory among security information sources. */
-      readonly identifiers: readonly ({
-          /**
-           * @description The type of advisory identifier. 
-           * @enum {string}
-           */
-          readonly type: "CVE" | "GHSA";
-          /** @description The value of the advisory identifer. */
-          readonly value: string;
-        })[];
-      /** @description Links to additional advisory information. */
-      readonly references: readonly ({
-          /**
-           * Format: uri 
-           * @description The URL of the reference.
-           */
-          readonly url: string;
-        })[];
-      /**
-       * Format: date-time 
-       * @description The time that the advisory was published in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`.
-       */
-      readonly published_at: string;
-      /**
-       * Format: date-time 
-       * @description The time that the advisory was last modified in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`.
-       */
-      readonly updated_at: string;
-      /**
-       * Format: date-time 
-       * @description The time that the advisory was withdrawn in ISO 8601 format: `YYYY-MM-DDTHH:MM:SSZ`.
-       */
-      readonly withdrawn_at: string | null;
-    };
     /** @description A Dependabot alert. */
     "dependabot-alert-with-repository": {
       number: components["schemas"]["alert-number"];
@@ -10116,7 +9569,7 @@ export interface components {
      * @description **Required when the `state` is `resolved`.** The reason for resolving the alert. 
      * @enum {string|null}
      */
-    "secret-scanning-alert-resolution": "" | "false_positive" | "wont_fix" | "revoked" | "used_in_tests" | null;
+    "secret-scanning-alert-resolution": "false_positive" | "wont_fix" | "revoked" | "used_in_tests" | null;
     "organization-secret-scanning-alert": {
       number?: components["schemas"]["alert-number"];
       created_at?: components["schemas"]["alert-created-at"];
@@ -10156,25 +9609,6 @@ export interface components {
       push_protection_bypassed_at?: string | null;
       /** @description The comment that was optionally added when this alert was closed */
       resolution_comment?: string | null;
-    };
-    "advanced-security-active-committers-user": {
-      user_login: string;
-      /** @example 2021-11-03 */
-      last_pushed_date: string;
-    };
-    "advanced-security-active-committers-repository": {
-      /** @example octocat/Hello-World */
-      name: string;
-      /** @example 25 */
-      advanced_security_committers: number;
-      advanced_security_committers_breakdown: (components["schemas"]["advanced-security-active-committers-user"])[];
-    };
-    "advanced-security-active-committers": {
-      /** @example 25 */
-      total_advanced_security_committers?: number;
-      /** @example 2 */
-      total_count?: number;
-      repositories: (components["schemas"]["advanced-security-active-committers-repository"])[];
     };
     /**
      * Actor 
@@ -10635,8 +10069,8 @@ export interface components {
       comments_url: string;
       owner?: components["schemas"]["simple-user"];
       truncated?: boolean;
-      forks?: (Record<string, never>)[];
-      history?: (Record<string, never>)[];
+      forks?: (unknown)[];
+      history?: (unknown)[];
     };
     /**
      * Public User 
@@ -10780,8 +10214,8 @@ export interface components {
         comments_url: string;
         owner?: components["schemas"]["nullable-simple-user"];
         truncated?: boolean;
-        forks?: (Record<string, never>)[];
-        history?: (Record<string, never>)[];
+        forks?: (unknown)[];
+        history?: (unknown)[];
       }) | null;
       url?: string;
       forks_url?: string;
@@ -11022,8 +10456,11 @@ export interface components {
       monthly_price_in_cents: number;
       /** @example 11870 */
       yearly_price_in_cents: number;
-      /** @example flat-rate */
-      price_model: string;
+      /**
+       * @example FLAT_RATE 
+       * @enum {string}
+       */
+      price_model: "FREE" | "FLAT_RATE" | "PER_UNIT";
       /** @example true */
       has_free_trial: boolean;
       unit_name: string | null;
@@ -11146,6 +10583,20 @@ export interface components {
        */
       dependabot?: (string)[];
     };
+    "security-and-analysis": ({
+      advanced_security?: {
+        /** @enum {string} */
+        status?: "enabled" | "disabled";
+      };
+      secret_scanning?: {
+        /** @enum {string} */
+        status?: "enabled" | "disabled";
+      };
+      secret_scanning_push_protection?: {
+        /** @enum {string} */
+        status?: "enabled" | "disabled";
+      };
+    }) | null;
     /**
      * Minimal Repository 
      * @description Minimal Repository
@@ -11355,6 +10806,7 @@ export interface components {
       allow_forking?: boolean;
       /** @example false */
       web_commit_signoff_required?: boolean;
+      security_and_analysis?: components["schemas"]["security-and-analysis"];
     };
     /**
      * Thread 
@@ -11408,28 +10860,43 @@ export interface components {
       repository_url?: string;
     };
     /**
-     * Organization Custom Repository Role 
-     * @description Custom repository roles created by organization administrators
+     * Organization Simple 
+     * @description A GitHub organization.
      */
-    "organization-custom-repository-role": {
-      /** @description The unique identifier of the custom role. */
+    "organization-simple": {
+      /** @example github */
+      login: string;
+      /** @example 1 */
       id: number;
-      /** @description The name of the custom role. */
-      name: string;
-      /** @description A short description about who this role is for or what permissions it grants. */
-      description?: string | null;
+      /** @example MDEyOk9yZ2FuaXphdGlvbjE= */
+      node_id: string;
       /**
-       * @description The system role from which this role inherits permissions. 
-       * @enum {string}
+       * Format: uri 
+       * @example https://api.github.com/orgs/github
        */
-      base_role?: "read" | "triage" | "write" | "maintain";
-      /** @description A list of additional permissions included in this role. */
-      permissions?: (string)[];
-      organization?: components["schemas"]["simple-user"];
-      /** Format: date-time */
-      created_at?: string;
-      /** Format: date-time */
-      updated_at?: string;
+      url: string;
+      /**
+       * Format: uri 
+       * @example https://api.github.com/orgs/github/repos
+       */
+      repos_url: string;
+      /**
+       * Format: uri 
+       * @example https://api.github.com/orgs/github/events
+       */
+      events_url: string;
+      /** @example https://api.github.com/orgs/github/hooks */
+      hooks_url: string;
+      /** @example https://api.github.com/orgs/github/issues */
+      issues_url: string;
+      /** @example https://api.github.com/orgs/github/members{/member} */
+      members_url: string;
+      /** @example https://api.github.com/orgs/github/public_members{/member} */
+      public_members_url: string;
+      /** @example https://github.com/images/error/octocat_happy.gif */
+      avatar_url: string;
+      /** @example A great organization */
+      description: string | null;
     };
     /**
      * Organization Full 
@@ -11618,6 +11085,12 @@ export interface components {
        */
       secret_scanning_push_protection_custom_link?: string | null;
     };
+    "actions-cache-usage-org-enterprise": {
+      /** @description The count of active caches across all repositories of an enterprise or an organization. */
+      total_active_caches_count: number;
+      /** @description The total size in bytes of all active cache items across all repositories of an enterprise or an organization. */
+      total_active_caches_size_in_bytes: number;
+    };
     /**
      * Actions Cache Usage by repository 
      * @description GitHub Actions Cache Usage by repository.
@@ -11640,10 +11113,30 @@ export interface components {
       active_caches_count: number;
     };
     /**
+     * Actions OIDC Subject customization 
+     * @description Actions OIDC Subject customization
+     */
+    "oidc-custom-sub": {
+      /** @description Array of unique strings. Each claim key can only contain alphanumeric characters and underscores. */
+      include_claim_keys: (string)[];
+    };
+    /**
+     * Empty Object 
+     * @description An object without any properties.
+     */
+    "empty-object": Record<string, never>;
+    /**
      * @description The policy that controls the repositories in the organization that are allowed to run GitHub Actions. 
      * @enum {string}
      */
     "enabled-repositories": "all" | "none" | "selected";
+    /**
+     * @description The permissions policy that controls the actions and reusable workflows that are allowed to run. 
+     * @enum {string}
+     */
+    "allowed-actions": "all" | "local_only" | "selected";
+    /** @description The API URL to use to get or set the actions and reusable workflows that are allowed to run, when `allowed_actions` is set to `selected`. */
+    "selected-actions-url": string;
     "actions-organization-permissions": {
       enabled_repositories: components["schemas"]["enabled-repositories"];
       /** @description The API URL to use to get or set the selected repositories that are allowed to run GitHub Actions, when `enabled_repositories` is set to `selected`. */
@@ -11651,29 +11144,151 @@ export interface components {
       allowed_actions?: components["schemas"]["allowed-actions"];
       selected_actions_url?: components["schemas"]["selected-actions-url"];
     };
-    "runner-groups-org": {
+    "selected-actions": {
+      /** @description Whether GitHub-owned actions are allowed. For example, this includes the actions in the `actions` organization. */
+      github_owned_allowed?: boolean;
+      /** @description Whether actions from GitHub Marketplace verified creators are allowed. Set to `true` to allow all actions by GitHub Marketplace verified creators. */
+      verified_allowed?: boolean;
+      /**
+       * @description Specifies a list of string-matching patterns to allow specific action(s) and reusable workflow(s). Wildcards, tags, and SHAs are allowed. For example, `monalisa/octocat@*`, `monalisa/octocat@v2`, `monalisa/*`.
+       * 
+       * **Note**: The `patterns_allowed` setting only applies to public repositories.
+       */
+      patterns_allowed?: (string)[];
+    };
+    /**
+     * @description The default workflow permissions granted to the GITHUB_TOKEN when running workflows. 
+     * @enum {string}
+     */
+    "actions-default-workflow-permissions": "read" | "write";
+    /** @description Whether GitHub Actions can approve pull requests. Enabling this can be a security risk. */
+    "actions-can-approve-pull-request-reviews": boolean;
+    "actions-get-default-workflow-permissions": {
+      default_workflow_permissions: components["schemas"]["actions-default-workflow-permissions"];
+      can_approve_pull_request_reviews: components["schemas"]["actions-can-approve-pull-request-reviews"];
+    };
+    "actions-set-default-workflow-permissions": {
+      default_workflow_permissions?: components["schemas"]["actions-default-workflow-permissions"];
+      can_approve_pull_request_reviews?: components["schemas"]["actions-can-approve-pull-request-reviews"];
+    };
+    "required-workflow": {
+      /** @description Unique identifier for a required workflow */
       id: number;
+      /** @description Name present in the workflow file */
       name: string;
-      visibility: string;
-      default: boolean;
-      /** @description Link to the selected repositories resource for this runner group. Not present unless visibility was set to `selected` */
+      /** @description Path of the workflow file */
+      path: string;
+      /**
+       * @description Scope of the required workflow 
+       * @enum {string}
+       */
+      scope: "all" | "selected";
+      /** @description Ref at which the workflow file will be selected */
+      ref: string;
+      /**
+       * @description State of the required workflow 
+       * @enum {string}
+       */
+      state: "active" | "deleted";
+      /**
+       * Format: uri 
+       * @example https://api.github.com/organizations/org/actions/required_workflows/1/repositories
+       */
       selected_repositories_url?: string;
-      runners_url: string;
-      inherited: boolean;
-      inherited_allows_public_repositories?: boolean;
-      allows_public_repositories: boolean;
+      /** Format: date-time */
+      created_at: string;
+      /** Format: date-time */
+      updated_at: string;
+      repository: components["schemas"]["minimal-repository"];
+    };
+    /**
+     * Self hosted runner label 
+     * @description A label for a self hosted runner
+     */
+    "runner-label": {
+      /** @description Unique identifier of the label. */
+      id?: number;
+      /** @description Name of the label. */
+      name: string;
       /**
-       * @description If `true`, the `restricted_to_workflows` and `selected_workflows` fields cannot be modified. 
-       * @default false
+       * @description The type of label. Read-only labels are applied automatically when the runner is configured. 
+       * @enum {string}
        */
-      workflow_restrictions_read_only?: boolean;
+      type?: "read-only" | "custom";
+    };
+    /**
+     * Self hosted runners 
+     * @description A self hosted runner
+     */
+    runner: {
       /**
-       * @description If `true`, the runner group will be restricted to running only the workflows specified in the `selected_workflows` array. 
-       * @default false
+       * @description The id of the runner. 
+       * @example 5
        */
-      restricted_to_workflows?: boolean;
-      /** @description List of workflows the runner group should be allowed to run. This setting will be ignored unless `restricted_to_workflows` is set to `true`. */
-      selected_workflows?: (string)[];
+      id: number;
+      /**
+       * @description The name of the runner. 
+       * @example iMac
+       */
+      name: string;
+      /**
+       * @description The Operating System of the runner. 
+       * @example macos
+       */
+      os: string;
+      /**
+       * @description The status of the runner. 
+       * @example online
+       */
+      status: string;
+      busy: boolean;
+      labels: (components["schemas"]["runner-label"])[];
+    };
+    /**
+     * Runner Application 
+     * @description Runner Application
+     */
+    "runner-application": {
+      os: string;
+      architecture: string;
+      download_url: string;
+      filename: string;
+      /** @description A short lived bearer token used to download the runner, if needed. */
+      temp_download_token?: string;
+      sha256_checksum?: string;
+    };
+    /**
+     * Authentication Token 
+     * @description Authentication Token
+     */
+    "authentication-token": {
+      /**
+       * @description The token used for authentication 
+       * @example v1.1f699f1069f60xxx
+       */
+      token: string;
+      /**
+       * Format: date-time 
+       * @description The time this token expires 
+       * @example 2016-07-11T22:14:10Z
+       */
+      expires_at: string;
+      /**
+       * @example {
+       *   "issues": "read",
+       *   "deployments": "write"
+       * }
+       */
+      permissions?: Record<string, never>;
+      /** @description The repositories this token has access to */
+      repositories?: (components["schemas"]["repository"])[];
+      /** @example config.yaml */
+      single_file?: string | null;
+      /**
+       * @description Describe whether all repositories have been selected or there's a selection involved 
+       * @enum {string}
+       */
+      repository_selection?: "all" | "selected";
     };
     /**
      * Actions Secret for an Organization 
@@ -11725,10 +11340,162 @@ export interface components {
       created_at?: string;
     };
     /**
-     * Empty Object 
-     * @description An object without any properties.
+     * Actions Variable for an Organization 
+     * @description Organization variable for GitHub Actions.
      */
-    "empty-object": Record<string, never>;
+    "organization-actions-variable": {
+      /**
+       * @description The name of the variable. 
+       * @example USERNAME
+       */
+      name: string;
+      /**
+       * @description The value of the variable. 
+       * @example octocat
+       */
+      value: string;
+      /**
+       * Format: date-time 
+       * @description The date and time at which the variable was created, in ISO 8601 format':' YYYY-MM-DDTHH:MM:SSZ. 
+       * @example 2019-01-24T22:45:36.000Z
+       */
+      created_at: string;
+      /**
+       * Format: date-time 
+       * @description The date and time at which the variable was last updated, in ISO 8601 format':' YYYY-MM-DDTHH:MM:SSZ. 
+       * @example 2019-01-24T22:45:36.000Z
+       */
+      updated_at: string;
+      /**
+       * @description Visibility of a variable 
+       * @enum {string}
+       */
+      visibility: "all" | "private" | "selected";
+      /**
+       * Format: uri 
+       * @example https://api.github.com/organizations/org/variables/USERNAME/repositories
+       */
+      selected_repositories_url?: string;
+    };
+    /** @description The name of the tool used to generate the code scanning analysis. */
+    "code-scanning-analysis-tool-name": string;
+    /** @description The GUID of the tool used to generate the code scanning analysis, if provided in the uploaded SARIF data. */
+    "code-scanning-analysis-tool-guid": string | null;
+    /**
+     * @description State of a code scanning alert. 
+     * @enum {string}
+     */
+    "code-scanning-alert-state": "open" | "closed" | "dismissed" | "fixed";
+    /**
+     * @description Severity of a code scanning alert. 
+     * @enum {string}
+     */
+    "code-scanning-alert-severity": "critical" | "high" | "medium" | "low" | "warning" | "note" | "error";
+    /**
+     * Format: uri 
+     * @description The REST API URL for fetching the list of instances for an alert.
+     */
+    readonly "alert-instances-url": string;
+    /**
+     * @description **Required when the state is dismissed.** The reason for dismissing or closing the alert. 
+     * @enum {string|null}
+     */
+    "code-scanning-alert-dismissed-reason": "" | "false positive" | "won't fix" | "used in tests" | null;
+    /** @description The dismissal comment associated with the dismissal of the alert. */
+    "code-scanning-alert-dismissed-comment": string | null;
+    "code-scanning-alert-rule": {
+      /** @description A unique identifier for the rule used to detect the alert. */
+      id?: string | null;
+      /** @description The name of the rule used to detect the alert. */
+      name?: string;
+      /**
+       * @description The severity of the alert. 
+       * @enum {string|null}
+       */
+      severity?: "none" | "note" | "warning" | "error" | null;
+      /**
+       * @description The security severity of the alert. 
+       * @enum {string|null}
+       */
+      security_severity_level?: "low" | "medium" | "high" | "critical" | null;
+      /** @description A short description of the rule used to detect the alert. */
+      description?: string;
+      /** @description description of the rule used to detect the alert. */
+      full_description?: string;
+      /** @description A set of tags applicable for the rule. */
+      tags?: (string)[] | null;
+      /** @description Detailed documentation for the rule as GitHub Flavored Markdown. */
+      help?: string | null;
+      /** @description A link to the documentation for the rule used to detect the alert. */
+      help_uri?: string | null;
+    };
+    /** @description The version of the tool used to generate the code scanning analysis. */
+    "code-scanning-analysis-tool-version": string | null;
+    "code-scanning-analysis-tool": {
+      name?: components["schemas"]["code-scanning-analysis-tool-name"];
+      version?: components["schemas"]["code-scanning-analysis-tool-version"];
+      guid?: components["schemas"]["code-scanning-analysis-tool-guid"];
+    };
+    /**
+     * @description The full Git reference, formatted as `refs/heads/<branch name>`,
+     * `refs/pull/<number>/merge`, or `refs/pull/<number>/head`.
+     */
+    "code-scanning-ref": string;
+    /** @description Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name. */
+    "code-scanning-analysis-analysis-key": string;
+    /** @description Identifies the variable values associated with the environment in which the analysis that generated this alert instance was performed, such as the language that was analyzed. */
+    "code-scanning-alert-environment": string;
+    /** @description Identifies the configuration under which the analysis was executed. Used to distinguish between multiple analyses for the same tool and commit, but performed on different languages or different parts of the code. */
+    "code-scanning-analysis-category": string;
+    /** @description Describe a region within a file for the alert. */
+    "code-scanning-alert-location": {
+      path?: string;
+      start_line?: number;
+      end_line?: number;
+      start_column?: number;
+      end_column?: number;
+    };
+    /**
+     * @description A classification of the file. For example to identify it as generated. 
+     * @enum {string|null}
+     */
+    "code-scanning-alert-classification": "source" | "generated" | "test" | "library" | null;
+    "code-scanning-alert-instance": {
+      ref?: components["schemas"]["code-scanning-ref"];
+      analysis_key?: components["schemas"]["code-scanning-analysis-analysis-key"];
+      environment?: components["schemas"]["code-scanning-alert-environment"];
+      category?: components["schemas"]["code-scanning-analysis-category"];
+      state?: components["schemas"]["code-scanning-alert-state"];
+      commit_sha?: string;
+      message?: {
+        text?: string;
+      };
+      location?: components["schemas"]["code-scanning-alert-location"];
+      html_url?: string;
+      /**
+       * @description Classifications that have been applied to the file that triggered the alert.
+       * For example identifying it as documentation, or a generated file.
+       */
+      classifications?: (components["schemas"]["code-scanning-alert-classification"])[];
+    };
+    "code-scanning-organization-alert-items": {
+      number: components["schemas"]["alert-number"];
+      created_at: components["schemas"]["alert-created-at"];
+      updated_at?: components["schemas"]["alert-updated-at"];
+      url: components["schemas"]["alert-url"];
+      html_url: components["schemas"]["alert-html-url"];
+      instances_url: components["schemas"]["alert-instances-url"];
+      state: components["schemas"]["code-scanning-alert-state"];
+      fixed_at?: components["schemas"]["alert-fixed-at"];
+      dismissed_by: components["schemas"]["nullable-simple-user"];
+      dismissed_at: components["schemas"]["alert-dismissed-at"];
+      dismissed_reason: components["schemas"]["code-scanning-alert-dismissed-reason"];
+      dismissed_comment?: components["schemas"]["code-scanning-alert-dismissed-comment"];
+      rule: components["schemas"]["code-scanning-alert-rule"];
+      tool: components["schemas"]["code-scanning-analysis-tool"];
+      most_recent_instance: components["schemas"]["code-scanning-alert-instance"];
+      repository: components["schemas"]["simple-repository"];
+    };
     /**
      * Codespace machine 
      * @description A description of the machine powering a codespace.
@@ -11889,6 +11656,11 @@ export interface components {
       stop_url: string;
       /**
        * Format: uri 
+       * @description API URL to publish this codespace to a new repository.
+       */
+      publish_url?: string | null;
+      /**
+       * Format: uri 
        * @description API URL for the Pull Request associated with this codespace, if any.
        */
       pulls_url: string | null;
@@ -12035,14 +11807,8 @@ export interface components {
       node_id: string;
       /** @example "https://api.github.com/organizations/16/invitations/1/teams" */
       invitation_teams_url: string;
-    };
-    /**
-     * Organization Fine-Grained Permission 
-     * @description Fine-grained permissions available for the organization
-     */
-    "organization-fine-grained-permission": {
-      name: string;
-      description: string;
+      /** @example "member" */
+      invitation_source?: string;
     };
     /**
      * Org Hook 
@@ -12275,6 +12041,7 @@ export interface components {
       exclude_releases: boolean;
       exclude_owner_projects: boolean;
       org_metadata_only: boolean;
+      /** @description The repositories included in the migration. Only returned for export migrations. */
       repositories: (components["schemas"]["repository"])[];
       /**
        * Format: uri 
@@ -12294,7 +12061,7 @@ export interface components {
       node_id: string;
       /** Format: uri */
       archive_url?: string;
-      exclude?: (Record<string, never>)[];
+      exclude?: (unknown)[];
     };
     /**
      * Minimal Repository 
@@ -12505,6 +12272,7 @@ export interface components {
       allow_forking?: boolean;
       /** @example false */
       web_commit_signoff_required?: boolean;
+      security_and_analysis?: components["schemas"]["security-and-analysis"];
     }) | null;
     /**
      * Package 
@@ -12760,6 +12528,8 @@ export interface components {
         windows_32_core?: number;
         /** @description Total minutes used on Windows 64 core runner machines. */
         windows_64_core?: number;
+        /** @description Total minutes used on macOS 12 core runner machines. */
+        macos_12_core?: number;
         /** @description Total minutes used on all runner machines. */
         total?: number;
       };
@@ -14120,6 +13890,59 @@ export interface components {
       rate: components["schemas"]["rate-limit"];
     };
     /**
+     * Required workflow 
+     * @description A GitHub Actions required workflow
+     */
+    "repo-required-workflow": {
+      /** @example 5 */
+      id: number;
+      /** @example MDg6V29ya2Zsb3cxMg== */
+      node_id: string;
+      /** @example Required CI */
+      name: string;
+      /** @example .github/workflows/required_ci.yaml */
+      path: string;
+      /**
+       * @example active 
+       * @enum {string}
+       */
+      state: "active" | "deleted";
+      source_repository: components["schemas"]["minimal-repository"];
+      /**
+       * Format: date-time 
+       * @example 2019-12-06T14:20:20.000Z
+       */
+      created_at: string;
+      /**
+       * Format: date-time 
+       * @example 2019-12-06T14:20:20.000Z
+       */
+      updated_at: string;
+      /** @example https://api.github.com/repos/sample-org/sample-repo/actions/required_workflows/5 */
+      url: string;
+      /** @example https://github.com/sample-org/source-repo/blob/main/.github/workflows/required_ci.yaml */
+      html_url: string;
+      /** @example https://github.com/sample-org/sample-repo/workflows/required/sample-org/source-repo/.github/workflows/required_ci.yaml/badge.svg */
+      badge_url: string;
+    };
+    /**
+     * Workflow Usage 
+     * @description Workflow Usage
+     */
+    "workflow-usage": {
+      billable: {
+        UBUNTU?: {
+          total_ms?: number;
+        };
+        MACOS?: {
+          total_ms?: number;
+        };
+        WINDOWS?: {
+          total_ms?: number;
+        };
+      };
+    };
+    /**
      * Code Of Conduct Simple 
      * @description Code of Conduct Simple
      */
@@ -14139,20 +13962,6 @@ export interface components {
        */
       html_url: string | null;
     };
-    "security-and-analysis": ({
-      advanced_security?: {
-        /** @enum {string} */
-        status?: "enabled" | "disabled";
-      };
-      secret_scanning?: {
-        /** @enum {string} */
-        status?: "enabled" | "disabled";
-      };
-      secret_scanning_push_protection?: {
-        /** @enum {string} */
-        status?: "enabled" | "disabled";
-      };
-    }) | null;
     /**
      * Full Repository 
      * @description Full Repository
@@ -14584,6 +14393,12 @@ export interface components {
       conclusion: "success" | "failure" | "neutral" | "cancelled" | "skipped" | "timed_out" | "action_required" | null;
       /**
        * Format: date-time 
+       * @description The time that the job created, in ISO 8601 format. 
+       * @example 2019-08-08T08:00:00-07:00
+       */
+      created_at: string;
+      /**
+       * Format: date-time 
        * @description The time that the job started, in ISO 8601 format. 
        * @example 2019-08-08T08:00:00-07:00
        */
@@ -14663,6 +14478,26 @@ export interface components {
        * @example my runner group
        */
       runner_group_name: string | null;
+      /**
+       * @description The name of the workflow. 
+       * @example Build
+       */
+      workflow_name: string | null;
+      /**
+       * @description The name of the current branch. 
+       * @example main
+       */
+      head_branch: string | null;
+    };
+    /**
+     * Actions OIDC subject customization for a repository 
+     * @description Actions OIDC subject customization for a repository
+     */
+    "oidc-custom-sub-repo": {
+      /** @description Whether to use the default template or not. If `true`, the `include_claim_keys` field is ignored. */
+      use_default: boolean;
+      /** @description Array of unique strings. Each claim key can only contain alphanumeric characters and underscores. */
+      include_claim_keys?: (string)[];
     };
     /** @description Whether GitHub Actions is enabled on the repository. */
     "actions-enabled": boolean;
@@ -14674,10 +14509,12 @@ export interface components {
     "actions-workflow-access-to-repository": {
       /**
        * @description Defines the level of access that workflows outside of the repository have to actions and reusable workflows within the
-       * repository. `none` means access is only possible from workflows in this repository. 
+       * repository.
+       * 
+       * `none` means the access is only possible from workflows in this repository. `user` level access allows sharing across user owned private repos only. `organization` level access allows sharing across the organization. 
        * @enum {string}
        */
-      access_level: "none" | "organization" | "enterprise";
+      access_level: "none" | "user" | "organization";
     };
     /**
      * Referenced workflow 
@@ -14899,11 +14736,11 @@ export interface components {
           updated_at?: string;
         })[];
       /**
-       * @description Whether deployment to the environment(s) was approved or rejected 
+       * @description Whether deployment to the environment(s) was approved or rejected or pending (with comments) 
        * @example approved 
        * @enum {string}
        */
-      state: "approved" | "rejected";
+      state: "approved" | "rejected" | "pending";
       user: components["schemas"]["simple-user"];
       /**
        * @description The comment submitted with the deployment review 
@@ -15084,6 +14921,31 @@ export interface components {
       /** Format: date-time */
       updated_at: string;
     };
+    /** Actions Variable */
+    "actions-variable": {
+      /**
+       * @description The name of the variable. 
+       * @example USERNAME
+       */
+      name: string;
+      /**
+       * @description The value of the variable. 
+       * @example octocat
+       */
+      value: string;
+      /**
+       * Format: date-time 
+       * @description The date and time at which the variable was created, in ISO 8601 format':' YYYY-MM-DDTHH:MM:SSZ. 
+       * @example 2019-01-24T22:45:36.000Z
+       */
+      created_at: string;
+      /**
+       * Format: date-time 
+       * @description The date and time at which the variable was last updated, in ISO 8601 format':' YYYY-MM-DDTHH:MM:SSZ. 
+       * @example 2019-01-24T22:45:36.000Z
+       */
+      updated_at: string;
+    };
     /**
      * Workflow 
      * @description A GitHub Actions workflow
@@ -15123,23 +14985,6 @@ export interface components {
        * @example 2019-12-06T14:20:20.000Z
        */
       deleted_at?: string;
-    };
-    /**
-     * Workflow Usage 
-     * @description Workflow Usage
-     */
-    "workflow-usage": {
-      billable: {
-        UBUNTU?: {
-          total_ms?: number;
-        };
-        MACOS?: {
-          total_ms?: number;
-        };
-        WINDOWS?: {
-          total_ms?: number;
-        };
-      };
     };
     /**
      * Autolink reference 
@@ -17138,7 +16983,7 @@ export interface components {
         html_url?: string;
       };
       /**
-       * @description The commit SHA associated with this dependency snapshot. 
+       * @description The commit SHA associated with this dependency snapshot. Maximum length: 40 characters. 
        * @example ddc951f4b1293222421f2c8df679786153acf689
        */
       sha: string;
@@ -17298,6 +17143,7 @@ export interface components {
        * @example 2020-11-23T22:00:40Z
        */
       updated_at: string;
+      /** @description Built-in deployment protection rules for the environment. */
       protection_rules?: ({
           /** @example 3515 */
           id: number;
@@ -19597,10 +19443,10 @@ export interface components {
       /** Format: date-time */
       submitted_at?: string;
       /**
-       * @description A commit SHA for the review. 
+       * @description A commit SHA for the review. If the commit object was garbage collected or forcibly deleted, then it no longer exists in Git and this value will be `null`. 
        * @example 54bb654c9e6025347f57900a4a5c2313a96b8035
        */
-      commit_id: string;
+      commit_id: string | null;
       body_html?: string;
       body_text?: string;
       author_association: components["schemas"]["author-association"];
@@ -19803,7 +19649,7 @@ export interface components {
     "secret-scanning-alert": {
       number?: components["schemas"]["alert-number"];
       created_at?: components["schemas"]["alert-created-at"];
-      updated_at?: components["schemas"]["alert-updated-at"];
+      updated_at?: components["schemas"]["nullable-alert-updated-at"];
       url?: components["schemas"]["alert-url"];
       html_url?: components["schemas"]["alert-html-url"];
       /**
@@ -19871,14 +19717,41 @@ export interface components {
       /** @description The API URL to get the associated commit resource */
       commit_url: string;
     };
+    /** @description Represents an 'issue_title' secret scanning location type. This location type shows that a secret was detected in the title of an issue. */
+    "secret-scanning-location-issue-title": {
+      /**
+       * Format: uri 
+       * @description The API URL to get the issue where the secret was detected. 
+       * @example https://api.github.com/repos/octocat/Hello-World/issues/1347
+       */
+      issue_title_url: string;
+    };
+    /** @description Represents an 'issue_body' secret scanning location type. This location type shows that a secret was detected in the body of an issue. */
+    "secret-scanning-location-issue-body": {
+      /**
+       * Format: uri 
+       * @description The API URL to get the issue where the secret was detected. 
+       * @example https://api.github.com/repos/octocat/Hello-World/issues/1347
+       */
+      issue_body_url: string;
+    };
+    /** @description Represents an 'issue_comment' secret scanning location type. This location type shows that a secret was detected in a comment on an issue. */
+    "secret-scanning-location-issue-comment": {
+      /**
+       * Format: uri 
+       * @description The API URL to get the issue comment where the secret was detected. 
+       * @example https://api.github.com/repos/octocat/Hello-World/issues/comments/1081119451
+       */
+      issue_comment_url: string;
+    };
     "secret-scanning-location": {
       /**
        * @description The location type. Because secrets may be found in different types of resources (ie. code, comments, issues), this field identifies the type of resource where the secret was found. 
        * @example commit 
        * @enum {string}
        */
-      type: "commit";
-      details: components["schemas"]["secret-scanning-location-commit"];
+      type: "commit" | "issue_title" | "issue_body" | "issue_comment";
+      details: components["schemas"]["secret-scanning-location-commit"] | components["schemas"]["secret-scanning-location-issue-title"] | components["schemas"]["secret-scanning-location-issue-body"] | components["schemas"]["secret-scanning-location-issue-comment"];
     };
     /**
      * Stargazer 
@@ -20676,6 +20549,155 @@ export interface components {
       html_url?: string | null;
     };
     /**
+     * Codespace 
+     * @description A codespace.
+     */
+    "codespace-with-full-repository": {
+      /** @example 1 */
+      id: number;
+      /**
+       * @description Automatically generated name of this codespace. 
+       * @example monalisa-octocat-hello-world-g4wpq6h95q
+       */
+      name: string;
+      /**
+       * @description Display name for this codespace. 
+       * @example bookish space pancake
+       */
+      display_name?: string | null;
+      /**
+       * @description UUID identifying this codespace's environment. 
+       * @example 26a7c758-7299-4a73-b978-5a92a7ae98a0
+       */
+      environment_id: string | null;
+      owner: components["schemas"]["simple-user"];
+      billable_owner: components["schemas"]["simple-user"];
+      repository: components["schemas"]["full-repository"];
+      machine: components["schemas"]["nullable-codespace-machine"];
+      /**
+       * @description Path to devcontainer.json from repo root used to create Codespace. 
+       * @example .devcontainer/example/devcontainer.json
+       */
+      devcontainer_path?: string | null;
+      /**
+       * @description Whether the codespace was created from a prebuild. 
+       * @example false
+       */
+      prebuild: boolean | null;
+      /**
+       * Format: date-time 
+       * @example 2011-01-26T19:01:12Z
+       */
+      created_at: string;
+      /**
+       * Format: date-time 
+       * @example 2011-01-26T19:01:12Z
+       */
+      updated_at: string;
+      /**
+       * Format: date-time 
+       * @description Last known time this codespace was started. 
+       * @example 2011-01-26T19:01:12Z
+       */
+      last_used_at: string;
+      /**
+       * @description State of this codespace. 
+       * @example Available 
+       * @enum {string}
+       */
+      state: "Unknown" | "Created" | "Queued" | "Provisioning" | "Available" | "Awaiting" | "Unavailable" | "Deleted" | "Moved" | "Shutdown" | "Archived" | "Starting" | "ShuttingDown" | "Failed" | "Exporting" | "Updating" | "Rebuilding";
+      /**
+       * Format: uri 
+       * @description API URL for this codespace.
+       */
+      url: string;
+      /** @description Details about the codespace's git repository. */
+      git_status: {
+        /**
+         * @description The number of commits the local repository is ahead of the remote. 
+         * @example 0
+         */
+        ahead?: number;
+        /**
+         * @description The number of commits the local repository is behind the remote. 
+         * @example 0
+         */
+        behind?: number;
+        /** @description Whether the local repository has unpushed changes. */
+        has_unpushed_changes?: boolean;
+        /** @description Whether the local repository has uncommitted changes. */
+        has_uncommitted_changes?: boolean;
+        /**
+         * @description The current branch (or SHA if in detached HEAD state) of the local repository. 
+         * @example main
+         */
+        ref?: string;
+      };
+      /**
+       * @description The Azure region where this codespace is located. 
+       * @example WestUs2 
+       * @enum {string}
+       */
+      location: "EastUs" | "SouthEastAsia" | "WestEurope" | "WestUs2";
+      /**
+       * @description The number of minutes of inactivity after which this codespace will be automatically stopped. 
+       * @example 60
+       */
+      idle_timeout_minutes: number | null;
+      /**
+       * Format: uri 
+       * @description URL to access this codespace on the web.
+       */
+      web_url: string;
+      /**
+       * Format: uri 
+       * @description API URL to access available alternate machine types for this codespace.
+       */
+      machines_url: string;
+      /**
+       * Format: uri 
+       * @description API URL to start this codespace.
+       */
+      start_url: string;
+      /**
+       * Format: uri 
+       * @description API URL to stop this codespace.
+       */
+      stop_url: string;
+      /**
+       * Format: uri 
+       * @description API URL to publish this codespace to a new repository.
+       */
+      publish_url?: string | null;
+      /**
+       * Format: uri 
+       * @description API URL for the Pull Request associated with this codespace, if any.
+       */
+      pulls_url: string | null;
+      recent_folders: (string)[];
+      runtime_constraints?: {
+        /** @description The privacy settings a user can select from when forwarding a port. */
+        allowed_port_privacy_settings?: (string)[] | null;
+      };
+      /** @description Whether or not a codespace has a pending async operation. This would mean that the codespace is temporarily unavailable. The only thing that you can do with a codespace in this state is delete it. */
+      pending_operation?: boolean | null;
+      /** @description Text to show user when codespace is disabled by a pending operation */
+      pending_operation_disabled_reason?: string | null;
+      /** @description Text to show user when codespace idle timeout minutes has been overriden by an organization policy */
+      idle_timeout_notice?: string | null;
+      /**
+       * @description Duration in minutes after codespace has gone idle in which it will be deleted. Must be integer minutes between 0 and 43200 (30 days). 
+       * @example 60
+       */
+      retention_period_minutes?: number | null;
+      /**
+       * Format: date-time 
+       * @description When a codespace will be auto-deleted based on the "retention_period_minutes" and "last_used_at" 
+       * @example 2011-01-26T20:01:12Z
+       */
+      retention_expires_at?: string | null;
+    };
+    /**
      * Email 
      * @description Email
      */
@@ -20742,8 +20764,8 @@ export interface components {
           primary_key_id?: number;
           key_id?: string;
           public_key?: string;
-          emails?: (Record<string, never>)[];
-          subkeys?: (Record<string, never>)[];
+          emails?: (unknown)[];
+          subkeys?: (unknown)[];
           can_sign?: boolean;
           can_encrypt_comms?: boolean;
           can_encrypt_storage?: boolean;
@@ -20824,6 +20846,16 @@ export interface components {
       updated_at: string | null;
       account: components["schemas"]["marketplace-account"];
       plan: components["schemas"]["marketplace-listing-plan"];
+    };
+    /**
+     * Social account 
+     * @description Social media account
+     */
+    "social-account": {
+      /** @example linkedin */
+      provider: string;
+      /** @example https://www.linkedin.com/company/github/ */
+      url: string;
     };
     /**
      * SSH Signing Key 
@@ -20979,6 +21011,185 @@ export interface components {
       status: "queued" | "in_progress" | "completed" | "pending";
       /** @example https://api.github.com/repos/github/hello-world/check-runs/4 */
       url: string;
+    };
+    /**
+     * Discussion 
+     * @description A Discussion in a repository.
+     */
+    discussion: {
+      active_lock_reason: string | null;
+      answer_chosen_at: string | null;
+      /** User */
+      answer_chosen_by: ({
+        /** Format: uri */
+        avatar_url?: string;
+        deleted?: boolean;
+        email?: string | null;
+        /** Format: uri-template */
+        events_url?: string;
+        /** Format: uri */
+        followers_url?: string;
+        /** Format: uri-template */
+        following_url?: string;
+        /** Format: uri-template */
+        gists_url?: string;
+        gravatar_id?: string;
+        /** Format: uri */
+        html_url?: string;
+        id: number;
+        login: string;
+        name?: string;
+        node_id?: string;
+        /** Format: uri */
+        organizations_url?: string;
+        /** Format: uri */
+        received_events_url?: string;
+        /** Format: uri */
+        repos_url?: string;
+        site_admin?: boolean;
+        /** Format: uri-template */
+        starred_url?: string;
+        /** Format: uri */
+        subscriptions_url?: string;
+        /** @enum {string} */
+        type?: "Bot" | "User" | "Organization";
+        /** Format: uri */
+        url?: string;
+      }) | null;
+      answer_html_url: string | null;
+      /**
+       * AuthorAssociation 
+       * @description How the author is associated with the repository. 
+       * @enum {string}
+       */
+      author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
+      body: string;
+      category: {
+        /** Format: date-time */
+        created_at: string;
+        description: string;
+        emoji: string;
+        id: number;
+        is_answerable: boolean;
+        name: string;
+        node_id?: string;
+        repository_id: number;
+        slug: string;
+        updated_at: string;
+      };
+      comments: number;
+      /** Format: date-time */
+      created_at: string;
+      html_url: string;
+      id: number;
+      locked: boolean;
+      node_id: string;
+      number: number;
+      /** Reactions */
+      reactions?: {
+        "+1": number;
+        "-1": number;
+        confused: number;
+        eyes: number;
+        heart: number;
+        hooray: number;
+        laugh: number;
+        rocket: number;
+        total_count: number;
+        /** Format: uri */
+        url: string;
+      };
+      repository_url: string;
+      /**
+       * @description The current state of the discussion.
+       * `converting` means that the discussion is being converted from an issue.
+       * `transferring` means that the discussion is being transferred from another repository. 
+       * @enum {string}
+       */
+      state: "open" | "closed" | "locked" | "converting" | "transferring";
+      /**
+       * @description The reason for the current state 
+       * @example resolved 
+       * @enum {string|null}
+       */
+      state_reason: "resolved" | "outdated" | "duplicate" | "reopened" | null;
+      timeline_url?: string;
+      title: string;
+      /** Format: date-time */
+      updated_at: string;
+      /** User */
+      user: ({
+        /** Format: uri */
+        avatar_url?: string;
+        deleted?: boolean;
+        email?: string | null;
+        /** Format: uri-template */
+        events_url?: string;
+        /** Format: uri */
+        followers_url?: string;
+        /** Format: uri-template */
+        following_url?: string;
+        /** Format: uri-template */
+        gists_url?: string;
+        gravatar_id?: string;
+        /** Format: uri */
+        html_url?: string;
+        id: number;
+        login: string;
+        name?: string;
+        node_id?: string;
+        /** Format: uri */
+        organizations_url?: string;
+        /** Format: uri */
+        received_events_url?: string;
+        /** Format: uri */
+        repos_url?: string;
+        site_admin?: boolean;
+        /** Format: uri-template */
+        starred_url?: string;
+        /** Format: uri */
+        subscriptions_url?: string;
+        /** @enum {string} */
+        type?: "Bot" | "User" | "Organization";
+        /** Format: uri */
+        url?: string;
+      }) | null;
+    };
+    /**
+     * Projects v2 Project 
+     * @description A projects v2 project
+     */
+    "projects-v2": {
+      id: number;
+      node_id: string;
+      owner: components["schemas"]["simple-user"];
+      creator: components["schemas"]["simple-user"];
+      title: string;
+      description: string | null;
+      public: boolean;
+      /**
+       * Format: date-time 
+       * @example 2022-04-28T12:00:00Z
+       */
+      closed_at: string | null;
+      /**
+       * Format: date-time 
+       * @example 2022-04-28T12:00:00Z
+       */
+      created_at: string;
+      /**
+       * Format: date-time 
+       * @example 2022-04-28T12:00:00Z
+       */
+      updated_at: string;
+      number: number;
+      short_description: string | null;
+      /**
+       * Format: date-time 
+       * @example 2022-04-28T12:00:00Z
+       */
+      deleted_at: string | null;
+      deleted_by: components["schemas"]["nullable-simple-user"];
     };
     /**
      * Projects v2 Item Content Type 
@@ -21231,6 +21442,47 @@ export interface components {
       /** @description A URL-encoded string of the check_run.created JSON payload. The decoded payload is a JSON object. */
       payload: string;
     };
+    /** Check Run Requested Action Event */
+    "webhook-check-run-requested-action": {
+      /** @enum {string} */
+      action: "requested_action";
+      check_run: components["schemas"]["check-run-with-simple-check-suite"];
+      installation?: components["schemas"]["simple-installation"];
+      organization?: components["schemas"]["organization-simple"];
+      repository: components["schemas"]["repository"];
+      /** @description The action requested by the user. */
+      requested_action?: {
+        /** @description The integrator reference of the action requested by the user. */
+        identifier?: string;
+      };
+      sender: components["schemas"]["simple-user"];
+    };
+    /**
+     * Check Run Requested Action Event 
+     * @description The check_run.requested_action webhook encoded with URL encoding
+     */
+    "webhook-check-run-requested-action-form-encoded": {
+      /** @description A URL-encoded string of the check_run.requested_action JSON payload. The decoded payload is a JSON object. */
+      payload: string;
+    };
+    /** Check Run Re-Requested Event */
+    "webhook-check-run-rerequested": {
+      /** @enum {string} */
+      action?: "rerequested";
+      check_run: components["schemas"]["check-run-with-simple-check-suite"];
+      installation?: components["schemas"]["simple-installation"];
+      organization?: components["schemas"]["organization-simple"];
+      repository: components["schemas"]["repository"];
+      sender: components["schemas"]["simple-user"];
+    };
+    /**
+     * Check Run Re-Requested Event 
+     * @description The check_run.rerequested webhook encoded with URL encoding
+     */
+    "webhook-check-run-rerequested-form-encoded": {
+      /** @description A URL-encoded string of the check_run.rerequested JSON payload. The decoded payload is a JSON object. */
+      payload: string;
+    };
     /** check_suite completed event */
     "webhook-check-suite-completed": {
       /** @enum {string} */
@@ -21473,6 +21725,495 @@ export interface components {
       repository: components["schemas"]["repository"];
       sender: components["schemas"]["simple-user"];
     };
+    /** check_suite requested event */
+    "webhook-check-suite-requested": {
+      /** @enum {string} */
+      action: "requested";
+      actions_meta?: Record<string, unknown> | null;
+      /** @description The [check_suite](https://docs.github.com/rest/reference/checks#suites). */
+      check_suite: {
+        after: string | null;
+        /**
+         * App 
+         * @description GitHub apps are a new way to extend GitHub. They can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. GitHub apps are first class actors within GitHub.
+         */
+        app: {
+          /** Format: date-time */
+          created_at: string | null;
+          description: string | null;
+          /** @description The list of events for the GitHub app */
+          events?: ("branch_protection_rule" | "check_run" | "check_suite" | "code_scanning_alert" | "commit_comment" | "content_reference" | "create" | "delete" | "deployment" | "deployment_review" | "deployment_status" | "deploy_key" | "discussion" | "discussion_comment" | "fork" | "gollum" | "issues" | "issue_comment" | "label" | "member" | "membership" | "milestone" | "organization" | "org_block" | "page_build" | "project" | "project_card" | "project_column" | "public" | "pull_request" | "pull_request_review" | "pull_request_review_comment" | "push" | "registry_package" | "release" | "repository" | "repository_dispatch" | "secret_scanning_alert" | "star" | "status" | "team" | "team_add" | "watch" | "workflow_dispatch" | "workflow_run" | "pull_request_review_thread" | "workflow_job" | "merge_queue_entry" | "security_and_analysis" | "secret_scanning_alert_location" | "projects_v2_item" | "merge_group" | "repository_import")[];
+          /** Format: uri */
+          external_url: string | null;
+          /** Format: uri */
+          html_url: string;
+          /** @description Unique identifier of the GitHub app */
+          id: number | null;
+          /** @description The name of the GitHub app */
+          name: string;
+          node_id: string;
+          /** User */
+          owner: ({
+            /** Format: uri */
+            avatar_url?: string;
+            deleted?: boolean;
+            email?: string | null;
+            /** Format: uri-template */
+            events_url?: string;
+            /** Format: uri */
+            followers_url?: string;
+            /** Format: uri-template */
+            following_url?: string;
+            /** Format: uri-template */
+            gists_url?: string;
+            gravatar_id?: string;
+            /** Format: uri */
+            html_url?: string;
+            id: number;
+            login: string;
+            name?: string;
+            node_id?: string;
+            /** Format: uri */
+            organizations_url?: string;
+            /** Format: uri */
+            received_events_url?: string;
+            /** Format: uri */
+            repos_url?: string;
+            site_admin?: boolean;
+            /** Format: uri-template */
+            starred_url?: string;
+            /** Format: uri */
+            subscriptions_url?: string;
+            /** @enum {string} */
+            type?: "Bot" | "User" | "Organization";
+            /** Format: uri */
+            url?: string;
+          }) | null;
+          /** @description The set of permissions for the GitHub app */
+          permissions?: {
+            /** @enum {string} */
+            actions?: "read" | "write";
+            /** @enum {string} */
+            administration?: "read" | "write";
+            /** @enum {string} */
+            checks?: "read" | "write";
+            /** @enum {string} */
+            content_references?: "read" | "write";
+            /** @enum {string} */
+            contents?: "read" | "write";
+            /** @enum {string} */
+            deployments?: "read" | "write";
+            /** @enum {string} */
+            discussions?: "read" | "write";
+            /** @enum {string} */
+            emails?: "read" | "write";
+            /** @enum {string} */
+            environments?: "read" | "write";
+            /** @enum {string} */
+            issues?: "read" | "write";
+            /** @enum {string} */
+            keys?: "read" | "write";
+            /** @enum {string} */
+            members?: "read" | "write";
+            /** @enum {string} */
+            metadata?: "read" | "write";
+            /** @enum {string} */
+            organization_administration?: "read" | "write";
+            /** @enum {string} */
+            organization_hooks?: "read" | "write";
+            /** @enum {string} */
+            organization_packages?: "read" | "write";
+            /** @enum {string} */
+            organization_plan?: "read" | "write";
+            /** @enum {string} */
+            organization_projects?: "read" | "write" | "admin";
+            /** @enum {string} */
+            organization_secrets?: "read" | "write";
+            /** @enum {string} */
+            organization_self_hosted_runners?: "read" | "write";
+            /** @enum {string} */
+            organization_user_blocking?: "read" | "write";
+            /** @enum {string} */
+            packages?: "read" | "write";
+            /** @enum {string} */
+            pages?: "read" | "write";
+            /** @enum {string} */
+            pull_requests?: "read" | "write";
+            /** @enum {string} */
+            repository_hooks?: "read" | "write";
+            /** @enum {string} */
+            repository_projects?: "read" | "write" | "admin";
+            /** @enum {string} */
+            secret_scanning_alerts?: "read" | "write";
+            /** @enum {string} */
+            secrets?: "read" | "write";
+            /** @enum {string} */
+            security_events?: "read" | "write";
+            /** @enum {string} */
+            security_scanning_alert?: "read" | "write";
+            /** @enum {string} */
+            single_file?: "read" | "write";
+            /** @enum {string} */
+            statuses?: "read" | "write";
+            /** @enum {string} */
+            team_discussions?: "read" | "write";
+            /** @enum {string} */
+            vulnerability_alerts?: "read" | "write";
+            /** @enum {string} */
+            workflows?: "read" | "write";
+          };
+          /** @description The slug name of the GitHub app */
+          slug?: string;
+          /** Format: date-time */
+          updated_at: string | null;
+        };
+        before: string | null;
+        /** Format: uri */
+        check_runs_url: string;
+        /**
+         * @description The summary conclusion for all check runs that are part of the check suite. Can be one of `success`, `failure`,` neutral`, `cancelled`, `timed_out`, `action_required` or `stale`. This value will be `null` until the check run has completed. 
+         * @enum {string|null}
+         */
+        conclusion: "success" | "failure" | "neutral" | "cancelled" | "timed_out" | "action_required" | "stale" | "" | "skipped" | null;
+        /** Format: date-time */
+        created_at: string;
+        /** @description The head branch name the changes are on. */
+        head_branch: string | null;
+        /** SimpleCommit */
+        head_commit: {
+          /**
+           * Committer 
+           * @description Metaproperties for Git author/committer information.
+           */
+          author: {
+            /** Format: date-time */
+            date?: string;
+            /** Format: email */
+            email: string | null;
+            /** @description The git author's name. */
+            name: string;
+            username?: string;
+          };
+          /**
+           * Committer 
+           * @description Metaproperties for Git author/committer information.
+           */
+          committer: {
+            /** Format: date-time */
+            date?: string;
+            /** Format: email */
+            email: string | null;
+            /** @description The git author's name. */
+            name: string;
+            username?: string;
+          };
+          id: string;
+          message: string;
+          timestamp: string;
+          tree_id: string;
+        };
+        /** @description The SHA of the head commit that is being checked. */
+        head_sha: string;
+        id: number;
+        latest_check_runs_count: number;
+        node_id: string;
+        /** @description An array of pull requests that match this check suite. A pull request matches a check suite if they have the same `head_sha` and `head_branch`. When the check suite's `head_branch` is in a forked repository it will be `null` and the `pull_requests` array will be empty. */
+        pull_requests: ({
+            base: {
+              ref: string;
+              /** Repo Ref */
+              repo: {
+                id: number;
+                name: string;
+                /** Format: uri */
+                url: string;
+              };
+              sha: string;
+            };
+            head: {
+              ref: string;
+              /** Repo Ref */
+              repo: {
+                id: number;
+                name: string;
+                /** Format: uri */
+                url: string;
+              };
+              sha: string;
+            };
+            id: number;
+            number: number;
+            /** Format: uri */
+            url: string;
+          })[];
+        rerequestable?: boolean;
+        runs_rerequestable?: boolean;
+        /**
+         * @description The summary status for all check runs that are part of the check suite. Can be `requested`, `in_progress`, or `completed`. 
+         * @enum {string|null}
+         */
+        status: "requested" | "in_progress" | "completed" | "queued" | "" | null;
+        /** Format: date-time */
+        updated_at: string;
+        /**
+         * Format: uri 
+         * @description URL that points to the check suite API resource.
+         */
+        url: string;
+      };
+      enterprise?: components["schemas"]["enterprise"];
+      installation?: components["schemas"]["simple-installation"];
+      organization?: components["schemas"]["organization-simple"];
+      repository: components["schemas"]["repository"];
+      sender: components["schemas"]["simple-user"];
+    };
+    /** check_suite rerequested event */
+    "webhook-check-suite-rerequested": {
+      /** @enum {string} */
+      action: "rerequested";
+      actions_meta?: {
+        rerun_info?: {
+          plan_id?: string;
+          job_ids?: (string)[];
+        };
+      } | null;
+      /** @description The [check_suite](https://docs.github.com/rest/reference/checks#suites). */
+      check_suite: {
+        after: string | null;
+        /**
+         * App 
+         * @description GitHub apps are a new way to extend GitHub. They can be installed directly on organizations and user accounts and granted access to specific repositories. They come with granular permissions and built-in webhooks. GitHub apps are first class actors within GitHub.
+         */
+        app: {
+          /** Format: date-time */
+          created_at: string | null;
+          description: string | null;
+          /** @description The list of events for the GitHub app */
+          events?: ("branch_protection_rule" | "check_run" | "check_suite" | "code_scanning_alert" | "commit_comment" | "content_reference" | "create" | "delete" | "deployment" | "deployment_review" | "deployment_status" | "deploy_key" | "discussion" | "discussion_comment" | "fork" | "gollum" | "issues" | "issue_comment" | "label" | "member" | "membership" | "milestone" | "organization" | "org_block" | "page_build" | "project" | "project_card" | "project_column" | "public" | "pull_request" | "pull_request_review" | "pull_request_review_comment" | "push" | "registry_package" | "release" | "repository" | "repository_dispatch" | "secret_scanning_alert" | "star" | "status" | "team" | "team_add" | "watch" | "workflow_dispatch" | "workflow_run" | "pull_request_review_thread" | "merge_queue_entry" | "workflow_job")[];
+          /** Format: uri */
+          external_url: string | null;
+          /** Format: uri */
+          html_url: string;
+          /** @description Unique identifier of the GitHub app */
+          id: number | null;
+          /** @description The name of the GitHub app */
+          name: string;
+          node_id: string;
+          /** User */
+          owner: ({
+            /** Format: uri */
+            avatar_url?: string;
+            deleted?: boolean;
+            email?: string | null;
+            /** Format: uri-template */
+            events_url?: string;
+            /** Format: uri */
+            followers_url?: string;
+            /** Format: uri-template */
+            following_url?: string;
+            /** Format: uri-template */
+            gists_url?: string;
+            gravatar_id?: string;
+            /** Format: uri */
+            html_url?: string;
+            id: number;
+            login: string;
+            name?: string;
+            node_id?: string;
+            /** Format: uri */
+            organizations_url?: string;
+            /** Format: uri */
+            received_events_url?: string;
+            /** Format: uri */
+            repos_url?: string;
+            site_admin?: boolean;
+            /** Format: uri-template */
+            starred_url?: string;
+            /** Format: uri */
+            subscriptions_url?: string;
+            /** @enum {string} */
+            type?: "Bot" | "User" | "Organization";
+            /** Format: uri */
+            url?: string;
+          }) | null;
+          /** @description The set of permissions for the GitHub app */
+          permissions?: {
+            /** @enum {string} */
+            actions?: "read" | "write";
+            /** @enum {string} */
+            administration?: "read" | "write";
+            /** @enum {string} */
+            checks?: "read" | "write";
+            /** @enum {string} */
+            content_references?: "read" | "write";
+            /** @enum {string} */
+            contents?: "read" | "write";
+            /** @enum {string} */
+            deployments?: "read" | "write";
+            /** @enum {string} */
+            discussions?: "read" | "write";
+            /** @enum {string} */
+            emails?: "read" | "write";
+            /** @enum {string} */
+            environments?: "read" | "write";
+            /** @enum {string} */
+            issues?: "read" | "write";
+            /** @enum {string} */
+            keys?: "read" | "write";
+            /** @enum {string} */
+            members?: "read" | "write";
+            /** @enum {string} */
+            metadata?: "read" | "write";
+            /** @enum {string} */
+            organization_administration?: "read" | "write";
+            /** @enum {string} */
+            organization_hooks?: "read" | "write";
+            /** @enum {string} */
+            organization_packages?: "read" | "write";
+            /** @enum {string} */
+            organization_plan?: "read" | "write";
+            /** @enum {string} */
+            organization_projects?: "read" | "write" | "admin";
+            /** @enum {string} */
+            organization_secrets?: "read" | "write";
+            /** @enum {string} */
+            organization_self_hosted_runners?: "read" | "write";
+            /** @enum {string} */
+            organization_user_blocking?: "read" | "write";
+            /** @enum {string} */
+            packages?: "read" | "write";
+            /** @enum {string} */
+            pages?: "read" | "write";
+            /** @enum {string} */
+            pull_requests?: "read" | "write";
+            /** @enum {string} */
+            repository_hooks?: "read" | "write";
+            /** @enum {string} */
+            repository_projects?: "read" | "write" | "admin";
+            /** @enum {string} */
+            secret_scanning_alerts?: "read" | "write";
+            /** @enum {string} */
+            secrets?: "read" | "write";
+            /** @enum {string} */
+            security_events?: "read" | "write";
+            /** @enum {string} */
+            security_scanning_alert?: "read" | "write";
+            /** @enum {string} */
+            single_file?: "read" | "write";
+            /** @enum {string} */
+            statuses?: "read" | "write";
+            /** @enum {string} */
+            team_discussions?: "read" | "write";
+            /** @enum {string} */
+            vulnerability_alerts?: "read" | "write";
+            /** @enum {string} */
+            workflows?: "read" | "write";
+          };
+          /** @description The slug name of the GitHub app */
+          slug?: string;
+          /** Format: date-time */
+          updated_at: string | null;
+        };
+        before: string | null;
+        /** Format: uri */
+        check_runs_url: string;
+        /**
+         * @description The summary conclusion for all check runs that are part of the check suite. Can be one of `success`, `failure`,` neutral`, `cancelled`, `timed_out`, `action_required` or `stale`. This value will be `null` until the check run has completed. 
+         * @enum {string|null}
+         */
+        conclusion: "success" | "failure" | "neutral" | "cancelled" | "timed_out" | "action_required" | "stale" | "" | null;
+        /** Format: date-time */
+        created_at: string;
+        /** @description The head branch name the changes are on. */
+        head_branch: string | null;
+        /** SimpleCommit */
+        head_commit: {
+          /**
+           * Committer 
+           * @description Metaproperties for Git author/committer information.
+           */
+          author: {
+            /** Format: date-time */
+            date?: string;
+            /** Format: email */
+            email: string | null;
+            /** @description The git author's name. */
+            name: string;
+            username?: string;
+          };
+          /**
+           * Committer 
+           * @description Metaproperties for Git author/committer information.
+           */
+          committer: {
+            /** Format: date-time */
+            date?: string;
+            /** Format: email */
+            email: string | null;
+            /** @description The git author's name. */
+            name: string;
+            username?: string;
+          };
+          id: string;
+          message: string;
+          timestamp: string;
+          tree_id: string;
+        };
+        /** @description The SHA of the head commit that is being checked. */
+        head_sha: string;
+        id: number;
+        latest_check_runs_count: number;
+        node_id: string;
+        /** @description An array of pull requests that match this check suite. A pull request matches a check suite if they have the same `head_sha` and `head_branch`. When the check suite's `head_branch` is in a forked repository it will be `null` and the `pull_requests` array will be empty. */
+        pull_requests: ({
+            base: {
+              ref: string;
+              /** Repo Ref */
+              repo: {
+                id: number;
+                name: string;
+                /** Format: uri */
+                url: string;
+              };
+              sha: string;
+            };
+            head: {
+              ref: string;
+              /** Repo Ref */
+              repo: {
+                id: number;
+                name: string;
+                /** Format: uri */
+                url: string;
+              };
+              sha: string;
+            };
+            id: number;
+            number: number;
+            /** Format: uri */
+            url: string;
+          })[];
+        rerequestable?: boolean;
+        runs_rerequestable?: boolean;
+        /**
+         * @description The summary status for all check runs that are part of the check suite. Can be `requested`, `in_progress`, or `completed`. 
+         * @enum {string|null}
+         */
+        status: "requested" | "in_progress" | "completed" | "queued" | "" | null;
+        /** Format: date-time */
+        updated_at: string;
+        /**
+         * Format: uri 
+         * @description URL that points to the check suite API resource.
+         */
+        url: string;
+      };
+      enterprise?: components["schemas"]["enterprise"];
+      installation?: components["schemas"]["simple-installation"];
+      organization?: components["schemas"]["organization-simple"];
+      repository: components["schemas"]["repository"];
+      sender: components["schemas"]["simple-user"];
+    };
     /** code_scanning_alert appeared_in_branch event */
     "webhook-code-scanning-alert-appeared-in-branch": {
       /** @enum {string} */
@@ -21536,31 +22277,6 @@ export interface components {
          * @description The GitHub URL of the alert resource.
          */
         html_url: string;
-        instances?: (({
-            /** @description Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name. */
-            analysis_key: string;
-            classifications?: (string)[];
-            commit_sha?: string;
-            /** @description Identifies the variable values associated with the environment in which the analysis that generated this alert instance was performed, such as the language that was analyzed. */
-            environment: string;
-            location?: {
-              end_column?: number;
-              end_line?: number;
-              path?: string;
-              start_column?: number;
-              start_line?: number;
-            };
-            message?: {
-              text?: string;
-            };
-            /** @description The full Git reference, formatted as `refs/heads/<branch name>`. */
-            ref: string;
-            /**
-             * @description State of a code scanning alert. 
-             * @enum {string}
-             */
-            state: "open" | "dismissed" | "fixed";
-          }) | null)[];
         /** Alert Instance */
         most_recent_instance?: ({
           /** @description Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name. */
@@ -21687,34 +22403,6 @@ export interface components {
          * @description The GitHub URL of the alert resource.
          */
         html_url: string;
-        instances?: ((({
-            /** @description Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name. */
-            analysis_key: string;
-            classifications?: (string)[];
-            commit_sha?: string;
-            /** @description Identifies the variable values associated with the environment in which the analysis that generated this alert instance was performed, such as the language that was analyzed. */
-            environment: string;
-            location?: {
-              end_column?: number;
-              end_line?: number;
-              path?: string;
-              start_column?: number;
-              start_line?: number;
-            };
-            message?: {
-              text?: string;
-            };
-            /** @description The full Git reference, formatted as `refs/heads/<branch name>`. */
-            ref: string;
-            /**
-             * @description State of a code scanning alert. 
-             * @enum {string}
-             */
-            state: "open" | "dismissed" | "fixed";
-          }) | null) & {
-            /** @enum {string} */
-            state: "dismissed";
-          })[];
         /** Alert Instance */
         most_recent_instance?: ({
           /** @description Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name. */
@@ -21808,34 +22496,6 @@ export interface components {
          * @description The GitHub URL of the alert resource.
          */
         html_url: string;
-        instances?: ((({
-            /** @description Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name. */
-            analysis_key: string;
-            classifications?: (string)[];
-            commit_sha?: string;
-            /** @description Identifies the variable values associated with the environment in which the analysis that generated this alert instance was performed, such as the language that was analyzed. */
-            environment: string;
-            location?: {
-              end_column?: number;
-              end_line?: number;
-              path?: string;
-              start_column?: number;
-              start_line?: number;
-            };
-            message?: {
-              text?: string;
-            };
-            /** @description The full Git reference, formatted as `refs/heads/<branch name>`. */
-            ref: string;
-            /**
-             * @description State of a code scanning alert. 
-             * @enum {string}
-             */
-            state: "open" | "dismissed" | "fixed";
-          }) | null) & ({
-            /** @enum {string} */
-            state: "open" | "dismissed";
-          }))[];
         instances_url?: string;
         /** Alert Instance */
         most_recent_instance?: ({
@@ -21971,34 +22631,6 @@ export interface components {
          * @description The GitHub URL of the alert resource.
          */
         html_url: string;
-        instances?: ((({
-            /** @description Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name. */
-            analysis_key: string;
-            classifications?: (string)[];
-            commit_sha?: string;
-            /** @description Identifies the variable values associated with the environment in which the analysis that generated this alert instance was performed, such as the language that was analyzed. */
-            environment: string;
-            location?: {
-              end_column?: number;
-              end_line?: number;
-              path?: string;
-              start_column?: number;
-              start_line?: number;
-            };
-            message?: {
-              text?: string;
-            };
-            /** @description The full Git reference, formatted as `refs/heads/<branch name>`. */
-            ref: string;
-            /**
-             * @description State of a code scanning alert. 
-             * @enum {string}
-             */
-            state: "open" | "dismissed" | "fixed";
-          }) | null) & {
-            /** @enum {string} */
-            state: "fixed";
-          })[];
         /** Format: uri */
         instances_url?: string;
         /** Alert Instance */
@@ -22092,34 +22724,6 @@ export interface components {
          * @description The GitHub URL of the alert resource.
          */
         html_url: string;
-        instances?: ((({
-            /** @description Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name. */
-            analysis_key: string;
-            classifications?: (string)[];
-            commit_sha?: string;
-            /** @description Identifies the variable values associated with the environment in which the analysis that generated this alert instance was performed, such as the language that was analyzed. */
-            environment: string;
-            location?: {
-              end_column?: number;
-              end_line?: number;
-              path?: string;
-              start_column?: number;
-              start_line?: number;
-            };
-            message?: {
-              text?: string;
-            };
-            /** @description The full Git reference, formatted as `refs/heads/<branch name>`. */
-            ref: string;
-            /**
-             * @description State of a code scanning alert. 
-             * @enum {string}
-             */
-            state: "open" | "dismissed" | "fixed";
-          }) | null) & {
-            /** @enum {string} */
-            state: "open";
-          })[];
         /** Alert Instance */
         most_recent_instance?: ({
           /** @description Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name. */
@@ -22211,34 +22815,6 @@ export interface components {
          * @description The GitHub URL of the alert resource.
          */
         html_url: string;
-        instances?: ((({
-            /** @description Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name. */
-            analysis_key: string;
-            classifications?: (string)[];
-            commit_sha?: string;
-            /** @description Identifies the variable values associated with the environment in which the analysis that generated this alert instance was performed, such as the language that was analyzed. */
-            environment: string;
-            location?: {
-              end_column?: number;
-              end_line?: number;
-              path?: string;
-              start_column?: number;
-              start_line?: number;
-            };
-            message?: {
-              text?: string;
-            };
-            /** @description The full Git reference, formatted as `refs/heads/<branch name>`. */
-            ref: string;
-            /**
-             * @description State of a code scanning alert. 
-             * @enum {string}
-             */
-            state: "open" | "dismissed" | "fixed";
-          }) | null) & {
-            /** @enum {string} */
-            state: "open";
-          })[];
         /** Alert Instance */
         most_recent_instance?: ({
           /** @description Identifies the configuration under which the analysis was executed. For example, in GitHub Actions this includes the workflow filename and job name. */
@@ -23842,236 +24418,7 @@ export interface components {
           url?: string;
         }) | null;
       };
-      discussion: ({
-        active_lock_reason: string | null;
-        answer_chosen_at: string | null;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        answer_html_url: string | null;
-        /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
-         * @enum {string}
-         */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-        body: string;
-        category: {
-          /** Format: date-time */
-          created_at: string;
-          description: string;
-          emoji: string;
-          id: number;
-          is_answerable: boolean;
-          name: string;
-          node_id?: string;
-          repository_id: number;
-          slug: string;
-          updated_at: string;
-        };
-        comments: number;
-        /** Format: date-time */
-        created_at: string;
-        html_url: string;
-        id: number;
-        locked: boolean;
-        node_id: string;
-        number: number;
-        /** Reactions */
-        reactions?: {
-          "+1": number;
-          "-1": number;
-          confused: number;
-          eyes: number;
-          heart: number;
-          hooray: number;
-          laugh: number;
-          rocket: number;
-          total_count: number;
-          /** Format: uri */
-          url: string;
-        };
-        repository_url: string;
-        /** @enum {string} */
-        state: "open" | "locked" | "converting" | "transferring";
-        timeline_url?: string;
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      }) & ({
-        active_lock_reason?: string | null;
-        /** Format: date-time */
-        answer_chosen_at: string;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        /** Format: uri */
-        answer_html_url: string;
-        author_association?: string;
-        body?: string;
-        category: {
-          created_at?: string;
-          description?: string;
-          emoji?: string;
-          id?: number;
-          /** @enum {boolean} */
-          is_answerable: true;
-          name?: string;
-          node_id?: string;
-          repository_id?: number;
-          slug?: string;
-          updated_at?: string;
-        };
-        comments?: number;
-        created_at?: string;
-        html_url?: string;
-        id?: number;
-        locked?: boolean;
-        node_id?: string;
-        number?: number;
-        reactions?: {
-          "+1"?: number;
-          "-1"?: number;
-          confused?: number;
-          eyes?: number;
-          heart?: number;
-          hooray?: number;
-          laugh?: number;
-          rocket?: number;
-          total_count?: number;
-          url?: string;
-        };
-        repository_url?: string;
-        state?: string;
-        timeline_url?: string;
-        title?: string;
-        updated_at?: string;
-        user?: {
-          avatar_url?: string;
-          events_url?: string;
-          followers_url?: string;
-          following_url?: string;
-          gists_url?: string;
-          gravatar_id?: string;
-          html_url?: string;
-          id?: number;
-          login?: string;
-          node_id?: string;
-          organizations_url?: string;
-          received_events_url?: string;
-          repos_url?: string;
-          site_admin?: boolean;
-          starred_url?: string;
-          subscriptions_url?: string;
-          type?: string;
-          url?: string;
-        };
-      });
+      discussion: components["schemas"]["discussion"];
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
       organization?: components["schemas"]["organization-simple"];
@@ -24099,135 +24446,18 @@ export interface components {
           };
         };
       };
-      /** Discussion */
-      discussion: {
-        active_lock_reason: string | null;
-        answer_chosen_at: string | null;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        answer_html_url: string | null;
-        /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
-         * @enum {string}
-         */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-        body: string;
-        category: {
-          /** Format: date-time */
-          created_at: string;
-          description: string;
-          emoji: string;
-          id: number;
-          is_answerable: boolean;
-          name: string;
-          node_id?: string;
-          repository_id: number;
-          slug: string;
-          updated_at: string;
-        };
-        comments: number;
-        /** Format: date-time */
-        created_at: string;
-        html_url: string;
-        id: number;
-        locked: boolean;
-        node_id: string;
-        number: number;
-        /** Reactions */
-        reactions?: {
-          "+1": number;
-          "-1": number;
-          confused: number;
-          eyes: number;
-          heart: number;
-          hooray: number;
-          laugh: number;
-          rocket: number;
-          total_count: number;
-          /** Format: uri */
-          url: string;
-        };
-        repository_url: string;
-        /** @enum {string} */
-        state: "open" | "locked" | "converting" | "transferring";
-        timeline_url?: string;
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      };
+      discussion: components["schemas"]["discussion"];
+      enterprise?: components["schemas"]["enterprise"];
+      installation?: components["schemas"]["simple-installation"];
+      organization?: components["schemas"]["organization-simple"];
+      repository: components["schemas"]["repository"];
+      sender: components["schemas"]["simple-user"];
+    };
+    /** discussion closed event */
+    "webhook-discussion-closed": {
+      /** @enum {string} */
+      action: "closed";
+      discussion: components["schemas"]["discussion"];
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
       organization?: components["schemas"]["organization-simple"];
@@ -24307,135 +24537,7 @@ export interface components {
           url?: string;
         }) | null;
       };
-      /** Discussion */
-      discussion: {
-        active_lock_reason: string | null;
-        answer_chosen_at: string | null;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        answer_html_url: string | null;
-        /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
-         * @enum {string}
-         */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-        body: string | null;
-        category: {
-          /** Format: date-time */
-          created_at: string;
-          description: string;
-          emoji: string;
-          id: number;
-          is_answerable: boolean;
-          name: string;
-          node_id?: string;
-          repository_id: number;
-          slug: string;
-          updated_at: string;
-        };
-        comments: number;
-        /** Format: date-time */
-        created_at: string;
-        html_url: string;
-        id: number;
-        locked: boolean;
-        node_id: string;
-        number: number;
-        /** Reactions */
-        reactions?: {
-          "+1": number;
-          "-1": number;
-          confused: number;
-          eyes: number;
-          heart: number;
-          hooray: number;
-          laugh: number;
-          rocket: number;
-          total_count: number;
-          /** Format: uri */
-          url: string;
-        };
-        repository_url: string;
-        /** @enum {string} */
-        state: "open" | "locked" | "converting" | "transferring";
-        timeline_url?: string;
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      };
+      discussion: components["schemas"]["discussion"];
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
       organization?: components["schemas"]["organization-simple"];
@@ -24515,135 +24617,7 @@ export interface components {
           url?: string;
         }) | null;
       };
-      /** Discussion */
-      discussion: {
-        active_lock_reason: string | null;
-        answer_chosen_at: string | null;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        answer_html_url: string | null;
-        /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
-         * @enum {string}
-         */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-        body: string;
-        category: {
-          /** Format: date-time */
-          created_at: string;
-          description: string;
-          emoji: string;
-          id: number;
-          is_answerable: boolean;
-          name: string;
-          node_id?: string;
-          repository_id: number;
-          slug: string;
-          updated_at: string;
-        };
-        comments: number;
-        /** Format: date-time */
-        created_at: string;
-        html_url: string;
-        id: number;
-        locked: boolean;
-        node_id: string;
-        number: number;
-        /** Reactions */
-        reactions?: {
-          "+1": number;
-          "-1": number;
-          confused: number;
-          eyes: number;
-          heart: number;
-          hooray: number;
-          laugh: number;
-          rocket: number;
-          total_count: number;
-          /** Format: uri */
-          url: string;
-        };
-        repository_url: string;
-        /** @enum {string} */
-        state: "open" | "locked" | "converting" | "transferring";
-        timeline_url?: string;
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      };
+      discussion: components["schemas"]["discussion"];
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
       organization?: components["schemas"]["organization-simple"];
@@ -24728,135 +24702,7 @@ export interface components {
           url?: string;
         }) | null;
       };
-      /** Discussion */
-      discussion: {
-        active_lock_reason: string | null;
-        answer_chosen_at: string | null;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        answer_html_url: string | null;
-        /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
-         * @enum {string}
-         */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-        body: string | null;
-        category: {
-          /** Format: date-time */
-          created_at: string;
-          description: string;
-          emoji: string;
-          id: number;
-          is_answerable: boolean;
-          name: string;
-          node_id?: string;
-          repository_id: number;
-          slug: string;
-          updated_at: string;
-        };
-        comments: number;
-        /** Format: date-time */
-        created_at: string;
-        html_url: string;
-        id: number;
-        locked: boolean;
-        node_id: string;
-        number: number;
-        /** Reactions */
-        reactions?: {
-          "+1": number;
-          "-1": number;
-          confused: number;
-          eyes: number;
-          heart: number;
-          hooray: number;
-          laugh: number;
-          rocket: number;
-          total_count: number;
-          /** Format: uri */
-          url: string;
-        };
-        repository_url: string;
-        /** @enum {string} */
-        state: "open" | "locked" | "converting" | "transferring";
-        timeline_url?: string;
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      };
+      discussion: components["schemas"]["discussion"];
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
       organization?: components["schemas"]["organization-simple"];
@@ -25070,135 +24916,7 @@ export interface components {
     "webhook-discussion-deleted": {
       /** @enum {string} */
       action: "deleted";
-      /** Discussion */
-      discussion: {
-        active_lock_reason: string | null;
-        answer_chosen_at: string | null;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        answer_html_url: string | null;
-        /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
-         * @enum {string}
-         */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-        body: string;
-        category: {
-          /** Format: date-time */
-          created_at: string;
-          description: string;
-          emoji: string;
-          id: number;
-          is_answerable: boolean;
-          name: string;
-          node_id?: string;
-          repository_id: number;
-          slug: string;
-          updated_at: string;
-        };
-        comments: number;
-        /** Format: date-time */
-        created_at: string;
-        html_url: string;
-        id: number;
-        locked: boolean;
-        node_id: string;
-        number: number;
-        /** Reactions */
-        reactions?: {
-          "+1": number;
-          "-1": number;
-          confused: number;
-          eyes: number;
-          heart: number;
-          hooray: number;
-          laugh: number;
-          rocket: number;
-          total_count: number;
-          /** Format: uri */
-          url: string;
-        };
-        repository_url: string;
-        /** @enum {string} */
-        state: "open" | "locked" | "converting" | "transferring";
-        timeline_url?: string;
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      };
+      discussion: components["schemas"]["discussion"];
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
       organization?: components["schemas"]["organization-simple"];
@@ -25217,135 +24935,7 @@ export interface components {
           from: string;
         };
       };
-      /** Discussion */
-      discussion: {
-        active_lock_reason: string | null;
-        answer_chosen_at: string | null;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        answer_html_url: string | null;
-        /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
-         * @enum {string}
-         */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-        body: string;
-        category: {
-          /** Format: date-time */
-          created_at: string;
-          description: string;
-          emoji: string;
-          id: number;
-          is_answerable: boolean;
-          name: string;
-          node_id?: string;
-          repository_id: number;
-          slug: string;
-          updated_at: string;
-        };
-        comments: number;
-        /** Format: date-time */
-        created_at: string;
-        html_url: string;
-        id: number;
-        locked: boolean;
-        node_id: string;
-        number: number;
-        /** Reactions */
-        reactions?: {
-          "+1": number;
-          "-1": number;
-          confused: number;
-          eyes: number;
-          heart: number;
-          hooray: number;
-          laugh: number;
-          rocket: number;
-          total_count: number;
-          /** Format: uri */
-          url: string;
-        };
-        repository_url: string;
-        /** @enum {string} */
-        state: "open" | "locked" | "converting" | "transferring";
-        timeline_url?: string;
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      };
+      discussion: components["schemas"]["discussion"];
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
       organization?: components["schemas"]["organization-simple"];
@@ -25356,135 +24946,7 @@ export interface components {
     "webhook-discussion-labeled": {
       /** @enum {string} */
       action: "labeled";
-      /** Discussion */
-      discussion: {
-        active_lock_reason: string | null;
-        answer_chosen_at: string | null;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        answer_html_url: string | null;
-        /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
-         * @enum {string}
-         */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-        body: string | null;
-        category: {
-          /** Format: date-time */
-          created_at: string;
-          description: string;
-          emoji: string;
-          id: number;
-          is_answerable: boolean;
-          name: string;
-          node_id?: string;
-          repository_id: number;
-          slug: string;
-          updated_at: string;
-        };
-        comments: number;
-        /** Format: date-time */
-        created_at: string;
-        html_url: string;
-        id: number;
-        locked: boolean;
-        node_id: string;
-        number: number;
-        /** Reactions */
-        reactions?: {
-          "+1": number;
-          "-1": number;
-          confused: number;
-          eyes: number;
-          heart: number;
-          hooray: number;
-          laugh: number;
-          rocket: number;
-          total_count: number;
-          /** Format: uri */
-          url: string;
-        };
-        repository_url: string;
-        /** @enum {string} */
-        state: "open" | "locked" | "converting" | "transferring";
-        timeline_url?: string;
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      };
+      discussion: components["schemas"]["discussion"];
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
       /** Label */
@@ -25511,199 +24973,7 @@ export interface components {
     "webhook-discussion-locked": {
       /** @enum {string} */
       action: "locked";
-      discussion: ({
-        active_lock_reason: string | null;
-        answer_chosen_at: string | null;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        answer_html_url: string | null;
-        /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
-         * @enum {string}
-         */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-        body: string;
-        category: {
-          /** Format: date-time */
-          created_at: string;
-          description: string;
-          emoji: string;
-          id: number;
-          is_answerable: boolean;
-          name: string;
-          node_id?: string;
-          repository_id: number;
-          slug: string;
-          updated_at: string;
-        };
-        comments: number;
-        /** Format: date-time */
-        created_at: string;
-        html_url: string;
-        id: number;
-        locked: boolean;
-        node_id: string;
-        number: number;
-        /** Reactions */
-        reactions?: {
-          "+1": number;
-          "-1": number;
-          confused: number;
-          eyes: number;
-          heart: number;
-          hooray: number;
-          laugh: number;
-          rocket: number;
-          total_count: number;
-          /** Format: uri */
-          url: string;
-        };
-        repository_url: string;
-        /** @enum {string} */
-        state: "open" | "locked" | "converting" | "transferring";
-        timeline_url?: string;
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      }) & ({
-        active_lock_reason?: string;
-        answer_chosen_at?: string | null;
-        answer_chosen_by?: Record<string, unknown> | null;
-        answer_html_url?: string | null;
-        author_association?: string;
-        body?: string;
-        category?: {
-          created_at?: string;
-          description?: string;
-          emoji?: string;
-          id?: number;
-          is_answerable?: boolean;
-          name?: string;
-          node_id?: string;
-          repository_id?: number;
-          slug?: string;
-          updated_at?: string;
-        };
-        comments?: number;
-        created_at?: string;
-        html_url?: string;
-        id?: number;
-        /** @enum {boolean} */
-        locked: true;
-        node_id?: string;
-        number?: number;
-        reactions?: {
-          "+1"?: number;
-          "-1"?: number;
-          confused?: number;
-          eyes?: number;
-          heart?: number;
-          hooray?: number;
-          laugh?: number;
-          rocket?: number;
-          total_count?: number;
-          url?: string;
-        };
-        repository_url?: string;
-        /** @enum {string} */
-        state: "locked";
-        timeline_url?: string;
-        title?: string;
-        updated_at?: string;
-        user?: {
-          avatar_url?: string;
-          events_url?: string;
-          followers_url?: string;
-          following_url?: string;
-          gists_url?: string;
-          gravatar_id?: string;
-          html_url?: string;
-          id?: number;
-          login?: string;
-          node_id?: string;
-          organizations_url?: string;
-          received_events_url?: string;
-          repos_url?: string;
-          site_admin?: boolean;
-          starred_url?: string;
-          subscriptions_url?: string;
-          type?: string;
-          url?: string;
-        };
-      });
+      discussion: components["schemas"]["discussion"];
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
       organization?: components["schemas"]["organization-simple"];
@@ -25714,135 +24984,18 @@ export interface components {
     "webhook-discussion-pinned": {
       /** @enum {string} */
       action: "pinned";
-      /** Discussion */
-      discussion: {
-        active_lock_reason: string | null;
-        answer_chosen_at: string | null;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        answer_html_url: string | null;
-        /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
-         * @enum {string}
-         */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-        body: string;
-        category: {
-          /** Format: date-time */
-          created_at: string;
-          description: string;
-          emoji: string;
-          id: number;
-          is_answerable: boolean;
-          name: string;
-          node_id?: string;
-          repository_id: number;
-          slug: string;
-          updated_at: string;
-        };
-        comments: number;
-        /** Format: date-time */
-        created_at: string;
-        html_url: string;
-        id: number;
-        locked: boolean;
-        node_id: string;
-        number: number;
-        /** Reactions */
-        reactions?: {
-          "+1": number;
-          "-1": number;
-          confused: number;
-          eyes: number;
-          heart: number;
-          hooray: number;
-          laugh: number;
-          rocket: number;
-          total_count: number;
-          /** Format: uri */
-          url: string;
-        };
-        repository_url: string;
-        /** @enum {string} */
-        state: "open" | "locked" | "converting" | "transferring";
-        timeline_url?: string;
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      };
+      discussion: components["schemas"]["discussion"];
+      enterprise?: components["schemas"]["enterprise"];
+      installation?: components["schemas"]["simple-installation"];
+      organization?: components["schemas"]["organization-simple"];
+      repository: components["schemas"]["repository"];
+      sender: components["schemas"]["simple-user"];
+    };
+    /** discussion reopened event */
+    "webhook-discussion-reopened": {
+      /** @enum {string} */
+      action: "reopened";
+      discussion: components["schemas"]["discussion"];
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
       organization?: components["schemas"]["organization-simple"];
@@ -25854,507 +25007,10 @@ export interface components {
       /** @enum {string} */
       action: "transferred";
       changes: {
-        /** Discussion */
-        new_discussion: {
-          active_lock_reason: string | null;
-          answer_chosen_at: string | null;
-          /** User */
-          answer_chosen_by: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-          answer_html_url: string | null;
-          /**
-           * AuthorAssociation 
-           * @description How the author is associated with the repository. 
-           * @enum {string}
-           */
-          author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-          body: string;
-          category: {
-            /** Format: date-time */
-            created_at: string;
-            description: string;
-            emoji: string;
-            id: number;
-            is_answerable: boolean;
-            name: string;
-            node_id?: string;
-            repository_id: number;
-            slug: string;
-            updated_at: string;
-          };
-          comments: number;
-          /** Format: date-time */
-          created_at: string;
-          html_url: string;
-          id: number;
-          locked: boolean;
-          node_id: string;
-          number: number;
-          /** Reactions */
-          reactions?: {
-            "+1": number;
-            "-1": number;
-            confused: number;
-            eyes: number;
-            heart: number;
-            hooray: number;
-            laugh: number;
-            rocket: number;
-            total_count: number;
-            /** Format: uri */
-            url: string;
-          };
-          repository_url: string;
-          /** @enum {string} */
-          state: "open" | "locked" | "converting" | "transferring";
-          timeline_url?: string;
-          title: string;
-          /** Format: date-time */
-          updated_at: string;
-          /** User */
-          user: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-        };
-        /**
-         * Repository 
-         * @description A git repository
-         */
-        new_repository: {
-          /**
-           * @description Whether to allow auto-merge for pull requests. 
-           * @default false
-           */
-          allow_auto_merge?: boolean;
-          /** @description Whether to allow private forks */
-          allow_forking?: boolean;
-          /**
-           * @description Whether to allow merge commits for pull requests. 
-           * @default true
-           */
-          allow_merge_commit?: boolean;
-          /**
-           * @description Whether to allow rebase merges for pull requests. 
-           * @default true
-           */
-          allow_rebase_merge?: boolean;
-          /**
-           * @description Whether to allow squash merges for pull requests. 
-           * @default true
-           */
-          allow_squash_merge?: boolean;
-          allow_update_branch?: boolean;
-          /** Format: uri-template */
-          archive_url: string;
-          /**
-           * @description Whether the repository is archived. 
-           * @default false
-           */
-          archived: boolean;
-          /** Format: uri-template */
-          assignees_url: string;
-          /** Format: uri-template */
-          blobs_url: string;
-          /** Format: uri-template */
-          branches_url: string;
-          /** Format: uri */
-          clone_url: string;
-          /** Format: uri-template */
-          collaborators_url: string;
-          /** Format: uri-template */
-          comments_url: string;
-          /** Format: uri-template */
-          commits_url: string;
-          /** Format: uri-template */
-          compare_url: string;
-          /** Format: uri-template */
-          contents_url: string;
-          /** Format: uri */
-          contributors_url: string;
-          created_at: number | string;
-          /** @description The default branch of the repository. */
-          default_branch: string;
-          /**
-           * @description Whether to delete head branches when pull requests are merged 
-           * @default false
-           */
-          delete_branch_on_merge?: boolean;
-          /** Format: uri */
-          deployments_url: string;
-          description: string | null;
-          /** @description Returns whether or not this repository is disabled. */
-          disabled?: boolean;
-          /** Format: uri */
-          downloads_url: string;
-          /** Format: uri */
-          events_url: string;
-          fork: boolean;
-          forks: number;
-          forks_count: number;
-          /** Format: uri */
-          forks_url: string;
-          full_name: string;
-          /** Format: uri-template */
-          git_commits_url: string;
-          /** Format: uri-template */
-          git_refs_url: string;
-          /** Format: uri-template */
-          git_tags_url: string;
-          /** Format: uri */
-          git_url: string;
-          /**
-           * @description Whether downloads are enabled. 
-           * @default true
-           */
-          has_downloads: boolean;
-          /**
-           * @description Whether issues are enabled. 
-           * @default true
-           */
-          has_issues: boolean;
-          has_pages: boolean;
-          /**
-           * @description Whether projects are enabled. 
-           * @default true
-           */
-          has_projects: boolean;
-          /**
-           * @description Whether the wiki is enabled. 
-           * @default true
-           */
-          has_wiki: boolean;
-          /**
-           * @description Whether discussions are enabled. 
-           * @default false
-           */
-          has_discussions: boolean;
-          homepage: string | null;
-          /** Format: uri */
-          hooks_url: string;
-          /** Format: uri */
-          html_url: string;
-          /** @description Unique identifier of the repository */
-          id: number;
-          is_template?: boolean;
-          /** Format: uri-template */
-          issue_comment_url: string;
-          /** Format: uri-template */
-          issue_events_url: string;
-          /** Format: uri-template */
-          issues_url: string;
-          /** Format: uri-template */
-          keys_url: string;
-          /** Format: uri-template */
-          labels_url: string;
-          language: string | null;
-          /** Format: uri */
-          languages_url: string;
-          /** License */
-          license: ({
-            key: string;
-            name: string;
-            node_id: string;
-            spdx_id: string;
-            /** Format: uri */
-            url: string | null;
-          }) | null;
-          master_branch?: string;
-          /** Format: uri */
-          merges_url: string;
-          /** Format: uri-template */
-          milestones_url: string;
-          /** Format: uri */
-          mirror_url: string | null;
-          /** @description The name of the repository. */
-          name: string;
-          node_id: string;
-          /** Format: uri-template */
-          notifications_url: string;
-          open_issues: number;
-          open_issues_count: number;
-          organization?: string;
-          /** User */
-          owner: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-          permissions?: {
-            admin: boolean;
-            maintain?: boolean;
-            pull: boolean;
-            push: boolean;
-            triage?: boolean;
-          };
-          /** @description Whether the repository is private or public. */
-          private: boolean;
-          public?: boolean;
-          /** Format: uri-template */
-          pulls_url: string;
-          pushed_at: number | string;
-          /** Format: uri-template */
-          releases_url: string;
-          role_name?: string | null;
-          size: number;
-          ssh_url: string;
-          stargazers?: number;
-          stargazers_count: number;
-          /** Format: uri */
-          stargazers_url: string;
-          /** Format: uri-template */
-          statuses_url: string;
-          /** Format: uri */
-          subscribers_url: string;
-          /** Format: uri */
-          subscription_url: string;
-          /** Format: uri */
-          svn_url: string;
-          /** Format: uri */
-          tags_url: string;
-          /** Format: uri */
-          teams_url: string;
-          topics: (string)[];
-          /** Format: uri-template */
-          trees_url: string;
-          /** Format: date-time */
-          updated_at: string;
-          /** Format: uri */
-          url: string;
-          /** @enum {string} */
-          visibility: "public" | "private" | "internal";
-          watchers: number;
-          watchers_count: number;
-          /** @description Whether to require contributors to sign off on web-based commits */
-          web_commit_signoff_required?: boolean;
-        };
+        new_discussion: components["schemas"]["discussion"];
+        new_repository: components["schemas"]["repository"];
       };
-      /** Discussion */
-      discussion: {
-        active_lock_reason: string | null;
-        answer_chosen_at: string | null;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        answer_html_url: string | null;
-        /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
-         * @enum {string}
-         */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-        body: string;
-        category: {
-          /** Format: date-time */
-          created_at: string;
-          description: string;
-          emoji: string;
-          id: number;
-          is_answerable: boolean;
-          name: string;
-          node_id?: string;
-          repository_id: number;
-          slug: string;
-          updated_at: string;
-        };
-        comments: number;
-        /** Format: date-time */
-        created_at: string;
-        html_url: string;
-        id: number;
-        locked: boolean;
-        node_id: string;
-        number: number;
-        /** Reactions */
-        reactions?: {
-          "+1": number;
-          "-1": number;
-          confused: number;
-          eyes: number;
-          heart: number;
-          hooray: number;
-          laugh: number;
-          rocket: number;
-          total_count: number;
-          /** Format: uri */
-          url: string;
-        };
-        repository_url: string;
-        /** @enum {string} */
-        state: "open" | "locked" | "converting" | "transferring";
-        timeline_url?: string;
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      };
+      discussion: components["schemas"]["discussion"];
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
       organization?: components["schemas"]["organization-simple"];
@@ -26365,200 +25021,7 @@ export interface components {
     "webhook-discussion-unanswered": {
       /** @enum {string} */
       action: "unanswered";
-      discussion: ({
-        active_lock_reason: string | null;
-        answer_chosen_at: string | null;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        answer_html_url: string | null;
-        /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
-         * @enum {string}
-         */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-        body: string;
-        category: {
-          /** Format: date-time */
-          created_at: string;
-          description: string;
-          emoji: string;
-          id: number;
-          is_answerable: boolean;
-          name: string;
-          node_id?: string;
-          repository_id: number;
-          slug: string;
-          updated_at: string;
-        };
-        comments: number;
-        /** Format: date-time */
-        created_at: string;
-        html_url: string;
-        id: number;
-        locked: boolean;
-        node_id: string;
-        number: number;
-        /** Reactions */
-        reactions?: {
-          "+1": number;
-          "-1": number;
-          confused: number;
-          eyes: number;
-          heart: number;
-          hooray: number;
-          laugh: number;
-          rocket: number;
-          total_count: number;
-          /** Format: uri */
-          url: string;
-        };
-        repository_url: string;
-        /** @enum {string} */
-        state: "open" | "locked" | "converting" | "transferring";
-        timeline_url?: string;
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      }) & ({
-        active_lock_reason?: string | null;
-        answer_chosen_at: Record<string, unknown> | null;
-        answer_chosen_by: Record<string, unknown> | null;
-        answer_html_url: string | null;
-        author_association?: string;
-        body?: string;
-        category: {
-          created_at?: string;
-          description?: string;
-          emoji?: string;
-          id?: number;
-          /** @enum {boolean} */
-          is_answerable: true;
-          name?: string;
-          node_id?: string;
-          repository_id?: number;
-          slug?: string;
-          updated_at?: string;
-        };
-        comments?: number;
-        created_at?: string;
-        html_url?: string;
-        id?: number;
-        locked?: boolean;
-        node_id?: string;
-        number?: number;
-        reactions?: {
-          "+1"?: number;
-          "-1"?: number;
-          confused?: number;
-          eyes?: number;
-          heart?: number;
-          hooray?: number;
-          laugh?: number;
-          rocket?: number;
-          total_count?: number;
-          url?: string;
-        };
-        repository_url?: string;
-        state?: string;
-        timeline_url?: string;
-        title?: string;
-        updated_at?: string;
-        user?: {
-          avatar_url?: string;
-          events_url?: string;
-          followers_url?: string;
-          following_url?: string;
-          gists_url?: string;
-          gravatar_id?: string;
-          html_url?: string;
-          id?: number;
-          login?: string;
-          node_id?: string;
-          organizations_url?: string;
-          received_events_url?: string;
-          repos_url?: string;
-          site_admin?: boolean;
-          starred_url?: string;
-          subscriptions_url?: string;
-          type?: string;
-          url?: string;
-        };
-      });
-      enterprise?: components["schemas"]["enterprise"];
-      installation?: components["schemas"]["simple-installation"];
+      discussion: components["schemas"]["discussion"];
       old_answer: {
         /**
          * AuthorAssociation 
@@ -26638,135 +25101,7 @@ export interface components {
     "webhook-discussion-unlabeled": {
       /** @enum {string} */
       action: "unlabeled";
-      /** Discussion */
-      discussion: {
-        active_lock_reason: string | null;
-        answer_chosen_at: string | null;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        answer_html_url: string | null;
-        /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
-         * @enum {string}
-         */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-        body: string;
-        category: {
-          /** Format: date-time */
-          created_at: string;
-          description: string;
-          emoji: string;
-          id: number;
-          is_answerable: boolean;
-          name: string;
-          node_id?: string;
-          repository_id: number;
-          slug: string;
-          updated_at: string;
-        };
-        comments: number;
-        /** Format: date-time */
-        created_at: string;
-        html_url: string;
-        id: number;
-        locked: boolean;
-        node_id: string;
-        number: number;
-        /** Reactions */
-        reactions?: {
-          "+1": number;
-          "-1": number;
-          confused: number;
-          eyes: number;
-          heart: number;
-          hooray: number;
-          laugh: number;
-          rocket: number;
-          total_count: number;
-          /** Format: uri */
-          url: string;
-        };
-        repository_url: string;
-        /** @enum {string} */
-        state: "open" | "locked" | "converting" | "transferring";
-        timeline_url?: string;
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      };
+      discussion: components["schemas"]["discussion"];
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
       /** Label */
@@ -26793,199 +25128,7 @@ export interface components {
     "webhook-discussion-unlocked": {
       /** @enum {string} */
       action: "unlocked";
-      discussion: ({
-        active_lock_reason: string | null;
-        answer_chosen_at: string | null;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        answer_html_url: string | null;
-        /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
-         * @enum {string}
-         */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-        body: string;
-        category: {
-          /** Format: date-time */
-          created_at: string;
-          description: string;
-          emoji: string;
-          id: number;
-          is_answerable: boolean;
-          name: string;
-          node_id?: string;
-          repository_id: number;
-          slug: string;
-          updated_at: string;
-        };
-        comments: number;
-        /** Format: date-time */
-        created_at: string;
-        html_url: string;
-        id: number;
-        locked: boolean;
-        node_id: string;
-        number: number;
-        /** Reactions */
-        reactions?: {
-          "+1": number;
-          "-1": number;
-          confused: number;
-          eyes: number;
-          heart: number;
-          hooray: number;
-          laugh: number;
-          rocket: number;
-          total_count: number;
-          /** Format: uri */
-          url: string;
-        };
-        repository_url: string;
-        /** @enum {string} */
-        state: "open" | "locked" | "converting" | "transferring";
-        timeline_url?: string;
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      }) & ({
-        active_lock_reason?: Record<string, unknown> | null;
-        answer_chosen_at?: Record<string, unknown> | null;
-        answer_chosen_by?: Record<string, unknown> | null;
-        answer_html_url?: Record<string, unknown> | null;
-        author_association?: string;
-        body?: string;
-        category?: {
-          created_at?: string;
-          description?: string;
-          emoji?: string;
-          id?: number;
-          is_answerable?: boolean;
-          name?: string;
-          node_id?: string;
-          repository_id?: number;
-          slug?: string;
-          updated_at?: string;
-        };
-        comments?: number;
-        created_at?: string;
-        html_url?: string;
-        id?: number;
-        /** @enum {boolean} */
-        locked: false;
-        node_id?: string;
-        number?: number;
-        reactions?: {
-          "+1"?: number;
-          "-1"?: number;
-          confused?: number;
-          eyes?: number;
-          heart?: number;
-          hooray?: number;
-          laugh?: number;
-          rocket?: number;
-          total_count?: number;
-          url?: string;
-        };
-        repository_url?: string;
-        /** @enum {string} */
-        state: "open";
-        timeline_url?: string;
-        title?: string;
-        updated_at?: string;
-        user?: {
-          avatar_url?: string;
-          events_url?: string;
-          followers_url?: string;
-          following_url?: string;
-          gists_url?: string;
-          gravatar_id?: string;
-          html_url?: string;
-          id?: number;
-          login?: string;
-          node_id?: string;
-          organizations_url?: string;
-          received_events_url?: string;
-          repos_url?: string;
-          site_admin?: boolean;
-          starred_url?: string;
-          subscriptions_url?: string;
-          type?: string;
-          url?: string;
-        };
-      });
+      discussion: components["schemas"]["discussion"];
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
       organization?: components["schemas"]["organization-simple"];
@@ -26996,135 +25139,7 @@ export interface components {
     "webhook-discussion-unpinned": {
       /** @enum {string} */
       action: "unpinned";
-      /** Discussion */
-      discussion: {
-        active_lock_reason: string | null;
-        answer_chosen_at: string | null;
-        /** User */
-        answer_chosen_by: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        answer_html_url: string | null;
-        /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
-         * @enum {string}
-         */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
-        body: string;
-        category: {
-          /** Format: date-time */
-          created_at: string;
-          description: string;
-          emoji: string;
-          id: number;
-          is_answerable: boolean;
-          name: string;
-          node_id?: string;
-          repository_id: number;
-          slug: string;
-          updated_at: string;
-        };
-        comments: number;
-        /** Format: date-time */
-        created_at: string;
-        html_url: string;
-        id: number;
-        locked: boolean;
-        node_id: string;
-        number: number;
-        /** Reactions */
-        reactions?: {
-          "+1": number;
-          "-1": number;
-          confused: number;
-          eyes: number;
-          heart: number;
-          hooray: number;
-          laugh: number;
-          rocket: number;
-          total_count: number;
-          /** Format: uri */
-          url: string;
-        };
-        repository_url: string;
-        /** @enum {string} */
-        state: "open" | "locked" | "converting" | "transferring";
-        timeline_url?: string;
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      };
+      discussion: components["schemas"]["discussion"];
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
       organization?: components["schemas"]["organization-simple"];
@@ -34290,7 +32305,11 @@ export interface components {
       };
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
-      issue: ({
+      /**
+       * Issue 
+       * @description The [issue](https://docs.github.com/rest/reference/issues) itself.
+       */
+      issue: {
         /** @enum {string|null} */
         active_lock_reason: "resolved" | "off-topic" | "too heated" | "spam" | "" | null;
         /** User */
@@ -34694,66 +32713,7 @@ export interface components {
           /** Format: uri */
           url?: string;
         }) | null;
-      }) & ({
-        active_lock_reason?: string | null;
-        assignee?: Record<string, unknown> | null;
-        assignees?: (Record<string, unknown> | null)[];
-        author_association?: string;
-        body?: string | null;
-        closed_at: string | null;
-        comments?: number;
-        comments_url?: string;
-        created_at?: string;
-        events_url?: string;
-        html_url?: string;
-        id?: number;
-        labels?: (Record<string, unknown> | null)[];
-        labels_url?: string;
-        locked?: boolean;
-        milestone?: Record<string, unknown> | null;
-        node_id?: string;
-        number?: number;
-        performed_via_github_app?: Record<string, unknown> | null;
-        reactions?: {
-          "+1"?: number;
-          "-1"?: number;
-          confused?: number;
-          eyes?: number;
-          heart?: number;
-          hooray?: number;
-          laugh?: number;
-          rocket?: number;
-          total_count?: number;
-          url?: string;
-        };
-        repository_url?: string;
-        /** @enum {string} */
-        state: "open" | "closed";
-        timeline_url?: string;
-        title?: string;
-        updated_at?: string;
-        url?: string;
-        user?: {
-          avatar_url?: string;
-          events_url?: string;
-          followers_url?: string;
-          following_url?: string;
-          gists_url?: string;
-          gravatar_id?: string;
-          html_url?: string;
-          id?: number;
-          login?: string;
-          node_id?: string;
-          organizations_url?: string;
-          received_events_url?: string;
-          repos_url?: string;
-          site_admin?: boolean;
-          starred_url?: string;
-          subscriptions_url?: string;
-          type?: string;
-          url?: string;
-        };
-      });
+      };
       organization?: components["schemas"]["organization-simple"];
       repository: components["schemas"]["repository"];
       sender: components["schemas"]["simple-user"];
@@ -38629,7 +36589,8 @@ export interface components {
           id: number;
           monthly_price_in_cents: number;
           name: string;
-          price_model: string;
+          /** @enum {string} */
+          price_model: "FREE" | "FLAT_RATE" | "PER_UNIT";
           unit_name: string | null;
           yearly_price_in_cents: number;
         };
@@ -38653,7 +36614,8 @@ export interface components {
           id?: number;
           monthly_price_in_cents?: number;
           name?: string;
-          price_model?: string;
+          /** @enum {string} */
+          price_model?: "FREE" | "FLAT_RATE" | "PER_UNIT";
           unit_name?: string | null;
           yearly_price_in_cents?: number;
         };
@@ -38680,7 +36642,8 @@ export interface components {
           id: number;
           monthly_price_in_cents: number;
           name: string;
-          price_model: string;
+          /** @enum {string} */
+          price_model: "FREE" | "FLAT_RATE" | "PER_UNIT";
           unit_name: string | null;
           yearly_price_in_cents: number;
         };
@@ -38715,7 +36678,8 @@ export interface components {
           id: number;
           monthly_price_in_cents: number;
           name: string;
-          price_model: string;
+          /** @enum {string} */
+          price_model: "FREE" | "FLAT_RATE" | "PER_UNIT";
           unit_name: string | null;
           yearly_price_in_cents: number;
         };
@@ -38739,7 +36703,8 @@ export interface components {
           id?: number;
           monthly_price_in_cents?: number;
           name?: string;
-          price_model?: string;
+          /** @enum {string} */
+          price_model?: "FREE" | "FLAT_RATE" | "PER_UNIT";
           unit_name?: string | null;
           yearly_price_in_cents?: number;
         };
@@ -38766,7 +36731,8 @@ export interface components {
           id: number;
           monthly_price_in_cents: number;
           name: string;
-          price_model: string;
+          /** @enum {string} */
+          price_model: "FREE" | "FLAT_RATE" | "PER_UNIT";
           unit_name: string | null;
           yearly_price_in_cents: number;
         };
@@ -38801,7 +36767,8 @@ export interface components {
           id: number;
           monthly_price_in_cents: number;
           name: string;
-          price_model: string;
+          /** @enum {string} */
+          price_model: "FREE" | "FLAT_RATE" | "PER_UNIT";
           unit_name: string | null;
           yearly_price_in_cents: number;
         };
@@ -38825,7 +36792,8 @@ export interface components {
           id?: number;
           monthly_price_in_cents?: number;
           name?: string;
-          price_model?: string;
+          /** @enum {string} */
+          price_model?: "FREE" | "FLAT_RATE" | "PER_UNIT";
           unit_name?: string | null;
           yearly_price_in_cents?: number;
         };
@@ -38852,7 +36820,8 @@ export interface components {
           id: number;
           monthly_price_in_cents: number;
           name: string;
-          price_model: string;
+          /** @enum {string} */
+          price_model: "FREE" | "FLAT_RATE" | "PER_UNIT";
           unit_name: string | null;
           yearly_price_in_cents: number;
         };
@@ -38887,7 +36856,8 @@ export interface components {
           id: number;
           monthly_price_in_cents: number;
           name: string;
-          price_model: string;
+          /** @enum {string} */
+          price_model: "FREE" | "FLAT_RATE" | "PER_UNIT";
           unit_name: string | null;
           yearly_price_in_cents: number;
         };
@@ -38916,7 +36886,8 @@ export interface components {
           id: number;
           monthly_price_in_cents: number;
           name: string;
-          price_model: string;
+          /** @enum {string} */
+          price_model: "FREE" | "FLAT_RATE" | "PER_UNIT";
           unit_name: string | null;
           yearly_price_in_cents: number;
         };
@@ -38951,7 +36922,8 @@ export interface components {
           id: number;
           monthly_price_in_cents: number;
           name: string;
-          price_model: string;
+          /** @enum {string} */
+          price_model: "FREE" | "FLAT_RATE" | "PER_UNIT";
           unit_name: string | null;
           yearly_price_in_cents: number;
         };
@@ -38975,7 +36947,8 @@ export interface components {
           id?: number;
           monthly_price_in_cents?: number;
           name?: string;
-          price_model?: string;
+          /** @enum {string} */
+          price_model?: "FREE" | "FLAT_RATE" | "PER_UNIT";
           unit_name?: string | null;
           yearly_price_in_cents?: number;
         };
@@ -39002,7 +36975,8 @@ export interface components {
           id: number;
           monthly_price_in_cents: number;
           name: string;
-          price_model: string;
+          /** @enum {string} */
+          price_model: "FREE" | "FLAT_RATE" | "PER_UNIT";
           unit_name: string | null;
           yearly_price_in_cents: number;
         };
@@ -40226,6 +38200,7 @@ export interface components {
         node_id: string;
         role: string;
         team_count: number;
+        invitation_source?: string;
       };
       organization: components["schemas"]["organization-simple"];
       repository?: components["schemas"]["repository"];
@@ -40496,7 +38471,7 @@ export interface components {
           }) | null;
           created_at?: string;
           description: string;
-          docker_metadata?: (Record<string, never>)[];
+          docker_metadata?: (unknown)[];
           draft?: boolean;
           /** Format: uri */
           html_url: string;
@@ -40623,7 +38598,7 @@ export interface components {
             /** Format: uri */
             url: string;
           };
-          rubygems_metadata?: (Record<string, never>)[];
+          rubygems_metadata?: (unknown)[];
           source_url?: string;
           summary: string;
           tag_name?: string;
@@ -40743,14 +38718,14 @@ export interface components {
           body_html: string;
           created_at: string;
           description: string;
-          docker_metadata?: (Record<string, never>)[];
+          docker_metadata?: (unknown)[];
           draft?: boolean;
           /** Format: uri */
           html_url: string;
           id: number;
           installation_command: string;
           manifest?: string;
-          metadata: (Record<string, never>)[];
+          metadata: (unknown)[];
           name: string;
           package_files: ({
               content_type: string;
@@ -40819,7 +38794,7 @@ export interface components {
             /** Format: uri */
             url: string;
           };
-          rubygems_metadata?: (Record<string, never>)[];
+          rubygems_metadata?: (unknown)[];
           /** Format: uri */
           source_url?: string;
           summary: string;
@@ -40841,74 +38816,6 @@ export interface components {
         updated_at: string;
       };
       repository: components["schemas"]["repository"];
-      sender: components["schemas"]["simple-user"];
-    };
-    "webhook-package-v2-create": {
-      /** @enum {string} */
-      action: "create";
-      enterprise?: components["schemas"]["enterprise"];
-      installation?: components["schemas"]["simple-installation"];
-      organization: components["schemas"]["organization-simple"];
-      package: {
-        created_at: string;
-        description: string;
-        ecosystem: string;
-        html_url: string;
-        id: number;
-        name: string;
-        namespace: string;
-        package_version: {
-          blob_store: string;
-          container_metadata?: {
-            labels: {
-              all_labels: {
-                "com.github.base_image.id"?: string;
-                "com.github.base_image.repo_digest"?: string;
-                "com.github.repo.branch"?: string;
-                "ghes.licenses.path"?: string;
-                "org.opencontainers.image.created"?: string;
-                "org.opencontainers.image.description"?: string;
-                "org.opencontainers.image.documentation"?: string;
-                "org.opencontainers.image.revision"?: string;
-                "org.opencontainers.image.source"?: string;
-              };
-              description: string;
-              image_url: string;
-              licenses: string;
-              revision: string;
-              source: string;
-            };
-            manifest: {
-              config: {
-                digest: string;
-                media_type: string;
-                size: number;
-              };
-              digest: string;
-              layers: ({
-                  digest: string;
-                  media_type: string;
-                  size: number;
-                })[];
-              media_type: string;
-              size: number;
-              uri: string;
-            };
-            tag: {
-              digest: string;
-              name: string;
-            };
-          };
-          created_at: string;
-          description: string;
-          html_url: string;
-          id: number;
-          name: string;
-          updated_at: string;
-        };
-        updated_at: string;
-      };
-      repository?: components["schemas"]["repository"];
       sender: components["schemas"]["simple-user"];
     };
     /** page_build event */
@@ -41921,6 +39828,48 @@ export interface components {
       repository?: components["schemas"]["repository"];
       sender: components["schemas"]["simple-user"];
     };
+    /** Projects v2 Project Closed Event */
+    "webhook-projects-v2-project-closed": {
+      /** @enum {string} */
+      action: "closed";
+      organization: components["schemas"]["organization-simple"];
+      projects_v2: components["schemas"]["projects-v2"];
+      sender: components["schemas"]["simple-user"];
+    };
+    /** @description A project was created */
+    "webhook-projects-v2-project-created": {
+      /** @enum {string} */
+      action: "created";
+      organization: components["schemas"]["organization-simple"];
+      projects_v2: components["schemas"]["projects-v2"];
+      sender: components["schemas"]["simple-user"];
+    };
+    /** Projects v2 Project Edited Event */
+    "webhook-projects-v2-project-edited": {
+      /** @enum {string} */
+      action: "edited";
+      changes: {
+        description?: {
+          from?: string | null;
+          to?: string | null;
+        };
+        public?: {
+          from?: boolean;
+          to?: boolean;
+        };
+        short_description?: {
+          from?: string | null;
+          to?: string | null;
+        };
+        title?: {
+          from?: string;
+          to?: string;
+        };
+      };
+      organization: components["schemas"]["organization-simple"];
+      projects_v2: components["schemas"]["projects-v2"];
+      sender: components["schemas"]["simple-user"];
+    };
     /** Projects v2 Item Archived Event */
     "webhook-projects-v2-item-archived": {
       /** @enum {string} */
@@ -42021,6 +39970,14 @@ export interface components {
       installation?: components["schemas"]["simple-installation"];
       organization: components["schemas"]["organization-simple"];
       projects_v2_item: components["schemas"]["projects-v2-item"];
+      sender: components["schemas"]["simple-user"];
+    };
+    /** Projects v2 Project Reopened Event */
+    "webhook-projects-v2-project-reopened": {
+      /** @enum {string} */
+      action: "reopened";
+      organization: components["schemas"]["organization-simple"];
+      projects_v2: components["schemas"]["projects-v2"];
       sender: components["schemas"]["simple-user"];
     };
     /** public event */
@@ -45644,1531 +43601,54 @@ export interface components {
       /** @description The pull request number. */
       number: number;
       organization?: components["schemas"]["organization-simple"];
-      pull_request: ({
-        _links: {
-          /** Link */
-          comments: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          commits: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          html: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          issue: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          review_comment: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          review_comments: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          self: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          statuses: {
-            /** Format: uri-template */
-            href: string;
-          };
-        };
-        /** @enum {string|null} */
-        active_lock_reason: "resolved" | "off-topic" | "too heated" | "spam" | "" | null;
-        additions?: number;
-        /** User */
-        assignee: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization" | "Mannequin";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        assignees: (({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization" | "Mannequin";
-            /** Format: uri */
-            url?: string;
-          }) | null)[];
+      pull_request: components["schemas"]["pull-request"] & ({
         /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
+         * @description Whether to allow auto-merge for pull requests. 
+         * @default false
+         */
+        allow_auto_merge?: boolean;
+        /** @description Whether to allow updating the pull request's branch. */
+        allow_update_branch?: boolean;
+        /**
+         * @description Whether to delete head branches when pull requests are merged. 
+         * @default false
+         */
+        delete_branch_on_merge?: boolean;
+        /**
+         * @description The default value for a merge commit message.
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `PR_BODY` - default to the pull request's body.
+         * - `BLANK` - default to a blank commit message. 
          * @enum {string}
          */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
+        merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
         /**
-         * PullRequestAutoMerge 
-         * @description The status of auto merging a pull request.
-         */
-        auto_merge: ({
-          /** @description Commit message for the merge commit. */
-          commit_message: string | null;
-          /** @description Title for the merge commit message. */
-          commit_title: string | null;
-          /** User */
-          enabled_by: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-          /**
-           * @description The merge method to use. 
-           * @enum {string}
-           */
-          merge_method: "merge" | "squash" | "rebase";
-        }) | null;
-        base: {
-          label: string;
-          ref: string;
-          /**
-           * Repository 
-           * @description A git repository
-           */
-          repo: {
-            /**
-             * @description Whether to allow auto-merge for pull requests. 
-             * @default false
-             */
-            allow_auto_merge?: boolean;
-            /** @description Whether to allow private forks */
-            allow_forking?: boolean;
-            /**
-             * @description Whether to allow merge commits for pull requests. 
-             * @default true
-             */
-            allow_merge_commit?: boolean;
-            /**
-             * @description Whether to allow rebase merges for pull requests. 
-             * @default true
-             */
-            allow_rebase_merge?: boolean;
-            /**
-             * @description Whether to allow squash merges for pull requests. 
-             * @default true
-             */
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            /** Format: uri-template */
-            archive_url: string;
-            /**
-             * @description Whether the repository is archived. 
-             * @default false
-             */
-            archived: boolean;
-            /** Format: uri-template */
-            assignees_url: string;
-            /** Format: uri-template */
-            blobs_url: string;
-            /** Format: uri-template */
-            branches_url: string;
-            /** Format: uri */
-            clone_url: string;
-            /** Format: uri-template */
-            collaborators_url: string;
-            /** Format: uri-template */
-            comments_url: string;
-            /** Format: uri-template */
-            commits_url: string;
-            /** Format: uri-template */
-            compare_url: string;
-            /** Format: uri-template */
-            contents_url: string;
-            /** Format: uri */
-            contributors_url: string;
-            created_at: number | string;
-            /** @description The default branch of the repository. */
-            default_branch: string;
-            /**
-             * @description Whether to delete head branches when pull requests are merged 
-             * @default false
-             */
-            delete_branch_on_merge?: boolean;
-            /** Format: uri */
-            deployments_url: string;
-            description: string | null;
-            /** @description Returns whether or not this repository is disabled. */
-            disabled?: boolean;
-            /** Format: uri */
-            downloads_url: string;
-            /** Format: uri */
-            events_url: string;
-            fork: boolean;
-            forks: number;
-            forks_count: number;
-            /** Format: uri */
-            forks_url: string;
-            full_name: string;
-            /** Format: uri-template */
-            git_commits_url: string;
-            /** Format: uri-template */
-            git_refs_url: string;
-            /** Format: uri-template */
-            git_tags_url: string;
-            /** Format: uri */
-            git_url: string;
-            /**
-             * @description Whether downloads are enabled. 
-             * @default true
-             */
-            has_downloads: boolean;
-            /**
-             * @description Whether issues are enabled. 
-             * @default true
-             */
-            has_issues: boolean;
-            has_pages: boolean;
-            /**
-             * @description Whether projects are enabled. 
-             * @default true
-             */
-            has_projects: boolean;
-            /**
-             * @description Whether the wiki is enabled. 
-             * @default true
-             */
-            has_wiki: boolean;
-            homepage: string | null;
-            /** Format: uri */
-            hooks_url: string;
-            /** Format: uri */
-            html_url: string;
-            /** @description Unique identifier of the repository */
-            id: number;
-            is_template?: boolean;
-            /** Format: uri-template */
-            issue_comment_url: string;
-            /** Format: uri-template */
-            issue_events_url: string;
-            /** Format: uri-template */
-            issues_url: string;
-            /** Format: uri-template */
-            keys_url: string;
-            /** Format: uri-template */
-            labels_url: string;
-            language: string | null;
-            /** Format: uri */
-            languages_url: string;
-            /** License */
-            license: ({
-              key: string;
-              name: string;
-              node_id: string;
-              spdx_id: string;
-              /** Format: uri */
-              url: string | null;
-            }) | null;
-            master_branch?: string;
-            /**
-             * @description The default value for a merge commit message.
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `PR_BODY` - default to the pull request's body.
-             * - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /**
-             * @description The default value for a merge commit title.
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name). 
-             * @enum {string}
-             */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            /** Format: uri */
-            merges_url: string;
-            /** Format: uri-template */
-            milestones_url: string;
-            /** Format: uri */
-            mirror_url: string | null;
-            /** @description The name of the repository. */
-            name: string;
-            node_id: string;
-            /** Format: uri-template */
-            notifications_url: string;
-            open_issues: number;
-            open_issues_count: number;
-            organization?: string;
-            /** User */
-            owner: ({
-              /** Format: uri */
-              avatar_url?: string;
-              deleted?: boolean;
-              email?: string | null;
-              /** Format: uri-template */
-              events_url?: string;
-              /** Format: uri */
-              followers_url?: string;
-              /** Format: uri-template */
-              following_url?: string;
-              /** Format: uri-template */
-              gists_url?: string;
-              gravatar_id?: string;
-              /** Format: uri */
-              html_url?: string;
-              id: number;
-              login: string;
-              name?: string;
-              node_id?: string;
-              /** Format: uri */
-              organizations_url?: string;
-              /** Format: uri */
-              received_events_url?: string;
-              /** Format: uri */
-              repos_url?: string;
-              site_admin?: boolean;
-              /** Format: uri-template */
-              starred_url?: string;
-              /** Format: uri */
-              subscriptions_url?: string;
-              /** @enum {string} */
-              type?: "Bot" | "User" | "Organization";
-              /** Format: uri */
-              url?: string;
-            }) | null;
-            permissions?: {
-              admin: boolean;
-              maintain?: boolean;
-              pull: boolean;
-              push: boolean;
-              triage?: boolean;
-            };
-            /** @description Whether the repository is private or public. */
-            private: boolean;
-            public?: boolean;
-            /** Format: uri-template */
-            pulls_url: string;
-            pushed_at: number | string;
-            /** Format: uri-template */
-            releases_url: string;
-            role_name?: string | null;
-            size: number;
-            /**
-             * @description The default value for a squash merge commit message:
-             * 
-             * - `PR_BODY` - default to the pull request's body.
-             * - `COMMIT_MESSAGES` - default to the branch's commit messages.
-             * - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /**
-             * @description The default value for a squash merge commit title:
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
-             * @enum {string}
-             */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url: string;
-            stargazers?: number;
-            stargazers_count: number;
-            /** Format: uri */
-            stargazers_url: string;
-            /** Format: uri-template */
-            statuses_url: string;
-            /** Format: uri */
-            subscribers_url: string;
-            /** Format: uri */
-            subscription_url: string;
-            /** Format: uri */
-            svn_url: string;
-            /** Format: uri */
-            tags_url: string;
-            /** Format: uri */
-            teams_url: string;
-            topics: (string)[];
-            /** Format: uri-template */
-            trees_url: string;
-            /** Format: date-time */
-            updated_at: string;
-            /** Format: uri */
-            url: string;
-            /**
-             * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead. 
-             * @default false
-             */
-            use_squash_pr_title_as_default?: boolean;
-            /** @enum {string} */
-            visibility: "public" | "private" | "internal";
-            watchers: number;
-            watchers_count: number;
-            /** @description Whether to require contributors to sign off on web-based commits */
-            web_commit_signoff_required?: boolean;
-          };
-          sha: string;
-          /** User */
-          user: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-        };
-        body: string | null;
-        changed_files?: number;
-        /** Format: date-time */
-        closed_at: string | null;
-        comments?: number;
-        /** Format: uri */
-        comments_url: string;
-        commits?: number;
-        /** Format: uri */
-        commits_url: string;
-        /** Format: date-time */
-        created_at: string;
-        deletions?: number;
-        /** Format: uri */
-        diff_url: string;
-        /** @description Indicates whether or not the pull request is a draft. */
-        draft: boolean;
-        head: {
-          label: string | null;
-          ref: string;
-          /**
-           * Repository 
-           * @description A git repository
-           */
-          repo: ({
-            /**
-             * @description Whether to allow auto-merge for pull requests. 
-             * @default false
-             */
-            allow_auto_merge?: boolean;
-            /** @description Whether to allow private forks */
-            allow_forking?: boolean;
-            /**
-             * @description Whether to allow merge commits for pull requests. 
-             * @default true
-             */
-            allow_merge_commit?: boolean;
-            /**
-             * @description Whether to allow rebase merges for pull requests. 
-             * @default true
-             */
-            allow_rebase_merge?: boolean;
-            /**
-             * @description Whether to allow squash merges for pull requests. 
-             * @default true
-             */
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            /** Format: uri-template */
-            archive_url: string;
-            /**
-             * @description Whether the repository is archived. 
-             * @default false
-             */
-            archived: boolean;
-            /** Format: uri-template */
-            assignees_url: string;
-            /** Format: uri-template */
-            blobs_url: string;
-            /** Format: uri-template */
-            branches_url: string;
-            /** Format: uri */
-            clone_url: string;
-            /** Format: uri-template */
-            collaborators_url: string;
-            /** Format: uri-template */
-            comments_url: string;
-            /** Format: uri-template */
-            commits_url: string;
-            /** Format: uri-template */
-            compare_url: string;
-            /** Format: uri-template */
-            contents_url: string;
-            /** Format: uri */
-            contributors_url: string;
-            created_at: number | string;
-            /** @description The default branch of the repository. */
-            default_branch: string;
-            /**
-             * @description Whether to delete head branches when pull requests are merged 
-             * @default false
-             */
-            delete_branch_on_merge?: boolean;
-            /** Format: uri */
-            deployments_url: string;
-            description: string | null;
-            /** @description Returns whether or not this repository is disabled. */
-            disabled?: boolean;
-            /** Format: uri */
-            downloads_url: string;
-            /** Format: uri */
-            events_url: string;
-            fork: boolean;
-            forks: number;
-            forks_count: number;
-            /** Format: uri */
-            forks_url: string;
-            full_name: string;
-            /** Format: uri-template */
-            git_commits_url: string;
-            /** Format: uri-template */
-            git_refs_url: string;
-            /** Format: uri-template */
-            git_tags_url: string;
-            /** Format: uri */
-            git_url: string;
-            /**
-             * @description Whether downloads are enabled. 
-             * @default true
-             */
-            has_downloads: boolean;
-            /**
-             * @description Whether issues are enabled. 
-             * @default true
-             */
-            has_issues: boolean;
-            has_pages: boolean;
-            /**
-             * @description Whether projects are enabled. 
-             * @default true
-             */
-            has_projects: boolean;
-            /**
-             * @description Whether the wiki is enabled. 
-             * @default true
-             */
-            has_wiki: boolean;
-            homepage: string | null;
-            /** Format: uri */
-            hooks_url: string;
-            /** Format: uri */
-            html_url: string;
-            /** @description Unique identifier of the repository */
-            id: number;
-            is_template?: boolean;
-            /** Format: uri-template */
-            issue_comment_url: string;
-            /** Format: uri-template */
-            issue_events_url: string;
-            /** Format: uri-template */
-            issues_url: string;
-            /** Format: uri-template */
-            keys_url: string;
-            /** Format: uri-template */
-            labels_url: string;
-            language: string | null;
-            /** Format: uri */
-            languages_url: string;
-            /** License */
-            license: ({
-              key: string;
-              name: string;
-              node_id: string;
-              spdx_id: string;
-              /** Format: uri */
-              url: string | null;
-            }) | null;
-            master_branch?: string;
-            /**
-             * @description The default value for a merge commit message. 
-             * @enum {string}
-             */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /**
-             * @description The default value for a merge commit message title. 
-             * @enum {string}
-             */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            /** Format: uri */
-            merges_url: string;
-            /** Format: uri-template */
-            milestones_url: string;
-            /** Format: uri */
-            mirror_url: string | null;
-            /** @description The name of the repository. */
-            name: string;
-            node_id: string;
-            /** Format: uri-template */
-            notifications_url: string;
-            open_issues: number;
-            open_issues_count: number;
-            organization?: string;
-            /** User */
-            owner: ({
-              /** Format: uri */
-              avatar_url?: string;
-              deleted?: boolean;
-              email?: string | null;
-              /** Format: uri-template */
-              events_url?: string;
-              /** Format: uri */
-              followers_url?: string;
-              /** Format: uri-template */
-              following_url?: string;
-              /** Format: uri-template */
-              gists_url?: string;
-              gravatar_id?: string;
-              /** Format: uri */
-              html_url?: string;
-              id: number;
-              login: string;
-              name?: string;
-              node_id?: string;
-              /** Format: uri */
-              organizations_url?: string;
-              /** Format: uri */
-              received_events_url?: string;
-              /** Format: uri */
-              repos_url?: string;
-              site_admin?: boolean;
-              /** Format: uri-template */
-              starred_url?: string;
-              /** Format: uri */
-              subscriptions_url?: string;
-              /** @enum {string} */
-              type?: "Bot" | "User" | "Organization";
-              /** Format: uri */
-              url?: string;
-            }) | null;
-            permissions?: {
-              admin: boolean;
-              maintain?: boolean;
-              pull: boolean;
-              push: boolean;
-              triage?: boolean;
-            };
-            /** @description Whether the repository is private or public. */
-            private: boolean;
-            public?: boolean;
-            /** Format: uri-template */
-            pulls_url: string;
-            pushed_at: number | string;
-            /** Format: uri-template */
-            releases_url: string;
-            role_name?: string | null;
-            size: number;
-            /**
-             * @description The default value for a squash merge commit message. 
-             * @enum {string}
-             */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /**
-             * @description The default value for a squash merge commit title. 
-             * @enum {string}
-             */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url: string;
-            stargazers?: number;
-            stargazers_count: number;
-            /** Format: uri */
-            stargazers_url: string;
-            /** Format: uri-template */
-            statuses_url: string;
-            /** Format: uri */
-            subscribers_url: string;
-            /** Format: uri */
-            subscription_url: string;
-            /** Format: uri */
-            svn_url: string;
-            /** Format: uri */
-            tags_url: string;
-            /** Format: uri */
-            teams_url: string;
-            topics: (string)[];
-            /** Format: uri-template */
-            trees_url: string;
-            /** Format: date-time */
-            updated_at: string;
-            /** Format: uri */
-            url: string;
-            /**
-             * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead. 
-             * @default false
-             */
-            use_squash_pr_title_as_default?: boolean;
-            /** @enum {string} */
-            visibility: "public" | "private" | "internal";
-            watchers: number;
-            watchers_count: number;
-            /** @description Whether to require contributors to sign off on web-based commits */
-            web_commit_signoff_required?: boolean;
-          }) | null;
-          sha: string;
-          /** User */
-          user: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-        };
-        /** Format: uri */
-        html_url: string;
-        id: number;
-        /** Format: uri */
-        issue_url: string;
-        labels: ({
-            /** @description 6-character hex code, without the leading #, identifying the color */
-            color: string;
-            default: boolean;
-            description: string | null;
-            id: number;
-            /** @description The name of the label. */
-            name: string;
-            node_id: string;
-            /**
-             * Format: uri 
-             * @description URL for the label
-             */
-            url: string;
-          })[];
-        locked: boolean;
-        /** @description Indicates whether maintainers can modify the pull request. */
-        maintainer_can_modify?: boolean;
-        merge_commit_sha: string | null;
-        mergeable?: boolean | null;
-        mergeable_state?: string;
-        merged?: boolean | null;
-        /** Format: date-time */
-        merged_at: string | null;
-        /** User */
-        merged_by?: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        /**
-         * Milestone 
-         * @description A collection of related issues and pull requests.
-         */
-        milestone: ({
-          /** Format: date-time */
-          closed_at: string | null;
-          closed_issues: number;
-          /** Format: date-time */
-          created_at: string;
-          /** User */
-          creator: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization" | "Mannequin";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-          description: string | null;
-          /** Format: date-time */
-          due_on: string | null;
-          /** Format: uri */
-          html_url: string;
-          id: number;
-          /** Format: uri */
-          labels_url: string;
-          node_id: string;
-          /** @description The number of the milestone. */
-          number: number;
-          open_issues: number;
-          /**
-           * @description The state of the milestone. 
-           * @enum {string}
-           */
-          state: "open" | "closed";
-          /** @description The title of the milestone. */
-          title: string;
-          /** Format: date-time */
-          updated_at: string;
-          /** Format: uri */
-          url: string;
-        }) | null;
-        node_id: string;
-        /** @description Number uniquely identifying the pull request within its repository. */
-        number: number;
-        /** Format: uri */
-        patch_url: string;
-        rebaseable?: boolean | null;
-        requested_reviewers: (OneOf<[({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization" | "Mannequin";
-            /** Format: uri */
-            url?: string;
-          }) | null, {
-            deleted?: boolean;
-            /** @description Description of the team */
-            description: string | null;
-            /** Format: uri */
-            html_url: string;
-            /** @description Unique identifier of the team */
-            id: number;
-            /** Format: uri-template */
-            members_url: string;
-            /** @description Name of the team */
-            name: string;
-            node_id: string;
-            parent?: ({
-              /** @description Description of the team */
-              description: string | null;
-              /** Format: uri */
-              html_url: string;
-              /** @description Unique identifier of the team */
-              id: number;
-              /** Format: uri-template */
-              members_url: string;
-              /** @description Name of the team */
-              name: string;
-              node_id: string;
-              /** @description Permission that the team will have for its repositories */
-              permission: string;
-              /** @enum {string} */
-              privacy: "open" | "closed" | "secret";
-              /** Format: uri */
-              repositories_url: string;
-              slug: string;
-              /**
-               * Format: uri 
-               * @description URL for the team
-               */
-              url: string;
-            }) | null;
-            /** @description Permission that the team will have for its repositories */
-            permission: string;
-            /** @enum {string} */
-            privacy: "open" | "closed" | "secret";
-            /** Format: uri */
-            repositories_url: string;
-            slug: string;
-            /**
-             * Format: uri 
-             * @description URL for the team
-             */
-            url: string;
-          }]>)[];
-        requested_teams: ({
-            deleted?: boolean;
-            /** @description Description of the team */
-            description?: string | null;
-            /** Format: uri */
-            html_url?: string;
-            /** @description Unique identifier of the team */
-            id: number;
-            /** Format: uri-template */
-            members_url?: string;
-            /** @description Name of the team */
-            name: string;
-            node_id?: string;
-            parent?: ({
-              /** @description Description of the team */
-              description: string | null;
-              /** Format: uri */
-              html_url: string;
-              /** @description Unique identifier of the team */
-              id: number;
-              /** Format: uri-template */
-              members_url: string;
-              /** @description Name of the team */
-              name: string;
-              node_id: string;
-              /** @description Permission that the team will have for its repositories */
-              permission: string;
-              /** @enum {string} */
-              privacy: "open" | "closed" | "secret";
-              /** Format: uri */
-              repositories_url: string;
-              slug: string;
-              /**
-               * Format: uri 
-               * @description URL for the team
-               */
-              url: string;
-            }) | null;
-            /** @description Permission that the team will have for its repositories */
-            permission?: string;
-            /** @enum {string} */
-            privacy?: "open" | "closed" | "secret";
-            /** Format: uri */
-            repositories_url?: string;
-            slug?: string;
-            /**
-             * Format: uri 
-             * @description URL for the team
-             */
-            url?: string;
-          })[];
-        /** Format: uri-template */
-        review_comment_url: string;
-        review_comments?: number;
-        /** Format: uri */
-        review_comments_url: string;
-        /**
-         * @description State of this Pull Request. Either `open` or `closed`. 
+         * @description The default value for a merge commit title.
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., "Merge pull request #123 from branch-name"). 
          * @enum {string}
          */
-        state: "open" | "closed";
-        /** Format: uri */
-        statuses_url: string;
-        /** @description The title of the pull request. */
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** Format: uri */
-        url: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization" | "Mannequin";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      }) & ({
-        _links?: {
-          comments?: {
-            href?: string;
-          };
-          commits?: {
-            href?: string;
-          };
-          html?: {
-            href?: string;
-          };
-          issue?: {
-            href?: string;
-          };
-          review_comment?: {
-            href?: string;
-          };
-          review_comments?: {
-            href?: string;
-          };
-          self?: {
-            href?: string;
-          };
-          statuses?: {
-            href?: string;
-          };
-        };
-        active_lock_reason?: string | null;
-        additions?: number;
-        assignee?: Record<string, unknown> | null;
-        assignees?: (Record<string, unknown> | null)[];
-        author_association?: string;
-        auto_merge?: Record<string, unknown> | null;
-        base?: {
-          label?: string;
-          ref?: string;
-          repo?: {
-            allow_auto_merge?: boolean;
-            allow_forking?: boolean;
-            allow_merge_commit?: boolean;
-            allow_rebase_merge?: boolean;
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            archive_url?: string;
-            archived?: boolean;
-            assignees_url?: string;
-            blobs_url?: string;
-            branches_url?: string;
-            clone_url?: string;
-            collaborators_url?: string;
-            comments_url?: string;
-            commits_url?: string;
-            compare_url?: string;
-            contents_url?: string;
-            contributors_url?: string;
-            created_at?: string;
-            default_branch?: string;
-            delete_branch_on_merge?: boolean;
-            deployments_url?: string;
-            description?: string | null;
-            disabled?: boolean;
-            downloads_url?: string;
-            events_url?: string;
-            fork?: boolean;
-            forks?: number;
-            forks_count?: number;
-            forks_url?: string;
-            full_name?: string;
-            git_commits_url?: string;
-            git_refs_url?: string;
-            git_tags_url?: string;
-            git_url?: string;
-            has_downloads?: boolean;
-            has_issues?: boolean;
-            has_pages?: boolean;
-            has_projects?: boolean;
-            has_wiki?: boolean;
-            homepage?: string | null;
-            hooks_url?: string;
-            html_url?: string;
-            id?: number;
-            is_template?: boolean;
-            issue_comment_url?: string;
-            issue_events_url?: string;
-            issues_url?: string;
-            keys_url?: string;
-            labels_url?: string;
-            language?: string | null;
-            languages_url?: string;
-            license?: Record<string, unknown> | null;
-            /** @enum {string} */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /** @enum {string} */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            merges_url?: string;
-            milestones_url?: string;
-            mirror_url?: string | null;
-            name?: string;
-            node_id?: string;
-            notifications_url?: string;
-            open_issues?: number;
-            open_issues_count?: number;
-            owner?: {
-              avatar_url?: string;
-              events_url?: string;
-              followers_url?: string;
-              following_url?: string;
-              gists_url?: string;
-              gravatar_id?: string;
-              html_url?: string;
-              id?: number;
-              login?: string;
-              node_id?: string;
-              organizations_url?: string;
-              received_events_url?: string;
-              repos_url?: string;
-              site_admin?: boolean;
-              starred_url?: string;
-              subscriptions_url?: string;
-              type?: string;
-              url?: string;
-            };
-            private?: boolean;
-            pulls_url?: string;
-            pushed_at?: string;
-            releases_url?: string;
-            size?: number;
-            /** @enum {string} */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /** @enum {string} */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url?: string;
-            stargazers_count?: number;
-            stargazers_url?: string;
-            statuses_url?: string;
-            subscribers_url?: string;
-            subscription_url?: string;
-            svn_url?: string;
-            tags_url?: string;
-            teams_url?: string;
-            topics?: (string | null)[];
-            trees_url?: string;
-            updated_at?: string;
-            url?: string;
-            use_squash_pr_title_as_default?: boolean;
-            visibility?: string;
-            watchers?: number;
-            watchers_count?: number;
-            web_commit_signoff_required?: boolean;
-          };
-          sha?: string;
-          user?: {
-            avatar_url?: string;
-            events_url?: string;
-            followers_url?: string;
-            following_url?: string;
-            gists_url?: string;
-            gravatar_id?: string;
-            html_url?: string;
-            id?: number;
-            login?: string;
-            node_id?: string;
-            organizations_url?: string;
-            received_events_url?: string;
-            repos_url?: string;
-            site_admin?: boolean;
-            starred_url?: string;
-            subscriptions_url?: string;
-            type?: string;
-            url?: string;
-          };
-        };
-        body?: string | null;
-        changed_files?: number;
-        /** Format: date-time */
-        closed_at: string | null;
-        comments?: number;
-        comments_url?: string;
-        commits?: number;
-        commits_url?: string;
-        created_at?: string;
-        deletions?: number;
-        diff_url?: string;
-        draft?: boolean;
-        head?: {
-          label?: string | null;
-          ref?: string;
-          repo?: ({
-            allow_auto_merge?: boolean;
-            allow_forking?: boolean;
-            allow_merge_commit?: boolean;
-            allow_rebase_merge?: boolean;
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            archive_url?: string;
-            archived?: boolean;
-            assignees_url?: string;
-            blobs_url?: string;
-            branches_url?: string;
-            clone_url?: string;
-            collaborators_url?: string;
-            comments_url?: string;
-            commits_url?: string;
-            compare_url?: string;
-            contents_url?: string;
-            contributors_url?: string;
-            created_at?: string;
-            default_branch?: string;
-            delete_branch_on_merge?: boolean;
-            deployments_url?: string;
-            description?: string | null;
-            disabled?: boolean;
-            downloads_url?: string;
-            events_url?: string;
-            fork?: boolean;
-            forks?: number;
-            forks_count?: number;
-            forks_url?: string;
-            full_name?: string;
-            git_commits_url?: string;
-            git_refs_url?: string;
-            git_tags_url?: string;
-            git_url?: string;
-            has_downloads?: boolean;
-            has_issues?: boolean;
-            has_pages?: boolean;
-            has_projects?: boolean;
-            has_wiki?: boolean;
-            homepage?: string | null;
-            hooks_url?: string;
-            html_url?: string;
-            id?: number;
-            is_template?: boolean;
-            issue_comment_url?: string;
-            issue_events_url?: string;
-            issues_url?: string;
-            keys_url?: string;
-            labels_url?: string;
-            language?: string | null;
-            languages_url?: string;
-            license?: Record<string, unknown> | null;
-            /** @enum {string} */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /** @enum {string} */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            merges_url?: string;
-            milestones_url?: string;
-            mirror_url?: string | null;
-            name?: string;
-            node_id?: string;
-            notifications_url?: string;
-            open_issues?: number;
-            open_issues_count?: number;
-            owner?: {
-              avatar_url?: string;
-              events_url?: string;
-              followers_url?: string;
-              following_url?: string;
-              gists_url?: string;
-              gravatar_id?: string;
-              html_url?: string;
-              id?: number;
-              login?: string;
-              node_id?: string;
-              organizations_url?: string;
-              received_events_url?: string;
-              repos_url?: string;
-              site_admin?: boolean;
-              starred_url?: string;
-              subscriptions_url?: string;
-              type?: string;
-              url?: string;
-            } | null;
-            private?: boolean;
-            pulls_url?: string;
-            pushed_at?: string;
-            releases_url?: string;
-            size?: number;
-            /** @enum {string} */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /** @enum {string} */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url?: string;
-            stargazers_count?: number;
-            stargazers_url?: string;
-            statuses_url?: string;
-            subscribers_url?: string;
-            subscription_url?: string;
-            svn_url?: string;
-            tags_url?: string;
-            teams_url?: string;
-            topics?: (string | null)[];
-            trees_url?: string;
-            updated_at?: string;
-            url?: string;
-            use_squash_pr_title_as_default?: boolean;
-            visibility?: string;
-            watchers?: number;
-            watchers_count?: number;
-            web_commit_signoff_required?: boolean;
-          }) | null;
-          sha?: string;
-          user?: {
-            avatar_url?: string;
-            events_url?: string;
-            followers_url?: string;
-            following_url?: string;
-            gists_url?: string;
-            gravatar_id?: string;
-            html_url?: string;
-            id?: number;
-            login?: string;
-            node_id?: string;
-            organizations_url?: string;
-            received_events_url?: string;
-            repos_url?: string;
-            site_admin?: boolean;
-            starred_url?: string;
-            subscriptions_url?: string;
-            type?: string;
-            url?: string;
-          } | null;
-        };
-        html_url?: string;
-        id?: number;
-        issue_url?: string;
-        labels?: (Record<string, unknown> | null)[];
-        locked?: boolean;
-        maintainer_can_modify?: boolean;
-        merge_commit_sha?: string | null;
-        mergeable?: boolean | null;
-        mergeable_state?: string;
-        merged: boolean;
-        merged_at?: string | null;
-        merged_by?: Record<string, unknown> | null;
-        milestone?: Record<string, unknown> | null;
-        node_id?: string;
-        number?: number;
-        patch_url?: string;
-        rebaseable?: boolean | null;
-        requested_reviewers?: (Record<string, unknown> | null)[];
-        requested_teams?: (Record<string, unknown> | null)[];
-        review_comment_url?: string;
-        review_comments?: number;
-        review_comments_url?: string;
+        merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
         /**
-         * @description State of this Pull Request. Either `open` or `closed`. 
+         * @description The default value for a squash merge commit message:
+         * - `PR_BODY` - default to the pull request's body.
+         * - `COMMIT_MESSAGES` - default to the branch's commit messages.
+         * - `BLANK` - default to a blank commit message. 
          * @enum {string}
          */
-        state: "closed" | "open";
-        statuses_url?: string;
-        title?: string;
-        updated_at?: string;
-        url?: string;
-        user?: {
-          avatar_url?: string;
-          events_url?: string;
-          followers_url?: string;
-          following_url?: string;
-          gists_url?: string;
-          gravatar_id?: string;
-          html_url?: string;
-          id?: number;
-          login?: string;
-          node_id?: string;
-          organizations_url?: string;
-          received_events_url?: string;
-          repos_url?: string;
-          site_admin?: boolean;
-          starred_url?: string;
-          subscriptions_url?: string;
-          type?: string;
-          url?: string;
-        };
+        squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
+        /**
+         * @description The default value for a squash merge commit title:
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
+         * @enum {string}
+         */
+        squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
+        /**
+         * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead.** 
+         * @default false
+         */
+        use_squash_pr_title_as_default?: boolean;
       });
       repository: components["schemas"]["repository"];
       sender: components["schemas"]["simple-user"];
@@ -47182,1542 +43662,54 @@ export interface components {
       /** @description The pull request number. */
       number: number;
       organization?: components["schemas"]["organization-simple"];
-      pull_request: ({
-        _links: {
-          /** Link */
-          comments: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          commits: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          html: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          issue: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          review_comment: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          review_comments: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          self: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          statuses: {
-            /** Format: uri-template */
-            href: string;
-          };
-        };
-        /** @enum {string|null} */
-        active_lock_reason: "resolved" | "off-topic" | "too heated" | "spam" | "" | null;
-        additions?: number;
-        /** User */
-        assignee: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        assignees: (({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null)[];
+      pull_request: components["schemas"]["pull-request"] & ({
         /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
+         * @description Whether to allow auto-merge for pull requests. 
+         * @default false
+         */
+        allow_auto_merge?: boolean;
+        /** @description Whether to allow updating the pull request's branch. */
+        allow_update_branch?: boolean;
+        /**
+         * @description Whether to delete head branches when pull requests are merged. 
+         * @default false
+         */
+        delete_branch_on_merge?: boolean;
+        /**
+         * @description The default value for a merge commit message.
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `PR_BODY` - default to the pull request's body.
+         * - `BLANK` - default to a blank commit message. 
          * @enum {string}
          */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
+        merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
         /**
-         * PullRequestAutoMerge 
-         * @description The status of auto merging a pull request.
-         */
-        auto_merge: ({
-          /** @description Commit message for the merge commit. */
-          commit_message: string | null;
-          /** @description Title for the merge commit message. */
-          commit_title: string | null;
-          /** User */
-          enabled_by: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-          /**
-           * @description The merge method to use. 
-           * @enum {string}
-           */
-          merge_method: "merge" | "squash" | "rebase";
-        }) | null;
-        base: {
-          label: string;
-          ref: string;
-          /**
-           * Repository 
-           * @description A git repository
-           */
-          repo: {
-            /**
-             * @description Whether to allow auto-merge for pull requests. 
-             * @default false
-             */
-            allow_auto_merge?: boolean;
-            /** @description Whether to allow private forks */
-            allow_forking?: boolean;
-            /**
-             * @description Whether to allow merge commits for pull requests. 
-             * @default true
-             */
-            allow_merge_commit?: boolean;
-            /**
-             * @description Whether to allow rebase merges for pull requests. 
-             * @default true
-             */
-            allow_rebase_merge?: boolean;
-            /**
-             * @description Whether to allow squash merges for pull requests. 
-             * @default true
-             */
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            /** Format: uri-template */
-            archive_url: string;
-            /**
-             * @description Whether the repository is archived. 
-             * @default false
-             */
-            archived: boolean;
-            /** Format: uri-template */
-            assignees_url: string;
-            /** Format: uri-template */
-            blobs_url: string;
-            /** Format: uri-template */
-            branches_url: string;
-            /** Format: uri */
-            clone_url: string;
-            /** Format: uri-template */
-            collaborators_url: string;
-            /** Format: uri-template */
-            comments_url: string;
-            /** Format: uri-template */
-            commits_url: string;
-            /** Format: uri-template */
-            compare_url: string;
-            /** Format: uri-template */
-            contents_url: string;
-            /** Format: uri */
-            contributors_url: string;
-            created_at: number | string;
-            /** @description The default branch of the repository. */
-            default_branch: string;
-            /**
-             * @description Whether to delete head branches when pull requests are merged 
-             * @default false
-             */
-            delete_branch_on_merge?: boolean;
-            /** Format: uri */
-            deployments_url: string;
-            description: string | null;
-            /** @description Returns whether or not this repository is disabled. */
-            disabled?: boolean;
-            /** Format: uri */
-            downloads_url: string;
-            /** Format: uri */
-            events_url: string;
-            fork: boolean;
-            forks: number;
-            forks_count: number;
-            /** Format: uri */
-            forks_url: string;
-            full_name: string;
-            /** Format: uri-template */
-            git_commits_url: string;
-            /** Format: uri-template */
-            git_refs_url: string;
-            /** Format: uri-template */
-            git_tags_url: string;
-            /** Format: uri */
-            git_url: string;
-            /**
-             * @description Whether downloads are enabled. 
-             * @default true
-             */
-            has_downloads: boolean;
-            /**
-             * @description Whether issues are enabled. 
-             * @default true
-             */
-            has_issues: boolean;
-            has_pages: boolean;
-            /**
-             * @description Whether projects are enabled. 
-             * @default true
-             */
-            has_projects: boolean;
-            /**
-             * @description Whether the wiki is enabled. 
-             * @default true
-             */
-            has_wiki: boolean;
-            homepage: string | null;
-            /** Format: uri */
-            hooks_url: string;
-            /** Format: uri */
-            html_url: string;
-            /** @description Unique identifier of the repository */
-            id: number;
-            is_template?: boolean;
-            /** Format: uri-template */
-            issue_comment_url: string;
-            /** Format: uri-template */
-            issue_events_url: string;
-            /** Format: uri-template */
-            issues_url: string;
-            /** Format: uri-template */
-            keys_url: string;
-            /** Format: uri-template */
-            labels_url: string;
-            language: string | null;
-            /** Format: uri */
-            languages_url: string;
-            /** License */
-            license: ({
-              key: string;
-              name: string;
-              node_id: string;
-              spdx_id: string;
-              /** Format: uri */
-              url: string | null;
-            }) | null;
-            master_branch?: string;
-            /**
-             * @description The default value for a merge commit message.
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `PR_BODY` - default to the pull request's body.
-             * - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /**
-             * @description The default value for a merge commit title.
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name). 
-             * @enum {string}
-             */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            /** Format: uri */
-            merges_url: string;
-            /** Format: uri-template */
-            milestones_url: string;
-            /** Format: uri */
-            mirror_url: string | null;
-            /** @description The name of the repository. */
-            name: string;
-            node_id: string;
-            /** Format: uri-template */
-            notifications_url: string;
-            open_issues: number;
-            open_issues_count: number;
-            organization?: string;
-            /** User */
-            owner: ({
-              /** Format: uri */
-              avatar_url?: string;
-              deleted?: boolean;
-              email?: string | null;
-              /** Format: uri-template */
-              events_url?: string;
-              /** Format: uri */
-              followers_url?: string;
-              /** Format: uri-template */
-              following_url?: string;
-              /** Format: uri-template */
-              gists_url?: string;
-              gravatar_id?: string;
-              /** Format: uri */
-              html_url?: string;
-              id: number;
-              login: string;
-              name?: string;
-              node_id?: string;
-              /** Format: uri */
-              organizations_url?: string;
-              /** Format: uri */
-              received_events_url?: string;
-              /** Format: uri */
-              repos_url?: string;
-              site_admin?: boolean;
-              /** Format: uri-template */
-              starred_url?: string;
-              /** Format: uri */
-              subscriptions_url?: string;
-              /** @enum {string} */
-              type?: "Bot" | "User" | "Organization";
-              /** Format: uri */
-              url?: string;
-            }) | null;
-            permissions?: {
-              admin: boolean;
-              maintain?: boolean;
-              pull: boolean;
-              push: boolean;
-              triage?: boolean;
-            };
-            /** @description Whether the repository is private or public. */
-            private: boolean;
-            public?: boolean;
-            /** Format: uri-template */
-            pulls_url: string;
-            pushed_at: number | string;
-            /** Format: uri-template */
-            releases_url: string;
-            role_name?: string | null;
-            size: number;
-            /**
-             * @description The default value for a squash merge commit message:
-             * 
-             *   - `PR_BODY` - default to the pull request's body.
-             *   - `COMMIT_MESSAGES` - default to the branch's commit messages.
-             *   - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /**
-             * @description The default value for a squash merge commit title:
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
-             * @enum {string}
-             */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url: string;
-            stargazers?: number;
-            stargazers_count: number;
-            /** Format: uri */
-            stargazers_url: string;
-            /** Format: uri-template */
-            statuses_url: string;
-            /** Format: uri */
-            subscribers_url: string;
-            /** Format: uri */
-            subscription_url: string;
-            /** Format: uri */
-            svn_url: string;
-            /** Format: uri */
-            tags_url: string;
-            /** Format: uri */
-            teams_url: string;
-            topics: (string)[];
-            /** Format: uri-template */
-            trees_url: string;
-            /** Format: date-time */
-            updated_at: string;
-            /** Format: uri */
-            url: string;
-            /**
-             * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead. 
-             * @default false
-             */
-            use_squash_pr_title_as_default?: boolean;
-            /** @enum {string} */
-            visibility: "public" | "private" | "internal";
-            watchers: number;
-            watchers_count: number;
-            /** @description Whether to require contributors to sign off on web-based commits */
-            web_commit_signoff_required?: boolean;
-          };
-          sha: string;
-          /** User */
-          user: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-        };
-        body: string | null;
-        changed_files?: number;
-        /** Format: date-time */
-        closed_at: string | null;
-        comments?: number;
-        /** Format: uri */
-        comments_url: string;
-        commits?: number;
-        /** Format: uri */
-        commits_url: string;
-        /** Format: date-time */
-        created_at: string;
-        deletions?: number;
-        /** Format: uri */
-        diff_url: string;
-        /** @description Indicates whether or not the pull request is a draft. */
-        draft: boolean;
-        head: {
-          label: string;
-          ref: string;
-          /**
-           * Repository 
-           * @description A git repository
-           */
-          repo: ({
-            /**
-             * @description Whether to allow auto-merge for pull requests. 
-             * @default false
-             */
-            allow_auto_merge?: boolean;
-            /** @description Whether to allow private forks */
-            allow_forking?: boolean;
-            /**
-             * @description Whether to allow merge commits for pull requests. 
-             * @default true
-             */
-            allow_merge_commit?: boolean;
-            /**
-             * @description Whether to allow rebase merges for pull requests. 
-             * @default true
-             */
-            allow_rebase_merge?: boolean;
-            /**
-             * @description Whether to allow squash merges for pull requests. 
-             * @default true
-             */
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            /** Format: uri-template */
-            archive_url: string;
-            /**
-             * @description Whether the repository is archived. 
-             * @default false
-             */
-            archived: boolean;
-            /** Format: uri-template */
-            assignees_url: string;
-            /** Format: uri-template */
-            blobs_url: string;
-            /** Format: uri-template */
-            branches_url: string;
-            /** Format: uri */
-            clone_url: string;
-            /** Format: uri-template */
-            collaborators_url: string;
-            /** Format: uri-template */
-            comments_url: string;
-            /** Format: uri-template */
-            commits_url: string;
-            /** Format: uri-template */
-            compare_url: string;
-            /** Format: uri-template */
-            contents_url: string;
-            /** Format: uri */
-            contributors_url: string;
-            created_at: number | string;
-            /** @description The default branch of the repository. */
-            default_branch: string;
-            /**
-             * @description Whether to delete head branches when pull requests are merged 
-             * @default false
-             */
-            delete_branch_on_merge?: boolean;
-            /** Format: uri */
-            deployments_url: string;
-            description: string | null;
-            /** @description Returns whether or not this repository is disabled. */
-            disabled?: boolean;
-            /** Format: uri */
-            downloads_url: string;
-            /** Format: uri */
-            events_url: string;
-            fork: boolean;
-            forks: number;
-            forks_count: number;
-            /** Format: uri */
-            forks_url: string;
-            full_name: string;
-            /** Format: uri-template */
-            git_commits_url: string;
-            /** Format: uri-template */
-            git_refs_url: string;
-            /** Format: uri-template */
-            git_tags_url: string;
-            /** Format: uri */
-            git_url: string;
-            /**
-             * @description Whether downloads are enabled. 
-             * @default true
-             */
-            has_downloads: boolean;
-            /**
-             * @description Whether issues are enabled. 
-             * @default true
-             */
-            has_issues: boolean;
-            has_pages: boolean;
-            /**
-             * @description Whether projects are enabled. 
-             * @default true
-             */
-            has_projects: boolean;
-            /**
-             * @description Whether the wiki is enabled. 
-             * @default true
-             */
-            has_wiki: boolean;
-            homepage: string | null;
-            /** Format: uri */
-            hooks_url: string;
-            /** Format: uri */
-            html_url: string;
-            /** @description Unique identifier of the repository */
-            id: number;
-            is_template?: boolean;
-            /** Format: uri-template */
-            issue_comment_url: string;
-            /** Format: uri-template */
-            issue_events_url: string;
-            /** Format: uri-template */
-            issues_url: string;
-            /** Format: uri-template */
-            keys_url: string;
-            /** Format: uri-template */
-            labels_url: string;
-            language: string | null;
-            /** Format: uri */
-            languages_url: string;
-            /** License */
-            license: ({
-              key: string;
-              name: string;
-              node_id: string;
-              spdx_id: string;
-              /** Format: uri */
-              url: string | null;
-            }) | null;
-            master_branch?: string;
-            /**
-             * @description The default value for a merge commit message.
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `PR_BODY` - default to the pull request's body.
-             * - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /**
-             * @description The default value for a merge commit title.
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name). 
-             * @enum {string}
-             */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            /** Format: uri */
-            merges_url: string;
-            /** Format: uri-template */
-            milestones_url: string;
-            /** Format: uri */
-            mirror_url: string | null;
-            /** @description The name of the repository. */
-            name: string;
-            node_id: string;
-            /** Format: uri-template */
-            notifications_url: string;
-            open_issues: number;
-            open_issues_count: number;
-            organization?: string;
-            /** User */
-            owner: ({
-              /** Format: uri */
-              avatar_url?: string;
-              deleted?: boolean;
-              email?: string | null;
-              /** Format: uri-template */
-              events_url?: string;
-              /** Format: uri */
-              followers_url?: string;
-              /** Format: uri-template */
-              following_url?: string;
-              /** Format: uri-template */
-              gists_url?: string;
-              gravatar_id?: string;
-              /** Format: uri */
-              html_url?: string;
-              id: number;
-              login: string;
-              name?: string;
-              node_id?: string;
-              /** Format: uri */
-              organizations_url?: string;
-              /** Format: uri */
-              received_events_url?: string;
-              /** Format: uri */
-              repos_url?: string;
-              site_admin?: boolean;
-              /** Format: uri-template */
-              starred_url?: string;
-              /** Format: uri */
-              subscriptions_url?: string;
-              /** @enum {string} */
-              type?: "Bot" | "User" | "Organization";
-              /** Format: uri */
-              url?: string;
-            }) | null;
-            permissions?: {
-              admin: boolean;
-              maintain?: boolean;
-              pull: boolean;
-              push: boolean;
-              triage?: boolean;
-            };
-            /** @description Whether the repository is private or public. */
-            private: boolean;
-            public?: boolean;
-            /** Format: uri-template */
-            pulls_url: string;
-            pushed_at: number | string;
-            /** Format: uri-template */
-            releases_url: string;
-            role_name?: string | null;
-            size: number;
-            /**
-             * @description The default value for a squash merge commit message:
-             * 
-             *   - `PR_BODY` - default to the pull request's body.
-             *   - `COMMIT_MESSAGES` - default to the branch's commit messages.
-             *   - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /**
-             * @description The default value for a squash merge commit title:
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
-             * @enum {string}
-             */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url: string;
-            stargazers?: number;
-            stargazers_count: number;
-            /** Format: uri */
-            stargazers_url: string;
-            /** Format: uri-template */
-            statuses_url: string;
-            /** Format: uri */
-            subscribers_url: string;
-            /** Format: uri */
-            subscription_url: string;
-            /** Format: uri */
-            svn_url: string;
-            /** Format: uri */
-            tags_url: string;
-            /** Format: uri */
-            teams_url: string;
-            topics: (string)[];
-            /** Format: uri-template */
-            trees_url: string;
-            /** Format: date-time */
-            updated_at: string;
-            /** Format: uri */
-            url: string;
-            /**
-             * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead. 
-             * @default false
-             */
-            use_squash_pr_title_as_default?: boolean;
-            /** @enum {string} */
-            visibility: "public" | "private" | "internal";
-            watchers: number;
-            watchers_count: number;
-            /** @description Whether to require contributors to sign off on web-based commits */
-            web_commit_signoff_required?: boolean;
-          }) | null;
-          sha: string;
-          /** User */
-          user: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-        };
-        /** Format: uri */
-        html_url: string;
-        id: number;
-        /** Format: uri */
-        issue_url: string;
-        labels: ({
-            /** @description 6-character hex code, without the leading #, identifying the color */
-            color: string;
-            default: boolean;
-            description: string | null;
-            id: number;
-            /** @description The name of the label. */
-            name: string;
-            node_id: string;
-            /**
-             * Format: uri 
-             * @description URL for the label
-             */
-            url: string;
-          })[];
-        locked: boolean;
-        /** @description Indicates whether maintainers can modify the pull request. */
-        maintainer_can_modify?: boolean;
-        merge_commit_sha: string | null;
-        mergeable?: boolean | null;
-        mergeable_state?: string;
-        merged?: boolean | null;
-        /** Format: date-time */
-        merged_at: string | null;
-        /** User */
-        merged_by?: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        /**
-         * Milestone 
-         * @description A collection of related issues and pull requests.
-         */
-        milestone: ({
-          /** Format: date-time */
-          closed_at: string | null;
-          closed_issues: number;
-          /** Format: date-time */
-          created_at: string;
-          /** User */
-          creator: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-          description: string | null;
-          /** Format: date-time */
-          due_on: string | null;
-          /** Format: uri */
-          html_url: string;
-          id: number;
-          /** Format: uri */
-          labels_url: string;
-          node_id: string;
-          /** @description The number of the milestone. */
-          number: number;
-          open_issues: number;
-          /**
-           * @description The state of the milestone. 
-           * @enum {string}
-           */
-          state: "open" | "closed";
-          /** @description The title of the milestone. */
-          title: string;
-          /** Format: date-time */
-          updated_at: string;
-          /** Format: uri */
-          url: string;
-        }) | null;
-        node_id: string;
-        /** @description Number uniquely identifying the pull request within its repository. */
-        number: number;
-        /** Format: uri */
-        patch_url: string;
-        rebaseable?: boolean | null;
-        requested_reviewers: (OneOf<[({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null, {
-            deleted?: boolean;
-            /** @description Description of the team */
-            description?: string | null;
-            /** Format: uri */
-            html_url?: string;
-            /** @description Unique identifier of the team */
-            id: number;
-            /** Format: uri-template */
-            members_url?: string;
-            /** @description Name of the team */
-            name: string;
-            node_id?: string;
-            parent?: ({
-              /** @description Description of the team */
-              description: string | null;
-              /** Format: uri */
-              html_url: string;
-              /** @description Unique identifier of the team */
-              id: number;
-              /** Format: uri-template */
-              members_url: string;
-              /** @description Name of the team */
-              name: string;
-              node_id: string;
-              /** @description Permission that the team will have for its repositories */
-              permission: string;
-              /** @enum {string} */
-              privacy: "open" | "closed" | "secret";
-              /** Format: uri */
-              repositories_url: string;
-              slug: string;
-              /**
-               * Format: uri 
-               * @description URL for the team
-               */
-              url: string;
-            }) | null;
-            /** @description Permission that the team will have for its repositories */
-            permission?: string;
-            /** @enum {string} */
-            privacy?: "open" | "closed" | "secret";
-            /** Format: uri */
-            repositories_url?: string;
-            slug?: string;
-            /**
-             * Format: uri 
-             * @description URL for the team
-             */
-            url?: string;
-          }]>)[];
-        requested_teams: ({
-            deleted?: boolean;
-            /** @description Description of the team */
-            description?: string | null;
-            /** Format: uri */
-            html_url?: string;
-            /** @description Unique identifier of the team */
-            id: number;
-            /** Format: uri-template */
-            members_url?: string;
-            /** @description Name of the team */
-            name: string;
-            node_id?: string;
-            parent?: ({
-              /** @description Description of the team */
-              description: string | null;
-              /** Format: uri */
-              html_url: string;
-              /** @description Unique identifier of the team */
-              id: number;
-              /** Format: uri-template */
-              members_url: string;
-              /** @description Name of the team */
-              name: string;
-              node_id: string;
-              /** @description Permission that the team will have for its repositories */
-              permission: string;
-              /** @enum {string} */
-              privacy: "open" | "closed" | "secret";
-              /** Format: uri */
-              repositories_url: string;
-              slug: string;
-              /**
-               * Format: uri 
-               * @description URL for the team
-               */
-              url: string;
-            }) | null;
-            /** @description Permission that the team will have for its repositories */
-            permission?: string;
-            /** @enum {string} */
-            privacy?: "open" | "closed" | "secret";
-            /** Format: uri */
-            repositories_url?: string;
-            slug?: string;
-            /**
-             * Format: uri 
-             * @description URL for the team
-             */
-            url?: string;
-          })[];
-        /** Format: uri-template */
-        review_comment_url: string;
-        review_comments?: number;
-        /** Format: uri */
-        review_comments_url: string;
-        /**
-         * @description State of this Pull Request. Either `open` or `closed`. 
+         * @description The default value for a merge commit title.
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., "Merge pull request #123 from branch-name"). 
          * @enum {string}
          */
-        state: "open" | "closed";
-        /** Format: uri */
-        statuses_url: string;
-        /** @description The title of the pull request. */
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** Format: uri */
-        url: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization" | "Mannequin";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      }) & ({
-        _links?: {
-          comments?: {
-            href?: string;
-          };
-          commits?: {
-            href?: string;
-          };
-          html?: {
-            href?: string;
-          };
-          issue?: {
-            href?: string;
-          };
-          review_comment?: {
-            href?: string;
-          };
-          review_comments?: {
-            href?: string;
-          };
-          self?: {
-            href?: string;
-          };
-          statuses?: {
-            href?: string;
-          };
-        };
-        active_lock_reason?: string | null;
-        additions?: number;
-        assignee?: Record<string, unknown> | null;
-        assignees?: (Record<string, unknown> | null)[];
-        author_association?: string;
-        auto_merge?: Record<string, unknown> | null;
-        base?: {
-          label?: string;
-          ref?: string;
-          repo?: {
-            allow_auto_merge?: boolean;
-            allow_forking?: boolean;
-            allow_merge_commit?: boolean;
-            allow_rebase_merge?: boolean;
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            archive_url?: string;
-            archived?: boolean;
-            assignees_url?: string;
-            blobs_url?: string;
-            branches_url?: string;
-            clone_url?: string;
-            collaborators_url?: string;
-            comments_url?: string;
-            commits_url?: string;
-            compare_url?: string;
-            contents_url?: string;
-            contributors_url?: string;
-            created_at?: string;
-            default_branch?: string;
-            delete_branch_on_merge?: boolean;
-            deployments_url?: string;
-            description?: string | null;
-            disabled?: boolean;
-            downloads_url?: string;
-            events_url?: string;
-            fork?: boolean;
-            forks?: number;
-            forks_count?: number;
-            forks_url?: string;
-            full_name?: string;
-            git_commits_url?: string;
-            git_refs_url?: string;
-            git_tags_url?: string;
-            git_url?: string;
-            has_downloads?: boolean;
-            has_issues?: boolean;
-            has_pages?: boolean;
-            has_projects?: boolean;
-            has_wiki?: boolean;
-            homepage?: string | null;
-            hooks_url?: string;
-            html_url?: string;
-            id?: number;
-            is_template?: boolean;
-            issue_comment_url?: string;
-            issue_events_url?: string;
-            issues_url?: string;
-            keys_url?: string;
-            labels_url?: string;
-            language?: string | null;
-            languages_url?: string;
-            license?: Record<string, unknown> | null;
-            /** @enum {string} */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /** @enum {string} */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            merges_url?: string;
-            milestones_url?: string;
-            mirror_url?: Record<string, unknown> | null;
-            name?: string;
-            node_id?: string;
-            notifications_url?: string;
-            open_issues?: number;
-            open_issues_count?: number;
-            owner?: {
-              avatar_url?: string;
-              events_url?: string;
-              followers_url?: string;
-              following_url?: string;
-              gists_url?: string;
-              gravatar_id?: string;
-              html_url?: string;
-              id?: number;
-              login?: string;
-              node_id?: string;
-              organizations_url?: string;
-              received_events_url?: string;
-              repos_url?: string;
-              site_admin?: boolean;
-              starred_url?: string;
-              subscriptions_url?: string;
-              type?: string;
-              url?: string;
-            };
-            private?: boolean;
-            pulls_url?: string;
-            pushed_at?: string;
-            releases_url?: string;
-            size?: number;
-            /** @enum {string} */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /** @enum {string} */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url?: string;
-            stargazers_count?: number;
-            stargazers_url?: string;
-            statuses_url?: string;
-            subscribers_url?: string;
-            subscription_url?: string;
-            svn_url?: string;
-            tags_url?: string;
-            teams_url?: string;
-            topics?: (string | null)[];
-            trees_url?: string;
-            updated_at?: string;
-            url?: string;
-            use_squash_pr_title_as_default?: boolean;
-            visibility?: string;
-            watchers?: number;
-            watchers_count?: number;
-            web_commit_signoff_required?: boolean;
-          };
-          sha?: string;
-          user?: {
-            avatar_url?: string;
-            events_url?: string;
-            followers_url?: string;
-            following_url?: string;
-            gists_url?: string;
-            gravatar_id?: string;
-            html_url?: string;
-            id?: number;
-            login?: string;
-            node_id?: string;
-            organizations_url?: string;
-            received_events_url?: string;
-            repos_url?: string;
-            site_admin?: boolean;
-            starred_url?: string;
-            subscriptions_url?: string;
-            type?: string;
-            url?: string;
-          };
-        };
-        body?: string | null;
-        changed_files?: number;
-        closed_at: string | null;
-        comments?: number;
-        comments_url?: string;
-        commits?: number;
-        commits_url?: string;
-        created_at?: string;
-        deletions?: number;
-        diff_url?: string;
-        /** @description Indicates whether or not the pull request is a draft. */
-        draft: boolean;
-        head?: {
-          label?: string;
-          ref?: string;
-          repo?: ({
-            allow_auto_merge?: boolean;
-            allow_forking?: boolean;
-            allow_merge_commit?: boolean;
-            allow_rebase_merge?: boolean;
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            archive_url?: string;
-            archived?: boolean;
-            assignees_url?: string;
-            blobs_url?: string;
-            branches_url?: string;
-            clone_url?: string;
-            collaborators_url?: string;
-            comments_url?: string;
-            commits_url?: string;
-            compare_url?: string;
-            contents_url?: string;
-            contributors_url?: string;
-            created_at?: string;
-            default_branch?: string;
-            delete_branch_on_merge?: boolean;
-            deployments_url?: string;
-            description?: string | null;
-            disabled?: boolean;
-            downloads_url?: string;
-            events_url?: string;
-            fork?: boolean;
-            forks?: number;
-            forks_count?: number;
-            forks_url?: string;
-            full_name?: string;
-            git_commits_url?: string;
-            git_refs_url?: string;
-            git_tags_url?: string;
-            git_url?: string;
-            has_downloads?: boolean;
-            has_issues?: boolean;
-            has_pages?: boolean;
-            has_projects?: boolean;
-            has_wiki?: boolean;
-            homepage?: string | null;
-            hooks_url?: string;
-            html_url?: string;
-            id?: number;
-            is_template?: boolean;
-            issue_comment_url?: string;
-            issue_events_url?: string;
-            issues_url?: string;
-            keys_url?: string;
-            labels_url?: string;
-            language?: string | null;
-            languages_url?: string;
-            license?: Record<string, unknown> | null;
-            /** @enum {string} */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /** @enum {string} */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            merges_url?: string;
-            milestones_url?: string;
-            mirror_url?: Record<string, unknown> | null;
-            name?: string;
-            node_id?: string;
-            notifications_url?: string;
-            open_issues?: number;
-            open_issues_count?: number;
-            owner?: {
-              avatar_url?: string;
-              events_url?: string;
-              followers_url?: string;
-              following_url?: string;
-              gists_url?: string;
-              gravatar_id?: string;
-              html_url?: string;
-              id?: number;
-              login?: string;
-              node_id?: string;
-              organizations_url?: string;
-              received_events_url?: string;
-              repos_url?: string;
-              site_admin?: boolean;
-              starred_url?: string;
-              subscriptions_url?: string;
-              type?: string;
-              url?: string;
-            };
-            private?: boolean;
-            pulls_url?: string;
-            pushed_at?: string;
-            releases_url?: string;
-            size?: number;
-            /** @enum {string} */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /** @enum {string} */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url?: string;
-            stargazers_count?: number;
-            stargazers_url?: string;
-            statuses_url?: string;
-            subscribers_url?: string;
-            subscription_url?: string;
-            svn_url?: string;
-            tags_url?: string;
-            teams_url?: string;
-            topics?: (string | null)[];
-            trees_url?: string;
-            updated_at?: string;
-            url?: string;
-            use_squash_pr_title_as_default?: boolean;
-            visibility?: string;
-            watchers?: number;
-            watchers_count?: number;
-            web_commit_signoff_required?: boolean;
-          }) | null;
-          sha?: string;
-          user?: {
-            avatar_url?: string;
-            events_url?: string;
-            followers_url?: string;
-            following_url?: string;
-            gists_url?: string;
-            gravatar_id?: string;
-            html_url?: string;
-            id?: number;
-            login?: string;
-            node_id?: string;
-            organizations_url?: string;
-            received_events_url?: string;
-            repos_url?: string;
-            site_admin?: boolean;
-            starred_url?: string;
-            subscriptions_url?: string;
-            type?: string;
-            url?: string;
-          };
-        };
-        html_url?: string;
-        id?: number;
-        issue_url?: string;
-        labels?: (Record<string, unknown> | null)[];
-        locked?: boolean;
-        maintainer_can_modify?: boolean;
-        merge_commit_sha?: string | null;
-        mergeable?: boolean | null;
-        mergeable_state?: string;
-        /** @enum {boolean} */
-        merged: false;
-        merged_at: Record<string, unknown> | null;
-        merged_by: Record<string, unknown> | null;
-        milestone?: Record<string, unknown> | null;
-        node_id?: string;
-        number?: number;
-        patch_url?: string;
-        rebaseable?: boolean | null;
-        requested_reviewers?: (Record<string, unknown> | null)[];
-        requested_teams?: (Record<string, unknown> | null)[];
-        review_comment_url?: string;
-        review_comments?: number;
-        review_comments_url?: string;
-        state?: string;
-        statuses_url?: string;
-        title?: string;
-        updated_at?: string;
-        url?: string;
-        user?: {
-          avatar_url?: string;
-          events_url?: string;
-          followers_url?: string;
-          following_url?: string;
-          gists_url?: string;
-          gravatar_id?: string;
-          html_url?: string;
-          id?: number;
-          login?: string;
-          node_id?: string;
-          organizations_url?: string;
-          received_events_url?: string;
-          repos_url?: string;
-          site_admin?: boolean;
-          starred_url?: string;
-          subscriptions_url?: string;
-          type?: string;
-          url?: string;
-        };
+        merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
+        /**
+         * @description The default value for a squash merge commit message:
+         * - `PR_BODY` - default to the pull request's body.
+         * - `COMMIT_MESSAGES` - default to the branch's commit messages.
+         * - `BLANK` - default to a blank commit message. 
+         * @enum {string}
+         */
+        squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
+        /**
+         * @description The default value for a squash merge commit title:
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
+         * @enum {string}
+         */
+        squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
+        /**
+         * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead.** 
+         * @default false
+         */
+        use_squash_pr_title_as_default?: boolean;
       });
       repository: components["schemas"]["repository"];
       sender: components["schemas"]["simple-user"];
@@ -49911,32 +44903,12 @@ export interface components {
       repository: components["schemas"]["repository"];
       sender?: components["schemas"]["simple-user"];
     };
-    /** pull_request edited event */
-    "webhook-pull-request-edited": {
+    /** pull_request dequeued event */
+    "webhook-pull-request-dequeued": {
       /** @enum {string} */
-      action: "edited";
-      /** @description The changes to the comment if the action was `edited`. */
-      changes: {
-        base?: {
-          ref: {
-            from: string;
-          };
-          sha: {
-            from: string;
-          };
-        };
-        body?: {
-          /** @description The previous version of the body if the action was `edited`. */
-          from: string;
-        };
-        title?: {
-          /** @description The previous version of the title if the action was `edited`. */
-          from: string;
-        };
-      };
+      action: "dequeued";
       enterprise?: components["schemas"]["enterprise"];
       installation?: components["schemas"]["simple-installation"];
-      /** @description The pull request number. */
       number: number;
       organization?: components["schemas"]["organization-simple"];
       /** Pull Request */
@@ -50019,7 +44991,7 @@ export interface components {
           /** Format: uri */
           subscriptions_url?: string;
           /** @enum {string} */
-          type?: "Bot" | "User" | "Organization" | "Mannequin";
+          type?: "Bot" | "User" | "Organization";
           /** Format: uri */
           url?: string;
         }) | null;
@@ -50055,7 +45027,7 @@ export interface components {
             /** Format: uri */
             subscriptions_url?: string;
             /** @enum {string} */
-            type?: "Bot" | "User" | "Organization" | "Mannequin";
+            type?: "Bot" | "User" | "Organization";
             /** Format: uri */
             url?: string;
           }) | null)[];
@@ -50458,13 +45430,13 @@ export interface components {
         /** @description Indicates whether or not the pull request is a draft. */
         draft: boolean;
         head: {
-          label: string | null;
+          label: string;
           ref: string;
           /**
            * Repository 
            * @description A git repository
            */
-          repo: ({
+          repo: {
             /**
              * @description Whether to allow auto-merge for pull requests. 
              * @default false
@@ -50696,7 +45668,7 @@ export interface components {
              * - `BLANK` - default to a blank commit message. 
              * @enum {string}
              */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK" | "BLANK";
+            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
             /**
              * @description The default value for a squash merge commit title:
              * 
@@ -50740,7 +45712,7 @@ export interface components {
             watchers_count: number;
             /** @description Whether to require contributors to sign off on web-based commits */
             web_commit_signoff_required?: boolean;
-          }) | null;
+          };
           sha: string;
           /** User */
           user: ({
@@ -50842,7 +45814,7 @@ export interface components {
           /** Format: uri */
           subscriptions_url?: string;
           /** @enum {string} */
-          type?: "Bot" | "User" | "Organization" | "Mannequin";
+          type?: "Bot" | "User" | "Organization";
           /** Format: uri */
           url?: string;
         }) | null;
@@ -50955,22 +45927,22 @@ export interface components {
             /** Format: uri */
             subscriptions_url?: string;
             /** @enum {string} */
-            type?: "Bot" | "User" | "Organization" | "Mannequin";
+            type?: "Bot" | "User" | "Organization";
             /** Format: uri */
             url?: string;
           }) | null, {
             deleted?: boolean;
             /** @description Description of the team */
-            description: string | null;
+            description?: string | null;
             /** Format: uri */
-            html_url: string;
+            html_url?: string;
             /** @description Unique identifier of the team */
             id: number;
             /** Format: uri-template */
-            members_url: string;
+            members_url?: string;
             /** @description Name of the team */
             name: string;
-            node_id: string;
+            node_id?: string;
             parent?: ({
               /** @description Description of the team */
               description: string | null;
@@ -50997,17 +45969,1286 @@ export interface components {
               url: string;
             }) | null;
             /** @description Permission that the team will have for its repositories */
-            permission: string;
+            permission?: string;
             /** @enum {string} */
-            privacy: "open" | "closed" | "secret";
+            privacy?: "open" | "closed" | "secret";
             /** Format: uri */
-            repositories_url: string;
-            slug: string;
+            repositories_url?: string;
+            slug?: string;
             /**
              * Format: uri 
              * @description URL for the team
              */
+            url?: string;
+          }]>)[];
+        requested_teams: ({
+            deleted?: boolean;
+            /** @description Description of the team */
+            description?: string | null;
+            /** Format: uri */
+            html_url?: string;
+            /** @description Unique identifier of the team */
+            id: number;
+            /** Format: uri-template */
+            members_url?: string;
+            /** @description Name of the team */
+            name: string;
+            node_id?: string;
+            parent?: ({
+              /** @description Description of the team */
+              description: string | null;
+              /** Format: uri */
+              html_url: string;
+              /** @description Unique identifier of the team */
+              id: number;
+              /** Format: uri-template */
+              members_url: string;
+              /** @description Name of the team */
+              name: string;
+              node_id: string;
+              /** @description Permission that the team will have for its repositories */
+              permission: string;
+              /** @enum {string} */
+              privacy: "open" | "closed" | "secret";
+              /** Format: uri */
+              repositories_url: string;
+              slug: string;
+              /**
+               * Format: uri 
+               * @description URL for the team
+               */
+              url: string;
+            }) | null;
+            /** @description Permission that the team will have for its repositories */
+            permission?: string;
+            /** @enum {string} */
+            privacy?: "open" | "closed" | "secret";
+            /** Format: uri */
+            repositories_url?: string;
+            slug?: string;
+            /**
+             * Format: uri 
+             * @description URL for the team
+             */
+            url?: string;
+          })[];
+        /** Format: uri-template */
+        review_comment_url: string;
+        review_comments?: number;
+        /** Format: uri */
+        review_comments_url: string;
+        /**
+         * @description State of this Pull Request. Either `open` or `closed`. 
+         * @enum {string}
+         */
+        state: "open" | "closed";
+        /** Format: uri */
+        statuses_url: string;
+        /** @description The title of the pull request. */
+        title: string;
+        /** Format: date-time */
+        updated_at: string;
+        /** Format: uri */
+        url: string;
+        /** User */
+        user: ({
+          /** Format: uri */
+          avatar_url?: string;
+          deleted?: boolean;
+          email?: string | null;
+          /** Format: uri-template */
+          events_url?: string;
+          /** Format: uri */
+          followers_url?: string;
+          /** Format: uri-template */
+          following_url?: string;
+          /** Format: uri-template */
+          gists_url?: string;
+          gravatar_id?: string;
+          /** Format: uri */
+          html_url?: string;
+          id: number;
+          login: string;
+          name?: string;
+          node_id?: string;
+          /** Format: uri */
+          organizations_url?: string;
+          /** Format: uri */
+          received_events_url?: string;
+          /** Format: uri */
+          repos_url?: string;
+          site_admin?: boolean;
+          /** Format: uri-template */
+          starred_url?: string;
+          /** Format: uri */
+          subscriptions_url?: string;
+          /** @enum {string} */
+          type?: "Bot" | "User" | "Organization" | "Mannequin";
+          /** Format: uri */
+          url?: string;
+        }) | null;
+      };
+      reason: string;
+      repository: components["schemas"]["repository"];
+      sender: components["schemas"]["simple-user"];
+    };
+    /** pull_request edited event */
+    "webhook-pull-request-edited": {
+      /** @enum {string} */
+      action: "edited";
+      /** @description The changes to the comment if the action was `edited`. */
+      changes: {
+        base?: {
+          ref: {
+            from: string;
+          };
+          sha: {
+            from: string;
+          };
+        };
+        body?: {
+          /** @description The previous version of the body if the action was `edited`. */
+          from: string;
+        };
+        title?: {
+          /** @description The previous version of the title if the action was `edited`. */
+          from: string;
+        };
+      };
+      enterprise?: components["schemas"]["enterprise"];
+      installation?: components["schemas"]["simple-installation"];
+      /** @description The pull request number. */
+      number: number;
+      organization?: components["schemas"]["organization-simple"];
+      pull_request: components["schemas"]["pull-request"] & ({
+        /**
+         * @description Whether to allow auto-merge for pull requests. 
+         * @default false
+         */
+        allow_auto_merge?: boolean;
+        /** @description Whether to allow updating the pull request's branch. */
+        allow_update_branch?: boolean;
+        /**
+         * @description Whether to delete head branches when pull requests are merged. 
+         * @default false
+         */
+        delete_branch_on_merge?: boolean;
+        /**
+         * @description The default value for a merge commit message.
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `PR_BODY` - default to the pull request's body.
+         * - `BLANK` - default to a blank commit message. 
+         * @enum {string}
+         */
+        merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
+        /**
+         * @description The default value for a merge commit title.
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., "Merge pull request #123 from branch-name"). 
+         * @enum {string}
+         */
+        merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
+        /**
+         * @description The default value for a squash merge commit message:
+         * - `PR_BODY` - default to the pull request's body.
+         * - `COMMIT_MESSAGES` - default to the branch's commit messages.
+         * - `BLANK` - default to a blank commit message. 
+         * @enum {string}
+         */
+        squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
+        /**
+         * @description The default value for a squash merge commit title:
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
+         * @enum {string}
+         */
+        squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
+        /**
+         * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead. 
+         * @default false
+         */
+        use_squash_pr_title_as_default?: boolean;
+      });
+      repository: components["schemas"]["repository"];
+      sender?: components["schemas"]["simple-user"];
+    };
+    /** pull_request enqueued event */
+    "webhook-pull-request-enqueued": {
+      /** @enum {string} */
+      action: "enqueued";
+      enterprise?: components["schemas"]["enterprise"];
+      installation?: components["schemas"]["simple-installation"];
+      number: number;
+      organization?: components["schemas"]["organization-simple"];
+      /** Pull Request */
+      pull_request: {
+        _links: {
+          /** Link */
+          comments: {
+            /** Format: uri-template */
+            href: string;
+          };
+          /** Link */
+          commits: {
+            /** Format: uri-template */
+            href: string;
+          };
+          /** Link */
+          html: {
+            /** Format: uri-template */
+            href: string;
+          };
+          /** Link */
+          issue: {
+            /** Format: uri-template */
+            href: string;
+          };
+          /** Link */
+          review_comment: {
+            /** Format: uri-template */
+            href: string;
+          };
+          /** Link */
+          review_comments: {
+            /** Format: uri-template */
+            href: string;
+          };
+          /** Link */
+          self: {
+            /** Format: uri-template */
+            href: string;
+          };
+          /** Link */
+          statuses: {
+            /** Format: uri-template */
+            href: string;
+          };
+        };
+        /** @enum {string|null} */
+        active_lock_reason: "resolved" | "off-topic" | "too heated" | "spam" | "" | null;
+        additions?: number;
+        /** User */
+        assignee: ({
+          /** Format: uri */
+          avatar_url?: string;
+          deleted?: boolean;
+          email?: string | null;
+          /** Format: uri-template */
+          events_url?: string;
+          /** Format: uri */
+          followers_url?: string;
+          /** Format: uri-template */
+          following_url?: string;
+          /** Format: uri-template */
+          gists_url?: string;
+          gravatar_id?: string;
+          /** Format: uri */
+          html_url?: string;
+          id: number;
+          login: string;
+          name?: string;
+          node_id?: string;
+          /** Format: uri */
+          organizations_url?: string;
+          /** Format: uri */
+          received_events_url?: string;
+          /** Format: uri */
+          repos_url?: string;
+          site_admin?: boolean;
+          /** Format: uri-template */
+          starred_url?: string;
+          /** Format: uri */
+          subscriptions_url?: string;
+          /** @enum {string} */
+          type?: "Bot" | "User" | "Organization";
+          /** Format: uri */
+          url?: string;
+        }) | null;
+        assignees: (({
+            /** Format: uri */
+            avatar_url?: string;
+            deleted?: boolean;
+            email?: string | null;
+            /** Format: uri-template */
+            events_url?: string;
+            /** Format: uri */
+            followers_url?: string;
+            /** Format: uri-template */
+            following_url?: string;
+            /** Format: uri-template */
+            gists_url?: string;
+            gravatar_id?: string;
+            /** Format: uri */
+            html_url?: string;
+            id: number;
+            login: string;
+            name?: string;
+            node_id?: string;
+            /** Format: uri */
+            organizations_url?: string;
+            /** Format: uri */
+            received_events_url?: string;
+            /** Format: uri */
+            repos_url?: string;
+            site_admin?: boolean;
+            /** Format: uri-template */
+            starred_url?: string;
+            /** Format: uri */
+            subscriptions_url?: string;
+            /** @enum {string} */
+            type?: "Bot" | "User" | "Organization";
+            /** Format: uri */
+            url?: string;
+          }) | null)[];
+        /**
+         * AuthorAssociation 
+         * @description How the author is associated with the repository. 
+         * @enum {string}
+         */
+        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
+        /**
+         * PullRequestAutoMerge 
+         * @description The status of auto merging a pull request.
+         */
+        auto_merge: ({
+          /** @description Commit message for the merge commit. */
+          commit_message: string | null;
+          /** @description Title for the merge commit message. */
+          commit_title: string | null;
+          /** User */
+          enabled_by: ({
+            /** Format: uri */
+            avatar_url?: string;
+            deleted?: boolean;
+            email?: string | null;
+            /** Format: uri-template */
+            events_url?: string;
+            /** Format: uri */
+            followers_url?: string;
+            /** Format: uri-template */
+            following_url?: string;
+            /** Format: uri-template */
+            gists_url?: string;
+            gravatar_id?: string;
+            /** Format: uri */
+            html_url?: string;
+            id: number;
+            login: string;
+            name?: string;
+            node_id?: string;
+            /** Format: uri */
+            organizations_url?: string;
+            /** Format: uri */
+            received_events_url?: string;
+            /** Format: uri */
+            repos_url?: string;
+            site_admin?: boolean;
+            /** Format: uri-template */
+            starred_url?: string;
+            /** Format: uri */
+            subscriptions_url?: string;
+            /** @enum {string} */
+            type?: "Bot" | "User" | "Organization";
+            /** Format: uri */
+            url?: string;
+          }) | null;
+          /**
+           * @description The merge method to use. 
+           * @enum {string}
+           */
+          merge_method: "merge" | "squash" | "rebase";
+        }) | null;
+        base: {
+          label: string;
+          ref: string;
+          /**
+           * Repository 
+           * @description A git repository
+           */
+          repo: {
+            /**
+             * @description Whether to allow auto-merge for pull requests. 
+             * @default false
+             */
+            allow_auto_merge?: boolean;
+            /** @description Whether to allow private forks */
+            allow_forking?: boolean;
+            /**
+             * @description Whether to allow merge commits for pull requests. 
+             * @default true
+             */
+            allow_merge_commit?: boolean;
+            /**
+             * @description Whether to allow rebase merges for pull requests. 
+             * @default true
+             */
+            allow_rebase_merge?: boolean;
+            /**
+             * @description Whether to allow squash merges for pull requests. 
+             * @default true
+             */
+            allow_squash_merge?: boolean;
+            allow_update_branch?: boolean;
+            /** Format: uri-template */
+            archive_url: string;
+            /**
+             * @description Whether the repository is archived. 
+             * @default false
+             */
+            archived: boolean;
+            /** Format: uri-template */
+            assignees_url: string;
+            /** Format: uri-template */
+            blobs_url: string;
+            /** Format: uri-template */
+            branches_url: string;
+            /** Format: uri */
+            clone_url: string;
+            /** Format: uri-template */
+            collaborators_url: string;
+            /** Format: uri-template */
+            comments_url: string;
+            /** Format: uri-template */
+            commits_url: string;
+            /** Format: uri-template */
+            compare_url: string;
+            /** Format: uri-template */
+            contents_url: string;
+            /** Format: uri */
+            contributors_url: string;
+            created_at: number | string;
+            /** @description The default branch of the repository. */
+            default_branch: string;
+            /**
+             * @description Whether to delete head branches when pull requests are merged 
+             * @default false
+             */
+            delete_branch_on_merge?: boolean;
+            /** Format: uri */
+            deployments_url: string;
+            description: string | null;
+            /** @description Returns whether or not this repository is disabled. */
+            disabled?: boolean;
+            /** Format: uri */
+            downloads_url: string;
+            /** Format: uri */
+            events_url: string;
+            fork: boolean;
+            forks: number;
+            forks_count: number;
+            /** Format: uri */
+            forks_url: string;
+            full_name: string;
+            /** Format: uri-template */
+            git_commits_url: string;
+            /** Format: uri-template */
+            git_refs_url: string;
+            /** Format: uri-template */
+            git_tags_url: string;
+            /** Format: uri */
+            git_url: string;
+            /**
+             * @description Whether downloads are enabled. 
+             * @default true
+             */
+            has_downloads: boolean;
+            /**
+             * @description Whether issues are enabled. 
+             * @default true
+             */
+            has_issues: boolean;
+            has_pages: boolean;
+            /**
+             * @description Whether projects are enabled. 
+             * @default true
+             */
+            has_projects: boolean;
+            /**
+             * @description Whether the wiki is enabled. 
+             * @default true
+             */
+            has_wiki: boolean;
+            /**
+             * @description Whether discussions are enabled. 
+             * @default false
+             */
+            has_discussions: boolean;
+            homepage: string | null;
+            /** Format: uri */
+            hooks_url: string;
+            /** Format: uri */
+            html_url: string;
+            /** @description Unique identifier of the repository */
+            id: number;
+            is_template?: boolean;
+            /** Format: uri-template */
+            issue_comment_url: string;
+            /** Format: uri-template */
+            issue_events_url: string;
+            /** Format: uri-template */
+            issues_url: string;
+            /** Format: uri-template */
+            keys_url: string;
+            /** Format: uri-template */
+            labels_url: string;
+            language: string | null;
+            /** Format: uri */
+            languages_url: string;
+            /** License */
+            license: ({
+              key: string;
+              name: string;
+              node_id: string;
+              spdx_id: string;
+              /** Format: uri */
+              url: string | null;
+            }) | null;
+            master_branch?: string;
+            /**
+             * @description The default value for a merge commit message.
+             * 
+             * - `PR_TITLE` - default to the pull request's title.
+             * - `PR_BODY` - default to the pull request's body.
+             * - `BLANK` - default to a blank commit message. 
+             * @enum {string}
+             */
+            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
+            /**
+             * @description The default value for a merge commit title.
+             * 
+             * - `PR_TITLE` - default to the pull request's title.
+             * - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name). 
+             * @enum {string}
+             */
+            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
+            /** Format: uri */
+            merges_url: string;
+            /** Format: uri-template */
+            milestones_url: string;
+            /** Format: uri */
+            mirror_url: string | null;
+            /** @description The name of the repository. */
+            name: string;
+            node_id: string;
+            /** Format: uri-template */
+            notifications_url: string;
+            open_issues: number;
+            open_issues_count: number;
+            organization?: string;
+            /** User */
+            owner: ({
+              /** Format: uri */
+              avatar_url?: string;
+              deleted?: boolean;
+              email?: string | null;
+              /** Format: uri-template */
+              events_url?: string;
+              /** Format: uri */
+              followers_url?: string;
+              /** Format: uri-template */
+              following_url?: string;
+              /** Format: uri-template */
+              gists_url?: string;
+              gravatar_id?: string;
+              /** Format: uri */
+              html_url?: string;
+              id: number;
+              login: string;
+              name?: string;
+              node_id?: string;
+              /** Format: uri */
+              organizations_url?: string;
+              /** Format: uri */
+              received_events_url?: string;
+              /** Format: uri */
+              repos_url?: string;
+              site_admin?: boolean;
+              /** Format: uri-template */
+              starred_url?: string;
+              /** Format: uri */
+              subscriptions_url?: string;
+              /** @enum {string} */
+              type?: "Bot" | "User" | "Organization";
+              /** Format: uri */
+              url?: string;
+            }) | null;
+            permissions?: {
+              admin: boolean;
+              maintain?: boolean;
+              pull: boolean;
+              push: boolean;
+              triage?: boolean;
+            };
+            /** @description Whether the repository is private or public. */
+            private: boolean;
+            public?: boolean;
+            /** Format: uri-template */
+            pulls_url: string;
+            pushed_at: number | string;
+            /** Format: uri-template */
+            releases_url: string;
+            role_name?: string | null;
+            size: number;
+            /**
+             * @description The default value for a squash merge commit message:
+             * 
+             * - `PR_BODY` - default to the pull request's body.
+             * - `COMMIT_MESSAGES` - default to the branch's commit messages.
+             * - `BLANK` - default to a blank commit message. 
+             * @enum {string}
+             */
+            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
+            /**
+             * @description The default value for a squash merge commit title:
+             * 
+             * - `PR_TITLE` - default to the pull request's title.
+             * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
+             * @enum {string}
+             */
+            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
+            ssh_url: string;
+            stargazers?: number;
+            stargazers_count: number;
+            /** Format: uri */
+            stargazers_url: string;
+            /** Format: uri-template */
+            statuses_url: string;
+            /** Format: uri */
+            subscribers_url: string;
+            /** Format: uri */
+            subscription_url: string;
+            /** Format: uri */
+            svn_url: string;
+            /** Format: uri */
+            tags_url: string;
+            /** Format: uri */
+            teams_url: string;
+            topics: (string)[];
+            /** Format: uri-template */
+            trees_url: string;
+            /** Format: date-time */
+            updated_at: string;
+            /** Format: uri */
             url: string;
+            /**
+             * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead. 
+             * @default false
+             */
+            use_squash_pr_title_as_default?: boolean;
+            /** @enum {string} */
+            visibility: "public" | "private" | "internal";
+            watchers: number;
+            watchers_count: number;
+            /** @description Whether to require contributors to sign off on web-based commits */
+            web_commit_signoff_required?: boolean;
+          };
+          sha: string;
+          /** User */
+          user: ({
+            /** Format: uri */
+            avatar_url?: string;
+            deleted?: boolean;
+            email?: string | null;
+            /** Format: uri-template */
+            events_url?: string;
+            /** Format: uri */
+            followers_url?: string;
+            /** Format: uri-template */
+            following_url?: string;
+            /** Format: uri-template */
+            gists_url?: string;
+            gravatar_id?: string;
+            /** Format: uri */
+            html_url?: string;
+            id: number;
+            login: string;
+            name?: string;
+            node_id?: string;
+            /** Format: uri */
+            organizations_url?: string;
+            /** Format: uri */
+            received_events_url?: string;
+            /** Format: uri */
+            repos_url?: string;
+            site_admin?: boolean;
+            /** Format: uri-template */
+            starred_url?: string;
+            /** Format: uri */
+            subscriptions_url?: string;
+            /** @enum {string} */
+            type?: "Bot" | "User" | "Organization";
+            /** Format: uri */
+            url?: string;
+          }) | null;
+        };
+        body: string | null;
+        changed_files?: number;
+        /** Format: date-time */
+        closed_at: string | null;
+        comments?: number;
+        /** Format: uri */
+        comments_url: string;
+        commits?: number;
+        /** Format: uri */
+        commits_url: string;
+        /** Format: date-time */
+        created_at: string;
+        deletions?: number;
+        /** Format: uri */
+        diff_url: string;
+        /** @description Indicates whether or not the pull request is a draft. */
+        draft: boolean;
+        head: {
+          label: string;
+          ref: string;
+          /**
+           * Repository 
+           * @description A git repository
+           */
+          repo: {
+            /**
+             * @description Whether to allow auto-merge for pull requests. 
+             * @default false
+             */
+            allow_auto_merge?: boolean;
+            /** @description Whether to allow private forks */
+            allow_forking?: boolean;
+            /**
+             * @description Whether to allow merge commits for pull requests. 
+             * @default true
+             */
+            allow_merge_commit?: boolean;
+            /**
+             * @description Whether to allow rebase merges for pull requests. 
+             * @default true
+             */
+            allow_rebase_merge?: boolean;
+            /**
+             * @description Whether to allow squash merges for pull requests. 
+             * @default true
+             */
+            allow_squash_merge?: boolean;
+            allow_update_branch?: boolean;
+            /** Format: uri-template */
+            archive_url: string;
+            /**
+             * @description Whether the repository is archived. 
+             * @default false
+             */
+            archived: boolean;
+            /** Format: uri-template */
+            assignees_url: string;
+            /** Format: uri-template */
+            blobs_url: string;
+            /** Format: uri-template */
+            branches_url: string;
+            /** Format: uri */
+            clone_url: string;
+            /** Format: uri-template */
+            collaborators_url: string;
+            /** Format: uri-template */
+            comments_url: string;
+            /** Format: uri-template */
+            commits_url: string;
+            /** Format: uri-template */
+            compare_url: string;
+            /** Format: uri-template */
+            contents_url: string;
+            /** Format: uri */
+            contributors_url: string;
+            created_at: number | string;
+            /** @description The default branch of the repository. */
+            default_branch: string;
+            /**
+             * @description Whether to delete head branches when pull requests are merged 
+             * @default false
+             */
+            delete_branch_on_merge?: boolean;
+            /** Format: uri */
+            deployments_url: string;
+            description: string | null;
+            /** @description Returns whether or not this repository is disabled. */
+            disabled?: boolean;
+            /** Format: uri */
+            downloads_url: string;
+            /** Format: uri */
+            events_url: string;
+            fork: boolean;
+            forks: number;
+            forks_count: number;
+            /** Format: uri */
+            forks_url: string;
+            full_name: string;
+            /** Format: uri-template */
+            git_commits_url: string;
+            /** Format: uri-template */
+            git_refs_url: string;
+            /** Format: uri-template */
+            git_tags_url: string;
+            /** Format: uri */
+            git_url: string;
+            /**
+             * @description Whether downloads are enabled. 
+             * @default true
+             */
+            has_downloads: boolean;
+            /**
+             * @description Whether issues are enabled. 
+             * @default true
+             */
+            has_issues: boolean;
+            has_pages: boolean;
+            /**
+             * @description Whether projects are enabled. 
+             * @default true
+             */
+            has_projects: boolean;
+            /**
+             * @description Whether the wiki is enabled. 
+             * @default true
+             */
+            has_wiki: boolean;
+            /**
+             * @description Whether discussions are enabled. 
+             * @default false
+             */
+            has_discussions: boolean;
+            homepage: string | null;
+            /** Format: uri */
+            hooks_url: string;
+            /** Format: uri */
+            html_url: string;
+            /** @description Unique identifier of the repository */
+            id: number;
+            is_template?: boolean;
+            /** Format: uri-template */
+            issue_comment_url: string;
+            /** Format: uri-template */
+            issue_events_url: string;
+            /** Format: uri-template */
+            issues_url: string;
+            /** Format: uri-template */
+            keys_url: string;
+            /** Format: uri-template */
+            labels_url: string;
+            language: string | null;
+            /** Format: uri */
+            languages_url: string;
+            /** License */
+            license: ({
+              key: string;
+              name: string;
+              node_id: string;
+              spdx_id: string;
+              /** Format: uri */
+              url: string | null;
+            }) | null;
+            master_branch?: string;
+            /**
+             * @description The default value for a merge commit message.
+             * 
+             * - `PR_TITLE` - default to the pull request's title.
+             * - `PR_BODY` - default to the pull request's body.
+             * - `BLANK` - default to a blank commit message. 
+             * @enum {string}
+             */
+            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
+            /**
+             * @description The default value for a merge commit title.
+             * 
+             * - `PR_TITLE` - default to the pull request's title.
+             * - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name). 
+             * @enum {string}
+             */
+            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
+            /** Format: uri */
+            merges_url: string;
+            /** Format: uri-template */
+            milestones_url: string;
+            /** Format: uri */
+            mirror_url: string | null;
+            /** @description The name of the repository. */
+            name: string;
+            node_id: string;
+            /** Format: uri-template */
+            notifications_url: string;
+            open_issues: number;
+            open_issues_count: number;
+            organization?: string;
+            /** User */
+            owner: ({
+              /** Format: uri */
+              avatar_url?: string;
+              deleted?: boolean;
+              email?: string | null;
+              /** Format: uri-template */
+              events_url?: string;
+              /** Format: uri */
+              followers_url?: string;
+              /** Format: uri-template */
+              following_url?: string;
+              /** Format: uri-template */
+              gists_url?: string;
+              gravatar_id?: string;
+              /** Format: uri */
+              html_url?: string;
+              id: number;
+              login: string;
+              name?: string;
+              node_id?: string;
+              /** Format: uri */
+              organizations_url?: string;
+              /** Format: uri */
+              received_events_url?: string;
+              /** Format: uri */
+              repos_url?: string;
+              site_admin?: boolean;
+              /** Format: uri-template */
+              starred_url?: string;
+              /** Format: uri */
+              subscriptions_url?: string;
+              /** @enum {string} */
+              type?: "Bot" | "User" | "Organization";
+              /** Format: uri */
+              url?: string;
+            }) | null;
+            permissions?: {
+              admin: boolean;
+              maintain?: boolean;
+              pull: boolean;
+              push: boolean;
+              triage?: boolean;
+            };
+            /** @description Whether the repository is private or public. */
+            private: boolean;
+            public?: boolean;
+            /** Format: uri-template */
+            pulls_url: string;
+            pushed_at: number | string;
+            /** Format: uri-template */
+            releases_url: string;
+            role_name?: string | null;
+            size: number;
+            /**
+             * @description The default value for a squash merge commit message:
+             * 
+             * - `PR_BODY` - default to the pull request's body.
+             * - `COMMIT_MESSAGES` - default to the branch's commit messages.
+             * - `BLANK` - default to a blank commit message. 
+             * @enum {string}
+             */
+            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
+            /**
+             * @description The default value for a squash merge commit title:
+             * 
+             * - `PR_TITLE` - default to the pull request's title.
+             * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
+             * @enum {string}
+             */
+            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
+            ssh_url: string;
+            stargazers?: number;
+            stargazers_count: number;
+            /** Format: uri */
+            stargazers_url: string;
+            /** Format: uri-template */
+            statuses_url: string;
+            /** Format: uri */
+            subscribers_url: string;
+            /** Format: uri */
+            subscription_url: string;
+            /** Format: uri */
+            svn_url: string;
+            /** Format: uri */
+            tags_url: string;
+            /** Format: uri */
+            teams_url: string;
+            topics: (string)[];
+            /** Format: uri-template */
+            trees_url: string;
+            /** Format: date-time */
+            updated_at: string;
+            /** Format: uri */
+            url: string;
+            /**
+             * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead. 
+             * @default false
+             */
+            use_squash_pr_title_as_default?: boolean;
+            /** @enum {string} */
+            visibility: "public" | "private" | "internal";
+            watchers: number;
+            watchers_count: number;
+            /** @description Whether to require contributors to sign off on web-based commits */
+            web_commit_signoff_required?: boolean;
+          };
+          sha: string;
+          /** User */
+          user: ({
+            /** Format: uri */
+            avatar_url?: string;
+            deleted?: boolean;
+            email?: string | null;
+            /** Format: uri-template */
+            events_url?: string;
+            /** Format: uri */
+            followers_url?: string;
+            /** Format: uri-template */
+            following_url?: string;
+            /** Format: uri-template */
+            gists_url?: string;
+            gravatar_id?: string;
+            /** Format: uri */
+            html_url?: string;
+            id: number;
+            login: string;
+            name?: string;
+            node_id?: string;
+            /** Format: uri */
+            organizations_url?: string;
+            /** Format: uri */
+            received_events_url?: string;
+            /** Format: uri */
+            repos_url?: string;
+            site_admin?: boolean;
+            /** Format: uri-template */
+            starred_url?: string;
+            /** Format: uri */
+            subscriptions_url?: string;
+            /** @enum {string} */
+            type?: "Bot" | "User" | "Organization";
+            /** Format: uri */
+            url?: string;
+          }) | null;
+        };
+        /** Format: uri */
+        html_url: string;
+        id: number;
+        /** Format: uri */
+        issue_url: string;
+        labels: ({
+            /** @description 6-character hex code, without the leading #, identifying the color */
+            color: string;
+            default: boolean;
+            description: string | null;
+            id: number;
+            /** @description The name of the label. */
+            name: string;
+            node_id: string;
+            /**
+             * Format: uri 
+             * @description URL for the label
+             */
+            url: string;
+          })[];
+        locked: boolean;
+        /** @description Indicates whether maintainers can modify the pull request. */
+        maintainer_can_modify?: boolean;
+        merge_commit_sha: string | null;
+        mergeable?: boolean | null;
+        mergeable_state?: string;
+        merged?: boolean | null;
+        /** Format: date-time */
+        merged_at: string | null;
+        /** User */
+        merged_by?: ({
+          /** Format: uri */
+          avatar_url?: string;
+          deleted?: boolean;
+          email?: string | null;
+          /** Format: uri-template */
+          events_url?: string;
+          /** Format: uri */
+          followers_url?: string;
+          /** Format: uri-template */
+          following_url?: string;
+          /** Format: uri-template */
+          gists_url?: string;
+          gravatar_id?: string;
+          /** Format: uri */
+          html_url?: string;
+          id: number;
+          login: string;
+          name?: string;
+          node_id?: string;
+          /** Format: uri */
+          organizations_url?: string;
+          /** Format: uri */
+          received_events_url?: string;
+          /** Format: uri */
+          repos_url?: string;
+          site_admin?: boolean;
+          /** Format: uri-template */
+          starred_url?: string;
+          /** Format: uri */
+          subscriptions_url?: string;
+          /** @enum {string} */
+          type?: "Bot" | "User" | "Organization";
+          /** Format: uri */
+          url?: string;
+        }) | null;
+        /**
+         * Milestone 
+         * @description A collection of related issues and pull requests.
+         */
+        milestone: ({
+          /** Format: date-time */
+          closed_at: string | null;
+          closed_issues: number;
+          /** Format: date-time */
+          created_at: string;
+          /** User */
+          creator: ({
+            /** Format: uri */
+            avatar_url?: string;
+            deleted?: boolean;
+            email?: string | null;
+            /** Format: uri-template */
+            events_url?: string;
+            /** Format: uri */
+            followers_url?: string;
+            /** Format: uri-template */
+            following_url?: string;
+            /** Format: uri-template */
+            gists_url?: string;
+            gravatar_id?: string;
+            /** Format: uri */
+            html_url?: string;
+            id: number;
+            login: string;
+            name?: string;
+            node_id?: string;
+            /** Format: uri */
+            organizations_url?: string;
+            /** Format: uri */
+            received_events_url?: string;
+            /** Format: uri */
+            repos_url?: string;
+            site_admin?: boolean;
+            /** Format: uri-template */
+            starred_url?: string;
+            /** Format: uri */
+            subscriptions_url?: string;
+            /** @enum {string} */
+            type?: "Bot" | "User" | "Organization" | "Mannequin";
+            /** Format: uri */
+            url?: string;
+          }) | null;
+          description: string | null;
+          /** Format: date-time */
+          due_on: string | null;
+          /** Format: uri */
+          html_url: string;
+          id: number;
+          /** Format: uri */
+          labels_url: string;
+          node_id: string;
+          /** @description The number of the milestone. */
+          number: number;
+          open_issues: number;
+          /**
+           * @description The state of the milestone. 
+           * @enum {string}
+           */
+          state: "open" | "closed";
+          /** @description The title of the milestone. */
+          title: string;
+          /** Format: date-time */
+          updated_at: string;
+          /** Format: uri */
+          url: string;
+        }) | null;
+        node_id: string;
+        /** @description Number uniquely identifying the pull request within its repository. */
+        number: number;
+        /** Format: uri */
+        patch_url: string;
+        rebaseable?: boolean | null;
+        requested_reviewers: (OneOf<[({
+            /** Format: uri */
+            avatar_url?: string;
+            deleted?: boolean;
+            email?: string | null;
+            /** Format: uri-template */
+            events_url?: string;
+            /** Format: uri */
+            followers_url?: string;
+            /** Format: uri-template */
+            following_url?: string;
+            /** Format: uri-template */
+            gists_url?: string;
+            gravatar_id?: string;
+            /** Format: uri */
+            html_url?: string;
+            id: number;
+            login: string;
+            name?: string;
+            node_id?: string;
+            /** Format: uri */
+            organizations_url?: string;
+            /** Format: uri */
+            received_events_url?: string;
+            /** Format: uri */
+            repos_url?: string;
+            site_admin?: boolean;
+            /** Format: uri-template */
+            starred_url?: string;
+            /** Format: uri */
+            subscriptions_url?: string;
+            /** @enum {string} */
+            type?: "Bot" | "User" | "Organization";
+            /** Format: uri */
+            url?: string;
+          }) | null, {
+            deleted?: boolean;
+            /** @description Description of the team */
+            description?: string | null;
+            /** Format: uri */
+            html_url?: string;
+            /** @description Unique identifier of the team */
+            id: number;
+            /** Format: uri-template */
+            members_url?: string;
+            /** @description Name of the team */
+            name: string;
+            node_id?: string;
+            parent?: ({
+              /** @description Description of the team */
+              description: string | null;
+              /** Format: uri */
+              html_url: string;
+              /** @description Unique identifier of the team */
+              id: number;
+              /** Format: uri-template */
+              members_url: string;
+              /** @description Name of the team */
+              name: string;
+              node_id: string;
+              /** @description Permission that the team will have for its repositories */
+              permission: string;
+              /** @enum {string} */
+              privacy: "open" | "closed" | "secret";
+              /** Format: uri */
+              repositories_url: string;
+              slug: string;
+              /**
+               * Format: uri 
+               * @description URL for the team
+               */
+              url: string;
+            }) | null;
+            /** @description Permission that the team will have for its repositories */
+            permission?: string;
+            /** @enum {string} */
+            privacy?: "open" | "closed" | "secret";
+            /** Format: uri */
+            repositories_url?: string;
+            slug?: string;
+            /**
+             * Format: uri 
+             * @description URL for the team
+             */
+            url?: string;
           }]>)[];
         requested_teams: ({
             deleted?: boolean;
@@ -51117,7 +47358,7 @@ export interface components {
         }) | null;
       };
       repository: components["schemas"]["repository"];
-      sender?: components["schemas"]["simple-user"];
+      sender: components["schemas"]["simple-user"];
     };
     /** pull_request labeled event */
     "webhook-pull-request-labeled": {
@@ -54711,1516 +50952,54 @@ export interface components {
       /** @description The pull request number. */
       number: number;
       organization?: components["schemas"]["organization-simple"];
-      pull_request: ({
-        _links: {
-          /** Link */
-          comments: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          commits: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          html: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          issue: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          review_comment: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          review_comments: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          self: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          statuses: {
-            /** Format: uri-template */
-            href: string;
-          };
-        };
-        /** @enum {string|null} */
-        active_lock_reason: "resolved" | "off-topic" | "too heated" | "spam" | "" | null;
-        additions?: number;
-        /** User */
-        assignee: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        assignees: (({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null)[];
+      pull_request: components["schemas"]["pull-request"] & ({
         /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
+         * @description Whether to allow auto-merge for pull requests. 
+         * @default false
+         */
+        allow_auto_merge?: boolean;
+        /** @description Whether to allow updating the pull request's branch. */
+        allow_update_branch?: boolean;
+        /**
+         * @description Whether to delete head branches when pull requests are merged. 
+         * @default false
+         */
+        delete_branch_on_merge?: boolean;
+        /**
+         * @description The default value for a merge commit message.
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `PR_BODY` - default to the pull request's body.
+         * - `BLANK` - default to a blank commit message. 
          * @enum {string}
          */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
+        merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
         /**
-         * PullRequestAutoMerge 
-         * @description The status of auto merging a pull request.
-         */
-        auto_merge: ({
-          /** @description Commit message for the merge commit. */
-          commit_message: string | null;
-          /** @description Title for the merge commit message. */
-          commit_title: string | null;
-          /** User */
-          enabled_by: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-          /**
-           * @description The merge method to use. 
-           * @enum {string}
-           */
-          merge_method: "merge" | "squash" | "rebase";
-        }) | null;
-        base: {
-          label: string;
-          ref: string;
-          /**
-           * Repository 
-           * @description A git repository
-           */
-          repo: {
-            /**
-             * @description Whether to allow auto-merge for pull requests. 
-             * @default false
-             */
-            allow_auto_merge?: boolean;
-            /** @description Whether to allow private forks */
-            allow_forking?: boolean;
-            /**
-             * @description Whether to allow merge commits for pull requests. 
-             * @default true
-             */
-            allow_merge_commit?: boolean;
-            /**
-             * @description Whether to allow rebase merges for pull requests. 
-             * @default true
-             */
-            allow_rebase_merge?: boolean;
-            /**
-             * @description Whether to allow squash merges for pull requests. 
-             * @default true
-             */
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            /** Format: uri-template */
-            archive_url: string;
-            /**
-             * @description Whether the repository is archived. 
-             * @default false
-             */
-            archived: boolean;
-            /** Format: uri-template */
-            assignees_url: string;
-            /** Format: uri-template */
-            blobs_url: string;
-            /** Format: uri-template */
-            branches_url: string;
-            /** Format: uri */
-            clone_url: string;
-            /** Format: uri-template */
-            collaborators_url: string;
-            /** Format: uri-template */
-            comments_url: string;
-            /** Format: uri-template */
-            commits_url: string;
-            /** Format: uri-template */
-            compare_url: string;
-            /** Format: uri-template */
-            contents_url: string;
-            /** Format: uri */
-            contributors_url: string;
-            created_at: number | string;
-            /** @description The default branch of the repository. */
-            default_branch: string;
-            /**
-             * @description Whether to delete head branches when pull requests are merged 
-             * @default false
-             */
-            delete_branch_on_merge?: boolean;
-            /** Format: uri */
-            deployments_url: string;
-            description: string | null;
-            /** @description Returns whether or not this repository is disabled. */
-            disabled?: boolean;
-            /** Format: uri */
-            downloads_url: string;
-            /** Format: uri */
-            events_url: string;
-            fork: boolean;
-            forks: number;
-            forks_count: number;
-            /** Format: uri */
-            forks_url: string;
-            full_name: string;
-            /** Format: uri-template */
-            git_commits_url: string;
-            /** Format: uri-template */
-            git_refs_url: string;
-            /** Format: uri-template */
-            git_tags_url: string;
-            /** Format: uri */
-            git_url: string;
-            /**
-             * @description Whether downloads are enabled. 
-             * @default true
-             */
-            has_downloads: boolean;
-            /**
-             * @description Whether issues are enabled. 
-             * @default true
-             */
-            has_issues: boolean;
-            has_pages: boolean;
-            /**
-             * @description Whether projects are enabled. 
-             * @default true
-             */
-            has_projects: boolean;
-            /**
-             * @description Whether the wiki is enabled. 
-             * @default true
-             */
-            has_wiki: boolean;
-            homepage: string | null;
-            /** Format: uri */
-            hooks_url: string;
-            /** Format: uri */
-            html_url: string;
-            /** @description Unique identifier of the repository */
-            id: number;
-            is_template?: boolean;
-            /** Format: uri-template */
-            issue_comment_url: string;
-            /** Format: uri-template */
-            issue_events_url: string;
-            /** Format: uri-template */
-            issues_url: string;
-            /** Format: uri-template */
-            keys_url: string;
-            /** Format: uri-template */
-            labels_url: string;
-            language: string | null;
-            /** Format: uri */
-            languages_url: string;
-            /** License */
-            license: ({
-              key: string;
-              name: string;
-              node_id: string;
-              spdx_id: string;
-              /** Format: uri */
-              url: string | null;
-            }) | null;
-            master_branch?: string;
-            /**
-             * @description The default value for a merge commit message.
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `PR_BODY` - default to the pull request's body.
-             * - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /**
-             * @description The default value for a merge commit title.
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name). 
-             * @enum {string}
-             */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            /** Format: uri */
-            merges_url: string;
-            /** Format: uri-template */
-            milestones_url: string;
-            /** Format: uri */
-            mirror_url: string | null;
-            /** @description The name of the repository. */
-            name: string;
-            node_id: string;
-            /** Format: uri-template */
-            notifications_url: string;
-            open_issues: number;
-            open_issues_count: number;
-            organization?: string;
-            /** User */
-            owner: ({
-              /** Format: uri */
-              avatar_url?: string;
-              deleted?: boolean;
-              email?: string | null;
-              /** Format: uri-template */
-              events_url?: string;
-              /** Format: uri */
-              followers_url?: string;
-              /** Format: uri-template */
-              following_url?: string;
-              /** Format: uri-template */
-              gists_url?: string;
-              gravatar_id?: string;
-              /** Format: uri */
-              html_url?: string;
-              id: number;
-              login: string;
-              name?: string;
-              node_id?: string;
-              /** Format: uri */
-              organizations_url?: string;
-              /** Format: uri */
-              received_events_url?: string;
-              /** Format: uri */
-              repos_url?: string;
-              site_admin?: boolean;
-              /** Format: uri-template */
-              starred_url?: string;
-              /** Format: uri */
-              subscriptions_url?: string;
-              /** @enum {string} */
-              type?: "Bot" | "User" | "Organization";
-              /** Format: uri */
-              url?: string;
-            }) | null;
-            permissions?: {
-              admin: boolean;
-              maintain?: boolean;
-              pull: boolean;
-              push: boolean;
-              triage?: boolean;
-            };
-            /** @description Whether the repository is private or public. */
-            private: boolean;
-            public?: boolean;
-            /** Format: uri-template */
-            pulls_url: string;
-            pushed_at: number | string;
-            /** Format: uri-template */
-            releases_url: string;
-            role_name?: string | null;
-            size: number;
-            /**
-             * @description The default value for a squash merge commit message:
-             * 
-             * - `PR_BODY` - default to the pull request's body.
-             * - `COMMIT_MESSAGES` - default to the branch's commit messages.
-             * - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /**
-             * @description The default value for a squash merge commit title:
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
-             * @enum {string}
-             */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url: string;
-            stargazers?: number;
-            stargazers_count: number;
-            /** Format: uri */
-            stargazers_url: string;
-            /** Format: uri-template */
-            statuses_url: string;
-            /** Format: uri */
-            subscribers_url: string;
-            /** Format: uri */
-            subscription_url: string;
-            /** Format: uri */
-            svn_url: string;
-            /** Format: uri */
-            tags_url: string;
-            /** Format: uri */
-            teams_url: string;
-            topics: (string)[];
-            /** Format: uri-template */
-            trees_url: string;
-            /** Format: date-time */
-            updated_at: string;
-            /** Format: uri */
-            url: string;
-            /**
-             * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead. 
-             * @default false
-             */
-            use_squash_pr_title_as_default?: boolean;
-            /** @enum {string} */
-            visibility: "public" | "private" | "internal";
-            watchers: number;
-            watchers_count: number;
-            /** @description Whether to require contributors to sign off on web-based commits */
-            web_commit_signoff_required?: boolean;
-          };
-          sha: string;
-          /** User */
-          user: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-        };
-        body: string | null;
-        changed_files?: number;
-        /** Format: date-time */
-        closed_at: string | null;
-        comments?: number;
-        /** Format: uri */
-        comments_url: string;
-        commits?: number;
-        /** Format: uri */
-        commits_url: string;
-        /** Format: date-time */
-        created_at: string;
-        deletions?: number;
-        /** Format: uri */
-        diff_url: string;
-        /** @description Indicates whether or not the pull request is a draft. */
-        draft: boolean;
-        head: {
-          label: string;
-          ref: string;
-          /**
-           * Repository 
-           * @description A git repository
-           */
-          repo: {
-            /**
-             * @description Whether to allow auto-merge for pull requests. 
-             * @default false
-             */
-            allow_auto_merge?: boolean;
-            /** @description Whether to allow private forks */
-            allow_forking?: boolean;
-            /**
-             * @description Whether to allow merge commits for pull requests. 
-             * @default true
-             */
-            allow_merge_commit?: boolean;
-            /**
-             * @description Whether to allow rebase merges for pull requests. 
-             * @default true
-             */
-            allow_rebase_merge?: boolean;
-            /**
-             * @description Whether to allow squash merges for pull requests. 
-             * @default true
-             */
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            /** Format: uri-template */
-            archive_url: string;
-            /**
-             * @description Whether the repository is archived. 
-             * @default false
-             */
-            archived: boolean;
-            /** Format: uri-template */
-            assignees_url: string;
-            /** Format: uri-template */
-            blobs_url: string;
-            /** Format: uri-template */
-            branches_url: string;
-            /** Format: uri */
-            clone_url: string;
-            /** Format: uri-template */
-            collaborators_url: string;
-            /** Format: uri-template */
-            comments_url: string;
-            /** Format: uri-template */
-            commits_url: string;
-            /** Format: uri-template */
-            compare_url: string;
-            /** Format: uri-template */
-            contents_url: string;
-            /** Format: uri */
-            contributors_url: string;
-            created_at: number | string;
-            /** @description The default branch of the repository. */
-            default_branch: string;
-            /**
-             * @description Whether to delete head branches when pull requests are merged 
-             * @default false
-             */
-            delete_branch_on_merge?: boolean;
-            /** Format: uri */
-            deployments_url: string;
-            description: string | null;
-            /** @description Returns whether or not this repository is disabled. */
-            disabled?: boolean;
-            /** Format: uri */
-            downloads_url: string;
-            /** Format: uri */
-            events_url: string;
-            fork: boolean;
-            forks: number;
-            forks_count: number;
-            /** Format: uri */
-            forks_url: string;
-            full_name: string;
-            /** Format: uri-template */
-            git_commits_url: string;
-            /** Format: uri-template */
-            git_refs_url: string;
-            /** Format: uri-template */
-            git_tags_url: string;
-            /** Format: uri */
-            git_url: string;
-            /**
-             * @description Whether downloads are enabled. 
-             * @default true
-             */
-            has_downloads: boolean;
-            /**
-             * @description Whether issues are enabled. 
-             * @default true
-             */
-            has_issues: boolean;
-            has_pages: boolean;
-            /**
-             * @description Whether projects are enabled. 
-             * @default true
-             */
-            has_projects: boolean;
-            /**
-             * @description Whether the wiki is enabled. 
-             * @default true
-             */
-            has_wiki: boolean;
-            homepage: string | null;
-            /** Format: uri */
-            hooks_url: string;
-            /** Format: uri */
-            html_url: string;
-            /** @description Unique identifier of the repository */
-            id: number;
-            is_template?: boolean;
-            /** Format: uri-template */
-            issue_comment_url: string;
-            /** Format: uri-template */
-            issue_events_url: string;
-            /** Format: uri-template */
-            issues_url: string;
-            /** Format: uri-template */
-            keys_url: string;
-            /** Format: uri-template */
-            labels_url: string;
-            language: string | null;
-            /** Format: uri */
-            languages_url: string;
-            /** License */
-            license: ({
-              key: string;
-              name: string;
-              node_id: string;
-              spdx_id: string;
-              /** Format: uri */
-              url: string | null;
-            }) | null;
-            master_branch?: string;
-            /**
-             * @description The default value for a merge commit message. 
-             * @enum {string}
-             */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /**
-             * @description The default value for a merge commit message title. 
-             * @enum {string}
-             */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            /** Format: uri */
-            merges_url: string;
-            /** Format: uri-template */
-            milestones_url: string;
-            /** Format: uri */
-            mirror_url: string | null;
-            /** @description The name of the repository. */
-            name: string;
-            node_id: string;
-            /** Format: uri-template */
-            notifications_url: string;
-            open_issues: number;
-            open_issues_count: number;
-            organization?: string;
-            /** User */
-            owner: ({
-              /** Format: uri */
-              avatar_url?: string;
-              deleted?: boolean;
-              email?: string | null;
-              /** Format: uri-template */
-              events_url?: string;
-              /** Format: uri */
-              followers_url?: string;
-              /** Format: uri-template */
-              following_url?: string;
-              /** Format: uri-template */
-              gists_url?: string;
-              gravatar_id?: string;
-              /** Format: uri */
-              html_url?: string;
-              id: number;
-              login: string;
-              name?: string;
-              node_id?: string;
-              /** Format: uri */
-              organizations_url?: string;
-              /** Format: uri */
-              received_events_url?: string;
-              /** Format: uri */
-              repos_url?: string;
-              site_admin?: boolean;
-              /** Format: uri-template */
-              starred_url?: string;
-              /** Format: uri */
-              subscriptions_url?: string;
-              /** @enum {string} */
-              type?: "Bot" | "User" | "Organization";
-              /** Format: uri */
-              url?: string;
-            }) | null;
-            permissions?: {
-              admin: boolean;
-              maintain?: boolean;
-              pull: boolean;
-              push: boolean;
-              triage?: boolean;
-            };
-            /** @description Whether the repository is private or public. */
-            private: boolean;
-            public?: boolean;
-            /** Format: uri-template */
-            pulls_url: string;
-            pushed_at: number | string;
-            /** Format: uri-template */
-            releases_url: string;
-            role_name?: string | null;
-            size: number;
-            /**
-             * @description The default value for a squash merge commit message:
-             * 
-             * - `PR_BODY` - default to the pull request's body.
-             * - `COMMIT_MESSAGES` - default to the branch's commit messages.
-             * - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /**
-             * @description The default value for a squash merge commit title:
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
-             * @enum {string}
-             */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url: string;
-            stargazers?: number;
-            stargazers_count: number;
-            /** Format: uri */
-            stargazers_url: string;
-            /** Format: uri-template */
-            statuses_url: string;
-            /** Format: uri */
-            subscribers_url: string;
-            /** Format: uri */
-            subscription_url: string;
-            /** Format: uri */
-            svn_url: string;
-            /** Format: uri */
-            tags_url: string;
-            /** Format: uri */
-            teams_url: string;
-            topics: (string)[];
-            /** Format: uri-template */
-            trees_url: string;
-            /** Format: date-time */
-            updated_at: string;
-            /** Format: uri */
-            url: string;
-            /**
-             * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead. 
-             * @default false
-             */
-            use_squash_pr_title_as_default?: boolean;
-            /** @enum {string} */
-            visibility: "public" | "private" | "internal";
-            watchers: number;
-            watchers_count: number;
-            /** @description Whether to require contributors to sign off on web-based commits */
-            web_commit_signoff_required?: boolean;
-          };
-          sha: string;
-          /** User */
-          user: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-        };
-        /** Format: uri */
-        html_url: string;
-        id: number;
-        /** Format: uri */
-        issue_url: string;
-        labels: ({
-            /** @description 6-character hex code, without the leading #, identifying the color */
-            color: string;
-            default: boolean;
-            description: string | null;
-            id: number;
-            /** @description The name of the label. */
-            name: string;
-            node_id: string;
-            /**
-             * Format: uri 
-             * @description URL for the label
-             */
-            url: string;
-          })[];
-        locked: boolean;
-        /** @description Indicates whether maintainers can modify the pull request. */
-        maintainer_can_modify?: boolean;
-        merge_commit_sha: string | null;
-        mergeable?: boolean | null;
-        mergeable_state?: string;
-        merged?: boolean | null;
-        /** Format: date-time */
-        merged_at: string | null;
-        /** User */
-        merged_by?: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        /**
-         * Milestone 
-         * @description A collection of related issues and pull requests.
-         */
-        milestone: ({
-          /** Format: date-time */
-          closed_at: string | null;
-          closed_issues: number;
-          /** Format: date-time */
-          created_at: string;
-          /** User */
-          creator: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization" | "Mannequin";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-          description: string | null;
-          /** Format: date-time */
-          due_on: string | null;
-          /** Format: uri */
-          html_url: string;
-          id: number;
-          /** Format: uri */
-          labels_url: string;
-          node_id: string;
-          /** @description The number of the milestone. */
-          number: number;
-          open_issues: number;
-          /**
-           * @description The state of the milestone. 
-           * @enum {string}
-           */
-          state: "open" | "closed";
-          /** @description The title of the milestone. */
-          title: string;
-          /** Format: date-time */
-          updated_at: string;
-          /** Format: uri */
-          url: string;
-        }) | null;
-        node_id: string;
-        /** @description Number uniquely identifying the pull request within its repository. */
-        number: number;
-        /** Format: uri */
-        patch_url: string;
-        rebaseable?: boolean | null;
-        requested_reviewers: (OneOf<[({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null, {
-            deleted?: boolean;
-            /** @description Description of the team */
-            description?: string | null;
-            /** Format: uri */
-            html_url?: string;
-            /** @description Unique identifier of the team */
-            id: number;
-            /** Format: uri-template */
-            members_url?: string;
-            /** @description Name of the team */
-            name: string;
-            node_id?: string;
-            parent?: ({
-              /** @description Description of the team */
-              description: string | null;
-              /** Format: uri */
-              html_url: string;
-              /** @description Unique identifier of the team */
-              id: number;
-              /** Format: uri-template */
-              members_url: string;
-              /** @description Name of the team */
-              name: string;
-              node_id: string;
-              /** @description Permission that the team will have for its repositories */
-              permission: string;
-              /** @enum {string} */
-              privacy: "open" | "closed" | "secret";
-              /** Format: uri */
-              repositories_url: string;
-              slug: string;
-              /**
-               * Format: uri 
-               * @description URL for the team
-               */
-              url: string;
-            }) | null;
-            /** @description Permission that the team will have for its repositories */
-            permission?: string;
-            /** @enum {string} */
-            privacy?: "open" | "closed" | "secret";
-            /** Format: uri */
-            repositories_url?: string;
-            slug?: string;
-            /**
-             * Format: uri 
-             * @description URL for the team
-             */
-            url?: string;
-          }]>)[];
-        requested_teams: ({
-            deleted?: boolean;
-            /** @description Description of the team */
-            description?: string | null;
-            /** Format: uri */
-            html_url?: string;
-            /** @description Unique identifier of the team */
-            id: number;
-            /** Format: uri-template */
-            members_url?: string;
-            /** @description Name of the team */
-            name: string;
-            node_id?: string;
-            parent?: ({
-              /** @description Description of the team */
-              description: string | null;
-              /** Format: uri */
-              html_url: string;
-              /** @description Unique identifier of the team */
-              id: number;
-              /** Format: uri-template */
-              members_url: string;
-              /** @description Name of the team */
-              name: string;
-              node_id: string;
-              /** @description Permission that the team will have for its repositories */
-              permission: string;
-              /** @enum {string} */
-              privacy: "open" | "closed" | "secret";
-              /** Format: uri */
-              repositories_url: string;
-              slug: string;
-              /**
-               * Format: uri 
-               * @description URL for the team
-               */
-              url: string;
-            }) | null;
-            /** @description Permission that the team will have for its repositories */
-            permission?: string;
-            /** @enum {string} */
-            privacy?: "open" | "closed" | "secret";
-            /** Format: uri */
-            repositories_url?: string;
-            slug?: string;
-            /**
-             * Format: uri 
-             * @description URL for the team
-             */
-            url?: string;
-          })[];
-        /** Format: uri-template */
-        review_comment_url: string;
-        review_comments?: number;
-        /** Format: uri */
-        review_comments_url: string;
-        /**
-         * @description State of this Pull Request. Either `open` or `closed`. 
+         * @description The default value for a merge commit title.
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name). 
          * @enum {string}
          */
-        state: "open" | "closed";
-        /** Format: uri */
-        statuses_url: string;
-        /** @description The title of the pull request. */
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** Format: uri */
-        url: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization" | "Mannequin";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      }) & ({
-        _links?: {
-          comments?: {
-            href?: string;
-          };
-          commits?: {
-            href?: string;
-          };
-          html?: {
-            href?: string;
-          };
-          issue?: {
-            href?: string;
-          };
-          review_comment?: {
-            href?: string;
-          };
-          review_comments?: {
-            href?: string;
-          };
-          self?: {
-            href?: string;
-          };
-          statuses?: {
-            href?: string;
-          };
-        };
-        active_lock_reason: string | null;
-        additions?: number;
-        assignee?: Record<string, unknown> | null;
-        assignees?: (Record<string, unknown> | null)[];
-        author_association?: string;
-        auto_merge?: Record<string, unknown> | null;
-        base?: {
-          label?: string;
-          ref?: string;
-          repo?: {
-            allow_auto_merge?: boolean;
-            allow_forking?: boolean;
-            allow_merge_commit?: boolean;
-            allow_rebase_merge?: boolean;
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            archive_url?: string;
-            archived?: boolean;
-            assignees_url?: string;
-            blobs_url?: string;
-            branches_url?: string;
-            clone_url?: string;
-            collaborators_url?: string;
-            comments_url?: string;
-            commits_url?: string;
-            compare_url?: string;
-            contents_url?: string;
-            contributors_url?: string;
-            created_at?: string;
-            default_branch?: string;
-            delete_branch_on_merge?: boolean;
-            deployments_url?: string;
-            description?: string | null;
-            disabled?: boolean;
-            downloads_url?: string;
-            events_url?: string;
-            fork?: boolean;
-            forks?: number;
-            forks_count?: number;
-            forks_url?: string;
-            full_name?: string;
-            git_commits_url?: string;
-            git_refs_url?: string;
-            git_tags_url?: string;
-            git_url?: string;
-            has_downloads?: boolean;
-            has_issues?: boolean;
-            has_pages?: boolean;
-            has_projects?: boolean;
-            has_wiki?: boolean;
-            homepage?: string | null;
-            hooks_url?: string;
-            html_url?: string;
-            id?: number;
-            is_template?: boolean;
-            issue_comment_url?: string;
-            issue_events_url?: string;
-            issues_url?: string;
-            keys_url?: string;
-            labels_url?: string;
-            language?: string | null;
-            languages_url?: string;
-            license?: Record<string, unknown> | null;
-            merges_url?: string;
-            milestones_url?: string;
-            mirror_url?: string | null;
-            name?: string;
-            node_id?: string;
-            notifications_url?: string;
-            open_issues?: number;
-            open_issues_count?: number;
-            owner?: {
-              avatar_url?: string;
-              events_url?: string;
-              followers_url?: string;
-              following_url?: string;
-              gists_url?: string;
-              gravatar_id?: string;
-              html_url?: string;
-              id?: number;
-              login?: string;
-              node_id?: string;
-              organizations_url?: string;
-              received_events_url?: string;
-              repos_url?: string;
-              site_admin?: boolean;
-              starred_url?: string;
-              subscriptions_url?: string;
-              type?: string;
-              url?: string;
-            };
-            private?: boolean;
-            pulls_url?: string;
-            pushed_at?: string;
-            releases_url?: string;
-            size?: number;
-            ssh_url?: string;
-            stargazers_count?: number;
-            stargazers_url?: string;
-            statuses_url?: string;
-            subscribers_url?: string;
-            subscription_url?: string;
-            svn_url?: string;
-            tags_url?: string;
-            teams_url?: string;
-            topics?: (string | null)[];
-            trees_url?: string;
-            updated_at?: string;
-            url?: string;
-            visibility?: string;
-            watchers?: number;
-            watchers_count?: number;
-            web_commit_signoff_required?: boolean;
-          };
-          sha?: string;
-          user?: {
-            avatar_url?: string;
-            events_url?: string;
-            followers_url?: string;
-            following_url?: string;
-            gists_url?: string;
-            gravatar_id?: string;
-            html_url?: string;
-            id?: number;
-            login?: string;
-            node_id?: string;
-            organizations_url?: string;
-            received_events_url?: string;
-            repos_url?: string;
-            site_admin?: boolean;
-            starred_url?: string;
-            subscriptions_url?: string;
-            type?: string;
-            url?: string;
-          };
-        };
-        body?: string | null;
-        changed_files?: number;
-        closed_at: string | null;
-        comments?: number;
-        comments_url?: string;
-        commits?: number;
-        commits_url?: string;
-        created_at?: string;
-        deletions?: number;
-        diff_url?: string;
-        draft?: boolean;
-        head?: {
-          label?: string;
-          ref?: string;
-          repo?: {
-            allow_auto_merge?: boolean;
-            allow_forking?: boolean;
-            allow_merge_commit?: boolean;
-            allow_rebase_merge?: boolean;
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            archive_url?: string;
-            archived?: boolean;
-            assignees_url?: string;
-            blobs_url?: string;
-            branches_url?: string;
-            clone_url?: string;
-            collaborators_url?: string;
-            comments_url?: string;
-            commits_url?: string;
-            compare_url?: string;
-            contents_url?: string;
-            contributors_url?: string;
-            created_at?: string;
-            default_branch?: string;
-            delete_branch_on_merge?: boolean;
-            deployments_url?: string;
-            description?: string | null;
-            disabled?: boolean;
-            downloads_url?: string;
-            events_url?: string;
-            fork?: boolean;
-            forks?: number;
-            forks_count?: number;
-            forks_url?: string;
-            full_name?: string;
-            git_commits_url?: string;
-            git_refs_url?: string;
-            git_tags_url?: string;
-            git_url?: string;
-            has_downloads?: boolean;
-            has_issues?: boolean;
-            has_pages?: boolean;
-            has_projects?: boolean;
-            has_wiki?: boolean;
-            homepage?: string | null;
-            hooks_url?: string;
-            html_url?: string;
-            id?: number;
-            is_template?: boolean;
-            issue_comment_url?: string;
-            issue_events_url?: string;
-            issues_url?: string;
-            keys_url?: string;
-            labels_url?: string;
-            language?: string | null;
-            languages_url?: string;
-            license?: Record<string, unknown> | null;
-            merges_url?: string;
-            milestones_url?: string;
-            mirror_url?: string | null;
-            name?: string;
-            node_id?: string;
-            notifications_url?: string;
-            open_issues?: number;
-            open_issues_count?: number;
-            owner?: {
-              avatar_url?: string;
-              events_url?: string;
-              followers_url?: string;
-              following_url?: string;
-              gists_url?: string;
-              gravatar_id?: string;
-              html_url?: string;
-              id?: number;
-              login?: string;
-              node_id?: string;
-              organizations_url?: string;
-              received_events_url?: string;
-              repos_url?: string;
-              site_admin?: boolean;
-              starred_url?: string;
-              subscriptions_url?: string;
-              type?: string;
-              url?: string;
-            };
-            private?: boolean;
-            pulls_url?: string;
-            pushed_at?: string;
-            releases_url?: string;
-            size?: number;
-            ssh_url?: string;
-            stargazers_count?: number;
-            stargazers_url?: string;
-            statuses_url?: string;
-            subscribers_url?: string;
-            subscription_url?: string;
-            svn_url?: string;
-            tags_url?: string;
-            teams_url?: string;
-            topics?: (string | null)[];
-            trees_url?: string;
-            updated_at?: string;
-            url?: string;
-            visibility?: string;
-            watchers?: number;
-            watchers_count?: number;
-            web_commit_signoff_required?: boolean;
-          };
-          sha?: string;
-          user?: {
-            avatar_url?: string;
-            events_url?: string;
-            followers_url?: string;
-            following_url?: string;
-            gists_url?: string;
-            gravatar_id?: string;
-            html_url?: string;
-            id?: number;
-            login?: string;
-            node_id?: string;
-            organizations_url?: string;
-            received_events_url?: string;
-            repos_url?: string;
-            site_admin?: boolean;
-            starred_url?: string;
-            subscriptions_url?: string;
-            type?: string;
-            url?: string;
-          };
-        };
-        html_url?: string;
-        id?: number;
-        issue_url?: string;
-        labels?: (Record<string, unknown> | null)[];
-        locked?: boolean;
-        maintainer_can_modify?: boolean;
-        merge_commit_sha: string | null;
-        mergeable?: boolean | null;
-        mergeable_state?: string;
-        merged?: boolean;
-        merged_at: string | null;
-        merged_by: Record<string, unknown> | null;
-        milestone?: Record<string, unknown> | null;
-        node_id?: string;
-        number?: number;
-        patch_url?: string;
-        rebaseable?: boolean | null;
-        requested_reviewers?: (Record<string, unknown> | null)[];
-        requested_teams?: (Record<string, unknown> | null)[];
-        review_comment_url?: string;
-        review_comments?: number;
-        review_comments_url?: string;
-        /** @enum {string} */
-        state: "open" | "closed";
-        statuses_url?: string;
-        title?: string;
-        updated_at?: string;
-        url?: string;
-        user?: {
-          avatar_url?: string;
-          events_url?: string;
-          followers_url?: string;
-          following_url?: string;
-          gists_url?: string;
-          gravatar_id?: string;
-          html_url?: string;
-          id?: number;
-          login?: string;
-          node_id?: string;
-          organizations_url?: string;
-          received_events_url?: string;
-          repos_url?: string;
-          site_admin?: boolean;
-          starred_url?: string;
-          subscriptions_url?: string;
-          type?: string;
-          url?: string;
-        };
+        merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
+        /**
+         * @description The default value for a squash merge commit message:
+         * - `PR_BODY` - default to the pull request's body.
+         * - `COMMIT_MESSAGES` - default to the branch's commit messages.
+         * - `BLANK` - default to a blank commit message. 
+         * @enum {string}
+         */
+        squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
+        /**
+         * @description The default value for a squash merge commit title:
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
+         * @enum {string}
+         */
+        squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
+        /**
+         * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead.** 
+         * @default false
+         */
+        use_squash_pr_title_as_default?: boolean;
       });
       repository: components["schemas"]["repository"];
       sender: components["schemas"]["simple-user"];
@@ -56234,1542 +51013,54 @@ export interface components {
       /** @description The pull request number. */
       number: number;
       organization?: components["schemas"]["organization-simple"];
-      pull_request: ({
-        _links: {
-          /** Link */
-          comments: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          commits: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          html: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          issue: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          review_comment: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          review_comments: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          self: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          statuses: {
-            /** Format: uri-template */
-            href: string;
-          };
-        };
-        /** @enum {string|null} */
-        active_lock_reason: "resolved" | "off-topic" | "too heated" | "spam" | "" | null;
-        additions?: number;
-        /** User */
-        assignee: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        assignees: (({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null)[];
+      pull_request: components["schemas"]["pull-request"] & ({
         /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
+         * @description Whether to allow auto-merge for pull requests. 
+         * @default false
+         */
+        allow_auto_merge?: boolean;
+        /** @description Whether to allow updating the pull request's branch. */
+        allow_update_branch?: boolean;
+        /**
+         * @description Whether to delete head branches when pull requests are merged. 
+         * @default false
+         */
+        delete_branch_on_merge?: boolean;
+        /**
+         * @description The default value for a merge commit message.
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `PR_BODY` - default to the pull request's body.
+         * - `BLANK` - default to a blank commit message. 
          * @enum {string}
          */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
+        merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
         /**
-         * PullRequestAutoMerge 
-         * @description The status of auto merging a pull request.
-         */
-        auto_merge: ({
-          /** @description Commit message for the merge commit. */
-          commit_message: string | null;
-          /** @description Title for the merge commit message. */
-          commit_title: string | null;
-          /** User */
-          enabled_by: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-          /**
-           * @description The merge method to use. 
-           * @enum {string}
-           */
-          merge_method: "merge" | "squash" | "rebase";
-        }) | null;
-        base: {
-          label: string;
-          ref: string;
-          /**
-           * Repository 
-           * @description A git repository
-           */
-          repo: {
-            /**
-             * @description Whether to allow auto-merge for pull requests. 
-             * @default false
-             */
-            allow_auto_merge?: boolean;
-            /** @description Whether to allow private forks */
-            allow_forking?: boolean;
-            /**
-             * @description Whether to allow merge commits for pull requests. 
-             * @default true
-             */
-            allow_merge_commit?: boolean;
-            /**
-             * @description Whether to allow rebase merges for pull requests. 
-             * @default true
-             */
-            allow_rebase_merge?: boolean;
-            /**
-             * @description Whether to allow squash merges for pull requests. 
-             * @default true
-             */
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            /** Format: uri-template */
-            archive_url: string;
-            /**
-             * @description Whether the repository is archived. 
-             * @default false
-             */
-            archived: boolean;
-            /** Format: uri-template */
-            assignees_url: string;
-            /** Format: uri-template */
-            blobs_url: string;
-            /** Format: uri-template */
-            branches_url: string;
-            /** Format: uri */
-            clone_url: string;
-            /** Format: uri-template */
-            collaborators_url: string;
-            /** Format: uri-template */
-            comments_url: string;
-            /** Format: uri-template */
-            commits_url: string;
-            /** Format: uri-template */
-            compare_url: string;
-            /** Format: uri-template */
-            contents_url: string;
-            /** Format: uri */
-            contributors_url: string;
-            created_at: number | string;
-            /** @description The default branch of the repository. */
-            default_branch: string;
-            /**
-             * @description Whether to delete head branches when pull requests are merged 
-             * @default false
-             */
-            delete_branch_on_merge?: boolean;
-            /** Format: uri */
-            deployments_url: string;
-            description: string | null;
-            /** @description Returns whether or not this repository is disabled. */
-            disabled?: boolean;
-            /** Format: uri */
-            downloads_url: string;
-            /** Format: uri */
-            events_url: string;
-            fork: boolean;
-            forks: number;
-            forks_count: number;
-            /** Format: uri */
-            forks_url: string;
-            full_name: string;
-            /** Format: uri-template */
-            git_commits_url: string;
-            /** Format: uri-template */
-            git_refs_url: string;
-            /** Format: uri-template */
-            git_tags_url: string;
-            /** Format: uri */
-            git_url: string;
-            /**
-             * @description Whether downloads are enabled. 
-             * @default true
-             */
-            has_downloads: boolean;
-            /**
-             * @description Whether issues are enabled. 
-             * @default true
-             */
-            has_issues: boolean;
-            has_pages: boolean;
-            /**
-             * @description Whether projects are enabled. 
-             * @default true
-             */
-            has_projects: boolean;
-            /**
-             * @description Whether the wiki is enabled. 
-             * @default true
-             */
-            has_wiki: boolean;
-            homepage: string | null;
-            /** Format: uri */
-            hooks_url: string;
-            /** Format: uri */
-            html_url: string;
-            /** @description Unique identifier of the repository */
-            id: number;
-            is_template?: boolean;
-            /** Format: uri-template */
-            issue_comment_url: string;
-            /** Format: uri-template */
-            issue_events_url: string;
-            /** Format: uri-template */
-            issues_url: string;
-            /** Format: uri-template */
-            keys_url: string;
-            /** Format: uri-template */
-            labels_url: string;
-            language: string | null;
-            /** Format: uri */
-            languages_url: string;
-            /** License */
-            license: ({
-              key: string;
-              name: string;
-              node_id: string;
-              spdx_id: string;
-              /** Format: uri */
-              url: string | null;
-            }) | null;
-            master_branch?: string;
-            /**
-             * @description The default value for a merge commit message.
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `PR_BODY` - default to the pull request's body.
-             * - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /**
-             * @description The default value for a merge commit title.
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name). 
-             * @enum {string}
-             */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            /** Format: uri */
-            merges_url: string;
-            /** Format: uri-template */
-            milestones_url: string;
-            /** Format: uri */
-            mirror_url: string | null;
-            /** @description The name of the repository. */
-            name: string;
-            node_id: string;
-            /** Format: uri-template */
-            notifications_url: string;
-            open_issues: number;
-            open_issues_count: number;
-            organization?: string;
-            /** User */
-            owner: ({
-              /** Format: uri */
-              avatar_url?: string;
-              deleted?: boolean;
-              email?: string | null;
-              /** Format: uri-template */
-              events_url?: string;
-              /** Format: uri */
-              followers_url?: string;
-              /** Format: uri-template */
-              following_url?: string;
-              /** Format: uri-template */
-              gists_url?: string;
-              gravatar_id?: string;
-              /** Format: uri */
-              html_url?: string;
-              id: number;
-              login: string;
-              name?: string;
-              node_id?: string;
-              /** Format: uri */
-              organizations_url?: string;
-              /** Format: uri */
-              received_events_url?: string;
-              /** Format: uri */
-              repos_url?: string;
-              site_admin?: boolean;
-              /** Format: uri-template */
-              starred_url?: string;
-              /** Format: uri */
-              subscriptions_url?: string;
-              /** @enum {string} */
-              type?: "Bot" | "User" | "Organization";
-              /** Format: uri */
-              url?: string;
-            }) | null;
-            permissions?: {
-              admin: boolean;
-              maintain?: boolean;
-              pull: boolean;
-              push: boolean;
-              triage?: boolean;
-            };
-            /** @description Whether the repository is private or public. */
-            private: boolean;
-            public?: boolean;
-            /** Format: uri-template */
-            pulls_url: string;
-            pushed_at: number | string;
-            /** Format: uri-template */
-            releases_url: string;
-            role_name?: string | null;
-            size: number;
-            /**
-             * @description The default value for a squash merge commit message:
-             * 
-             * - `PR_BODY` - default to the pull request's body.
-             * - `COMMIT_MESSAGES` - default to the branch's commit messages.
-             * - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /**
-             * @description The default value for a squash merge commit title:
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
-             * @enum {string}
-             */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url: string;
-            stargazers?: number;
-            stargazers_count: number;
-            /** Format: uri */
-            stargazers_url: string;
-            /** Format: uri-template */
-            statuses_url: string;
-            /** Format: uri */
-            subscribers_url: string;
-            /** Format: uri */
-            subscription_url: string;
-            /** Format: uri */
-            svn_url: string;
-            /** Format: uri */
-            tags_url: string;
-            /** Format: uri */
-            teams_url: string;
-            topics: (string)[];
-            /** Format: uri-template */
-            trees_url: string;
-            /** Format: date-time */
-            updated_at: string;
-            /** Format: uri */
-            url: string;
-            /**
-             * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead. 
-             * @default false
-             */
-            use_squash_pr_title_as_default?: boolean;
-            /** @enum {string} */
-            visibility: "public" | "private" | "internal";
-            watchers: number;
-            watchers_count: number;
-            /** @description Whether to require contributors to sign off on web-based commits */
-            web_commit_signoff_required?: boolean;
-          };
-          sha: string;
-          /** User */
-          user: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-        };
-        body: string | null;
-        changed_files?: number;
-        /** Format: date-time */
-        closed_at: string | null;
-        comments?: number;
-        /** Format: uri */
-        comments_url: string;
-        commits?: number;
-        /** Format: uri */
-        commits_url: string;
-        /** Format: date-time */
-        created_at: string;
-        deletions?: number;
-        /** Format: uri */
-        diff_url: string;
-        /** @description Indicates whether or not the pull request is a draft. */
-        draft: boolean;
-        head: {
-          label: string;
-          ref: string;
-          /**
-           * Repository 
-           * @description A git repository
-           */
-          repo: {
-            /**
-             * @description Whether to allow auto-merge for pull requests. 
-             * @default false
-             */
-            allow_auto_merge?: boolean;
-            /** @description Whether to allow private forks */
-            allow_forking?: boolean;
-            /**
-             * @description Whether to allow merge commits for pull requests. 
-             * @default true
-             */
-            allow_merge_commit?: boolean;
-            /**
-             * @description Whether to allow rebase merges for pull requests. 
-             * @default true
-             */
-            allow_rebase_merge?: boolean;
-            /**
-             * @description Whether to allow squash merges for pull requests. 
-             * @default true
-             */
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            /** Format: uri-template */
-            archive_url: string;
-            /**
-             * @description Whether the repository is archived. 
-             * @default false
-             */
-            archived: boolean;
-            /** Format: uri-template */
-            assignees_url: string;
-            /** Format: uri-template */
-            blobs_url: string;
-            /** Format: uri-template */
-            branches_url: string;
-            /** Format: uri */
-            clone_url: string;
-            /** Format: uri-template */
-            collaborators_url: string;
-            /** Format: uri-template */
-            comments_url: string;
-            /** Format: uri-template */
-            commits_url: string;
-            /** Format: uri-template */
-            compare_url: string;
-            /** Format: uri-template */
-            contents_url: string;
-            /** Format: uri */
-            contributors_url: string;
-            created_at: number | string;
-            /** @description The default branch of the repository. */
-            default_branch: string;
-            /**
-             * @description Whether to delete head branches when pull requests are merged 
-             * @default false
-             */
-            delete_branch_on_merge?: boolean;
-            /** Format: uri */
-            deployments_url: string;
-            description: string | null;
-            /** @description Returns whether or not this repository is disabled. */
-            disabled?: boolean;
-            /** Format: uri */
-            downloads_url: string;
-            /** Format: uri */
-            events_url: string;
-            fork: boolean;
-            forks: number;
-            forks_count: number;
-            /** Format: uri */
-            forks_url: string;
-            full_name: string;
-            /** Format: uri-template */
-            git_commits_url: string;
-            /** Format: uri-template */
-            git_refs_url: string;
-            /** Format: uri-template */
-            git_tags_url: string;
-            /** Format: uri */
-            git_url: string;
-            /**
-             * @description Whether downloads are enabled. 
-             * @default true
-             */
-            has_downloads: boolean;
-            /**
-             * @description Whether issues are enabled. 
-             * @default true
-             */
-            has_issues: boolean;
-            has_pages: boolean;
-            /**
-             * @description Whether projects are enabled. 
-             * @default true
-             */
-            has_projects: boolean;
-            /**
-             * @description Whether the wiki is enabled. 
-             * @default true
-             */
-            has_wiki: boolean;
-            homepage: string | null;
-            /** Format: uri */
-            hooks_url: string;
-            /** Format: uri */
-            html_url: string;
-            /** @description Unique identifier of the repository */
-            id: number;
-            is_template?: boolean;
-            /** Format: uri-template */
-            issue_comment_url: string;
-            /** Format: uri-template */
-            issue_events_url: string;
-            /** Format: uri-template */
-            issues_url: string;
-            /** Format: uri-template */
-            keys_url: string;
-            /** Format: uri-template */
-            labels_url: string;
-            language: string | null;
-            /** Format: uri */
-            languages_url: string;
-            /** License */
-            license: ({
-              key: string;
-              name: string;
-              node_id: string;
-              spdx_id: string;
-              /** Format: uri */
-              url: string | null;
-            }) | null;
-            master_branch?: string;
-            /**
-             * @description The default value for a merge commit message.
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `PR_BODY` - default to the pull request's body.
-             * - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /**
-             * @description The default value for a merge commit title.
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name). 
-             * @enum {string}
-             */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            /** Format: uri */
-            merges_url: string;
-            /** Format: uri-template */
-            milestones_url: string;
-            /** Format: uri */
-            mirror_url: string | null;
-            /** @description The name of the repository. */
-            name: string;
-            node_id: string;
-            /** Format: uri-template */
-            notifications_url: string;
-            open_issues: number;
-            open_issues_count: number;
-            organization?: string;
-            /** User */
-            owner: ({
-              /** Format: uri */
-              avatar_url?: string;
-              deleted?: boolean;
-              email?: string | null;
-              /** Format: uri-template */
-              events_url?: string;
-              /** Format: uri */
-              followers_url?: string;
-              /** Format: uri-template */
-              following_url?: string;
-              /** Format: uri-template */
-              gists_url?: string;
-              gravatar_id?: string;
-              /** Format: uri */
-              html_url?: string;
-              id: number;
-              login: string;
-              name?: string;
-              node_id?: string;
-              /** Format: uri */
-              organizations_url?: string;
-              /** Format: uri */
-              received_events_url?: string;
-              /** Format: uri */
-              repos_url?: string;
-              site_admin?: boolean;
-              /** Format: uri-template */
-              starred_url?: string;
-              /** Format: uri */
-              subscriptions_url?: string;
-              /** @enum {string} */
-              type?: "Bot" | "User" | "Organization";
-              /** Format: uri */
-              url?: string;
-            }) | null;
-            permissions?: {
-              admin: boolean;
-              maintain?: boolean;
-              pull: boolean;
-              push: boolean;
-              triage?: boolean;
-            };
-            /** @description Whether the repository is private or public. */
-            private: boolean;
-            public?: boolean;
-            /** Format: uri-template */
-            pulls_url: string;
-            pushed_at: number | string;
-            /** Format: uri-template */
-            releases_url: string;
-            role_name?: string | null;
-            size: number;
-            /**
-             * @description The default value for a squash merge commit message:
-             * 
-             * - `PR_BODY` - default to the pull request's body.
-             * - `COMMIT_MESSAGES` - default to the branch's commit messages.
-             * - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /**
-             * @description The default value for a squash merge commit title:
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
-             * @enum {string}
-             */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url: string;
-            stargazers?: number;
-            stargazers_count: number;
-            /** Format: uri */
-            stargazers_url: string;
-            /** Format: uri-template */
-            statuses_url: string;
-            /** Format: uri */
-            subscribers_url: string;
-            /** Format: uri */
-            subscription_url: string;
-            /** Format: uri */
-            svn_url: string;
-            /** Format: uri */
-            tags_url: string;
-            /** Format: uri */
-            teams_url: string;
-            topics: (string)[];
-            /** Format: uri-template */
-            trees_url: string;
-            /** Format: date-time */
-            updated_at: string;
-            /** Format: uri */
-            url: string;
-            /**
-             * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead. 
-             * @default false
-             */
-            use_squash_pr_title_as_default?: boolean;
-            /** @enum {string} */
-            visibility: "public" | "private" | "internal";
-            watchers: number;
-            watchers_count: number;
-            /** @description Whether to require contributors to sign off on web-based commits */
-            web_commit_signoff_required?: boolean;
-          };
-          sha: string;
-          /** User */
-          user: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-        };
-        /** Format: uri */
-        html_url: string;
-        id: number;
-        /** Format: uri */
-        issue_url: string;
-        labels: ({
-            /** @description 6-character hex code, without the leading #, identifying the color */
-            color: string;
-            default: boolean;
-            description: string | null;
-            id: number;
-            /** @description The name of the label. */
-            name: string;
-            node_id: string;
-            /**
-             * Format: uri 
-             * @description URL for the label
-             */
-            url: string;
-          })[];
-        locked: boolean;
-        /** @description Indicates whether maintainers can modify the pull request. */
-        maintainer_can_modify?: boolean;
-        merge_commit_sha: string | null;
-        mergeable?: boolean | null;
-        mergeable_state?: string;
-        merged?: boolean | null;
-        /** Format: date-time */
-        merged_at: string | null;
-        /** User */
-        merged_by?: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        /**
-         * Milestone 
-         * @description A collection of related issues and pull requests.
-         */
-        milestone: ({
-          /** Format: date-time */
-          closed_at: string | null;
-          closed_issues: number;
-          /** Format: date-time */
-          created_at: string;
-          /** User */
-          creator: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization" | "Mannequin";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-          description: string | null;
-          /** Format: date-time */
-          due_on: string | null;
-          /** Format: uri */
-          html_url: string;
-          id: number;
-          /** Format: uri */
-          labels_url: string;
-          node_id: string;
-          /** @description The number of the milestone. */
-          number: number;
-          open_issues: number;
-          /**
-           * @description The state of the milestone. 
-           * @enum {string}
-           */
-          state: "open" | "closed";
-          /** @description The title of the milestone. */
-          title: string;
-          /** Format: date-time */
-          updated_at: string;
-          /** Format: uri */
-          url: string;
-        }) | null;
-        node_id: string;
-        /** @description Number uniquely identifying the pull request within its repository. */
-        number: number;
-        /** Format: uri */
-        patch_url: string;
-        rebaseable?: boolean | null;
-        requested_reviewers: (OneOf<[({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null, {
-            deleted?: boolean;
-            /** @description Description of the team */
-            description?: string | null;
-            /** Format: uri */
-            html_url?: string;
-            /** @description Unique identifier of the team */
-            id: number;
-            /** Format: uri-template */
-            members_url?: string;
-            /** @description Name of the team */
-            name: string;
-            node_id?: string;
-            parent?: ({
-              /** @description Description of the team */
-              description: string | null;
-              /** Format: uri */
-              html_url: string;
-              /** @description Unique identifier of the team */
-              id: number;
-              /** Format: uri-template */
-              members_url: string;
-              /** @description Name of the team */
-              name: string;
-              node_id: string;
-              /** @description Permission that the team will have for its repositories */
-              permission: string;
-              /** @enum {string} */
-              privacy: "open" | "closed" | "secret";
-              /** Format: uri */
-              repositories_url: string;
-              slug: string;
-              /**
-               * Format: uri 
-               * @description URL for the team
-               */
-              url: string;
-            }) | null;
-            /** @description Permission that the team will have for its repositories */
-            permission?: string;
-            /** @enum {string} */
-            privacy?: "open" | "closed" | "secret";
-            /** Format: uri */
-            repositories_url?: string;
-            slug?: string;
-            /**
-             * Format: uri 
-             * @description URL for the team
-             */
-            url?: string;
-          }]>)[];
-        requested_teams: ({
-            deleted?: boolean;
-            /** @description Description of the team */
-            description?: string | null;
-            /** Format: uri */
-            html_url?: string;
-            /** @description Unique identifier of the team */
-            id: number;
-            /** Format: uri-template */
-            members_url?: string;
-            /** @description Name of the team */
-            name: string;
-            node_id?: string;
-            parent?: ({
-              /** @description Description of the team */
-              description: string | null;
-              /** Format: uri */
-              html_url: string;
-              /** @description Unique identifier of the team */
-              id: number;
-              /** Format: uri-template */
-              members_url: string;
-              /** @description Name of the team */
-              name: string;
-              node_id: string;
-              /** @description Permission that the team will have for its repositories */
-              permission: string;
-              /** @enum {string} */
-              privacy: "open" | "closed" | "secret";
-              /** Format: uri */
-              repositories_url: string;
-              slug: string;
-              /**
-               * Format: uri 
-               * @description URL for the team
-               */
-              url: string;
-            }) | null;
-            /** @description Permission that the team will have for its repositories */
-            permission?: string;
-            /** @enum {string} */
-            privacy?: "open" | "closed" | "secret";
-            /** Format: uri */
-            repositories_url?: string;
-            slug?: string;
-            /**
-             * Format: uri 
-             * @description URL for the team
-             */
-            url?: string;
-          })[];
-        /** Format: uri-template */
-        review_comment_url: string;
-        review_comments?: number;
-        /** Format: uri */
-        review_comments_url: string;
-        /**
-         * @description State of this Pull Request. Either `open` or `closed`. 
+         * @description The default value for a merge commit title.
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., "Merge pull request #123 from branch-name"). 
          * @enum {string}
          */
-        state: "open" | "closed";
-        /** Format: uri */
-        statuses_url: string;
-        /** @description The title of the pull request. */
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** Format: uri */
-        url: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization" | "Mannequin";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      }) & ({
-        _links?: {
-          comments?: {
-            href?: string;
-          };
-          commits?: {
-            href?: string;
-          };
-          html?: {
-            href?: string;
-          };
-          issue?: {
-            href?: string;
-          };
-          review_comment?: {
-            href?: string;
-          };
-          review_comments?: {
-            href?: string;
-          };
-          self?: {
-            href?: string;
-          };
-          statuses?: {
-            href?: string;
-          };
-        };
-        active_lock_reason?: string | null;
-        additions?: number;
-        assignee?: Record<string, unknown> | null;
-        assignees?: (Record<string, unknown> | null)[];
-        author_association?: string;
-        auto_merge?: Record<string, unknown> | null;
-        base?: {
-          label?: string;
-          ref?: string;
-          repo?: {
-            allow_auto_merge?: boolean;
-            allow_forking?: boolean;
-            allow_merge_commit?: boolean;
-            allow_rebase_merge?: boolean;
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            archive_url?: string;
-            archived?: boolean;
-            assignees_url?: string;
-            blobs_url?: string;
-            branches_url?: string;
-            clone_url?: string;
-            collaborators_url?: string;
-            comments_url?: string;
-            commits_url?: string;
-            compare_url?: string;
-            contents_url?: string;
-            contributors_url?: string;
-            created_at?: string;
-            default_branch?: string;
-            delete_branch_on_merge?: boolean;
-            deployments_url?: string;
-            description?: string | null;
-            disabled?: boolean;
-            downloads_url?: string;
-            events_url?: string;
-            fork?: boolean;
-            forks?: number;
-            forks_count?: number;
-            forks_url?: string;
-            full_name?: string;
-            git_commits_url?: string;
-            git_refs_url?: string;
-            git_tags_url?: string;
-            git_url?: string;
-            has_downloads?: boolean;
-            has_issues?: boolean;
-            has_pages?: boolean;
-            has_projects?: boolean;
-            has_wiki?: boolean;
-            homepage?: string | null;
-            hooks_url?: string;
-            html_url?: string;
-            id?: number;
-            is_template?: boolean;
-            issue_comment_url?: string;
-            issue_events_url?: string;
-            issues_url?: string;
-            keys_url?: string;
-            labels_url?: string;
-            language?: string | null;
-            languages_url?: string;
-            license?: Record<string, unknown> | null;
-            /** @enum {string} */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /** @enum {string} */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            merges_url?: string;
-            milestones_url?: string;
-            mirror_url?: string | null;
-            name?: string;
-            node_id?: string;
-            notifications_url?: string;
-            open_issues?: number;
-            open_issues_count?: number;
-            owner?: {
-              avatar_url?: string;
-              events_url?: string;
-              followers_url?: string;
-              following_url?: string;
-              gists_url?: string;
-              gravatar_id?: string;
-              html_url?: string;
-              id?: number;
-              login?: string;
-              node_id?: string;
-              organizations_url?: string;
-              received_events_url?: string;
-              repos_url?: string;
-              site_admin?: boolean;
-              starred_url?: string;
-              subscriptions_url?: string;
-              type?: string;
-              url?: string;
-            };
-            private?: boolean;
-            pulls_url?: string;
-            pushed_at?: string;
-            releases_url?: string;
-            size?: number;
-            /** @enum {string} */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /** @enum {string} */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url?: string;
-            stargazers_count?: number;
-            stargazers_url?: string;
-            statuses_url?: string;
-            subscribers_url?: string;
-            subscription_url?: string;
-            svn_url?: string;
-            tags_url?: string;
-            teams_url?: string;
-            topics?: (string | null)[];
-            trees_url?: string;
-            updated_at?: string;
-            url?: string;
-            use_squash_pr_title_as_default?: boolean;
-            visibility?: string;
-            watchers?: number;
-            watchers_count?: number;
-            web_commit_signoff_required?: boolean;
-          };
-          sha?: string;
-          user?: {
-            avatar_url?: string;
-            events_url?: string;
-            followers_url?: string;
-            following_url?: string;
-            gists_url?: string;
-            gravatar_id?: string;
-            html_url?: string;
-            id?: number;
-            login?: string;
-            node_id?: string;
-            organizations_url?: string;
-            received_events_url?: string;
-            repos_url?: string;
-            site_admin?: boolean;
-            starred_url?: string;
-            subscriptions_url?: string;
-            type?: string;
-            url?: string;
-          };
-        };
-        body?: string | null;
-        changed_files?: number;
-        closed_at: string | null;
-        comments?: number;
-        comments_url?: string;
-        commits?: number;
-        commits_url?: string;
-        created_at?: string;
-        deletions?: number;
-        diff_url?: string;
-        /** @description Indicates whether or not the pull request is a draft. */
-        draft: boolean;
-        head?: {
-          label?: string;
-          ref?: string;
-          repo?: {
-            allow_auto_merge?: boolean;
-            allow_forking?: boolean;
-            allow_merge_commit?: boolean;
-            allow_rebase_merge?: boolean;
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            archive_url?: string;
-            archived?: boolean;
-            assignees_url?: string;
-            blobs_url?: string;
-            branches_url?: string;
-            clone_url?: string;
-            collaborators_url?: string;
-            comments_url?: string;
-            commits_url?: string;
-            compare_url?: string;
-            contents_url?: string;
-            contributors_url?: string;
-            created_at?: string;
-            default_branch?: string;
-            delete_branch_on_merge?: boolean;
-            deployments_url?: string;
-            description?: string | null;
-            disabled?: boolean;
-            downloads_url?: string;
-            events_url?: string;
-            fork?: boolean;
-            forks?: number;
-            forks_count?: number;
-            forks_url?: string;
-            full_name?: string;
-            git_commits_url?: string;
-            git_refs_url?: string;
-            git_tags_url?: string;
-            git_url?: string;
-            has_downloads?: boolean;
-            has_issues?: boolean;
-            has_pages?: boolean;
-            has_projects?: boolean;
-            has_wiki?: boolean;
-            homepage?: string | null;
-            hooks_url?: string;
-            html_url?: string;
-            id?: number;
-            is_template?: boolean;
-            issue_comment_url?: string;
-            issue_events_url?: string;
-            issues_url?: string;
-            keys_url?: string;
-            labels_url?: string;
-            language?: string | null;
-            languages_url?: string;
-            license?: Record<string, unknown> | null;
-            /** @enum {string} */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /** @enum {string} */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            merges_url?: string;
-            milestones_url?: string;
-            mirror_url?: string | null;
-            name?: string;
-            node_id?: string;
-            notifications_url?: string;
-            open_issues?: number;
-            open_issues_count?: number;
-            owner?: {
-              avatar_url?: string;
-              events_url?: string;
-              followers_url?: string;
-              following_url?: string;
-              gists_url?: string;
-              gravatar_id?: string;
-              html_url?: string;
-              id?: number;
-              login?: string;
-              node_id?: string;
-              organizations_url?: string;
-              received_events_url?: string;
-              repos_url?: string;
-              site_admin?: boolean;
-              starred_url?: string;
-              subscriptions_url?: string;
-              type?: string;
-              url?: string;
-            };
-            private?: boolean;
-            pulls_url?: string;
-            pushed_at?: string;
-            releases_url?: string;
-            size?: number;
-            /** @enum {string} */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /** @enum {string} */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url?: string;
-            stargazers_count?: number;
-            stargazers_url?: string;
-            statuses_url?: string;
-            subscribers_url?: string;
-            subscription_url?: string;
-            svn_url?: string;
-            tags_url?: string;
-            teams_url?: string;
-            topics?: (string | null)[];
-            trees_url?: string;
-            updated_at?: string;
-            url?: string;
-            use_squash_pr_title_as_default?: boolean;
-            visibility?: string;
-            watchers?: number;
-            watchers_count?: number;
-            web_commit_signoff_required?: boolean;
-          };
-          sha?: string;
-          user?: {
-            avatar_url?: string;
-            events_url?: string;
-            followers_url?: string;
-            following_url?: string;
-            gists_url?: string;
-            gravatar_id?: string;
-            html_url?: string;
-            id?: number;
-            login?: string;
-            node_id?: string;
-            organizations_url?: string;
-            received_events_url?: string;
-            repos_url?: string;
-            site_admin?: boolean;
-            starred_url?: string;
-            subscriptions_url?: string;
-            type?: string;
-            url?: string;
-          };
-        };
-        html_url?: string;
-        id?: number;
-        issue_url?: string;
-        labels?: (Record<string, unknown> | null)[];
-        locked?: boolean;
-        maintainer_can_modify?: boolean;
-        merge_commit_sha?: string | null;
-        mergeable?: boolean | null;
-        mergeable_state?: string;
-        merged: boolean;
-        merged_at: string | null;
-        merged_by: Record<string, unknown> | null;
-        milestone?: Record<string, unknown> | null;
-        node_id?: string;
-        number?: number;
-        patch_url?: string;
-        rebaseable?: boolean | null;
-        requested_reviewers?: (Record<string, unknown> | null)[];
-        requested_teams?: (Record<string, unknown> | null)[];
-        review_comment_url?: string;
-        review_comments?: number;
-        review_comments_url?: string;
-        /** @enum {string} */
-        state: "open" | "closed";
-        statuses_url?: string;
-        title?: string;
-        updated_at?: string;
-        url?: string;
-        user?: {
-          avatar_url?: string;
-          events_url?: string;
-          followers_url?: string;
-          following_url?: string;
-          gists_url?: string;
-          gravatar_id?: string;
-          html_url?: string;
-          id?: number;
-          login?: string;
-          node_id?: string;
-          organizations_url?: string;
-          received_events_url?: string;
-          repos_url?: string;
-          site_admin?: boolean;
-          starred_url?: string;
-          subscriptions_url?: string;
-          type?: string;
-          url?: string;
-        };
+        merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
+        /**
+         * @description The default value for a squash merge commit message:
+         * - `PR_BODY` - default to the pull request's body.
+         * - `COMMIT_MESSAGES` - default to the branch's commit messages.
+         * - `BLANK` - default to a blank commit message. 
+         * @enum {string}
+         */
+        squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
+        /**
+         * @description The default value for a squash merge commit title:
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
+         * @enum {string}
+         */
+        squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
+        /**
+         * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead.** 
+         * @default false
+         */
+        use_squash_pr_title_as_default?: boolean;
       });
       repository: components["schemas"]["repository"];
       sender: components["schemas"]["simple-user"];
@@ -57783,1534 +51074,54 @@ export interface components {
       /** @description The pull request number. */
       number: number;
       organization?: components["schemas"]["organization-simple"];
-      pull_request: ({
-        _links: {
-          /** Link */
-          comments: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          commits: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          html: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          issue: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          review_comment: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          review_comments: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          self: {
-            /** Format: uri-template */
-            href: string;
-          };
-          /** Link */
-          statuses: {
-            /** Format: uri-template */
-            href: string;
-          };
-        };
-        /** @enum {string|null} */
-        active_lock_reason: "resolved" | "off-topic" | "too heated" | "spam" | "" | null;
-        additions?: number;
-        /** User */
-        assignee: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        assignees: (({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null)[];
+      pull_request: components["schemas"]["pull-request"] & ({
         /**
-         * AuthorAssociation 
-         * @description How the author is associated with the repository. 
+         * @description Whether to allow auto-merge for pull requests. 
+         * @default false
+         */
+        allow_auto_merge?: boolean;
+        /** @description Whether to allow updating the pull request's branch. */
+        allow_update_branch?: boolean;
+        /**
+         * @description Whether to delete head branches when pull requests are merged. 
+         * @default false
+         */
+        delete_branch_on_merge?: boolean;
+        /**
+         * @description The default value for a merge commit message.
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `PR_BODY` - default to the pull request's body.
+         * - `BLANK` - default to a blank commit message. 
          * @enum {string}
          */
-        author_association: "COLLABORATOR" | "CONTRIBUTOR" | "FIRST_TIMER" | "FIRST_TIME_CONTRIBUTOR" | "MANNEQUIN" | "MEMBER" | "NONE" | "OWNER";
+        merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
         /**
-         * PullRequestAutoMerge 
-         * @description The status of auto merging a pull request.
-         */
-        auto_merge: ({
-          /** @description Commit message for the merge commit. */
-          commit_message: string | null;
-          /** @description Title for the merge commit message. */
-          commit_title: string;
-          /** User */
-          enabled_by: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-          /**
-           * @description The merge method to use. 
-           * @enum {string}
-           */
-          merge_method: "merge" | "squash" | "rebase";
-        }) | null;
-        base: {
-          label: string;
-          ref: string;
-          /**
-           * Repository 
-           * @description A git repository
-           */
-          repo: {
-            /**
-             * @description Whether to allow auto-merge for pull requests. 
-             * @default false
-             */
-            allow_auto_merge?: boolean;
-            /** @description Whether to allow private forks */
-            allow_forking?: boolean;
-            /**
-             * @description Whether to allow merge commits for pull requests. 
-             * @default true
-             */
-            allow_merge_commit?: boolean;
-            /**
-             * @description Whether to allow rebase merges for pull requests. 
-             * @default true
-             */
-            allow_rebase_merge?: boolean;
-            /**
-             * @description Whether to allow squash merges for pull requests. 
-             * @default true
-             */
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            /** Format: uri-template */
-            archive_url: string;
-            /**
-             * @description Whether the repository is archived. 
-             * @default false
-             */
-            archived: boolean;
-            /** Format: uri-template */
-            assignees_url: string;
-            /** Format: uri-template */
-            blobs_url: string;
-            /** Format: uri-template */
-            branches_url: string;
-            /** Format: uri */
-            clone_url: string;
-            /** Format: uri-template */
-            collaborators_url: string;
-            /** Format: uri-template */
-            comments_url: string;
-            /** Format: uri-template */
-            commits_url: string;
-            /** Format: uri-template */
-            compare_url: string;
-            /** Format: uri-template */
-            contents_url: string;
-            /** Format: uri */
-            contributors_url: string;
-            created_at: number | string;
-            /** @description The default branch of the repository. */
-            default_branch: string;
-            /**
-             * @description Whether to delete head branches when pull requests are merged 
-             * @default false
-             */
-            delete_branch_on_merge?: boolean;
-            /** Format: uri */
-            deployments_url: string;
-            description: string | null;
-            /** @description Returns whether or not this repository is disabled. */
-            disabled?: boolean;
-            /** Format: uri */
-            downloads_url: string;
-            /** Format: uri */
-            events_url: string;
-            fork: boolean;
-            forks: number;
-            forks_count: number;
-            /** Format: uri */
-            forks_url: string;
-            full_name: string;
-            /** Format: uri-template */
-            git_commits_url: string;
-            /** Format: uri-template */
-            git_refs_url: string;
-            /** Format: uri-template */
-            git_tags_url: string;
-            /** Format: uri */
-            git_url: string;
-            /**
-             * @description Whether downloads are enabled. 
-             * @default true
-             */
-            has_downloads: boolean;
-            /**
-             * @description Whether issues are enabled. 
-             * @default true
-             */
-            has_issues: boolean;
-            has_pages: boolean;
-            /**
-             * @description Whether projects are enabled. 
-             * @default true
-             */
-            has_projects: boolean;
-            /**
-             * @description Whether the wiki is enabled. 
-             * @default true
-             */
-            has_wiki: boolean;
-            homepage: string | null;
-            /** Format: uri */
-            hooks_url: string;
-            /** Format: uri */
-            html_url: string;
-            /** @description Unique identifier of the repository */
-            id: number;
-            is_template?: boolean;
-            /** Format: uri-template */
-            issue_comment_url: string;
-            /** Format: uri-template */
-            issue_events_url: string;
-            /** Format: uri-template */
-            issues_url: string;
-            /** Format: uri-template */
-            keys_url: string;
-            /** Format: uri-template */
-            labels_url: string;
-            language: string | null;
-            /** Format: uri */
-            languages_url: string;
-            /** License */
-            license: ({
-              key: string;
-              name: string;
-              node_id: string;
-              spdx_id: string;
-              /** Format: uri */
-              url: string | null;
-            }) | null;
-            master_branch?: string;
-            /**
-             * @description The default value for a merge commit message.
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `PR_BODY` - default to the pull request's body.
-             * - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /**
-             * @description The default value for a merge commit title.
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., Merge pull request #123 from branch-name). 
-             * @enum {string}
-             */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            /** Format: uri */
-            merges_url: string;
-            /** Format: uri-template */
-            milestones_url: string;
-            /** Format: uri */
-            mirror_url: string | null;
-            /** @description The name of the repository. */
-            name: string;
-            node_id: string;
-            /** Format: uri-template */
-            notifications_url: string;
-            open_issues: number;
-            open_issues_count: number;
-            organization?: string;
-            /** User */
-            owner: ({
-              /** Format: uri */
-              avatar_url?: string;
-              deleted?: boolean;
-              email?: string | null;
-              /** Format: uri-template */
-              events_url?: string;
-              /** Format: uri */
-              followers_url?: string;
-              /** Format: uri-template */
-              following_url?: string;
-              /** Format: uri-template */
-              gists_url?: string;
-              gravatar_id?: string;
-              /** Format: uri */
-              html_url?: string;
-              id: number;
-              login: string;
-              name?: string;
-              node_id?: string;
-              /** Format: uri */
-              organizations_url?: string;
-              /** Format: uri */
-              received_events_url?: string;
-              /** Format: uri */
-              repos_url?: string;
-              site_admin?: boolean;
-              /** Format: uri-template */
-              starred_url?: string;
-              /** Format: uri */
-              subscriptions_url?: string;
-              /** @enum {string} */
-              type?: "Bot" | "User" | "Organization";
-              /** Format: uri */
-              url?: string;
-            }) | null;
-            permissions?: {
-              admin: boolean;
-              maintain?: boolean;
-              pull: boolean;
-              push: boolean;
-              triage?: boolean;
-            };
-            /** @description Whether the repository is private or public. */
-            private: boolean;
-            public?: boolean;
-            /** Format: uri-template */
-            pulls_url: string;
-            pushed_at: number | string;
-            /** Format: uri-template */
-            releases_url: string;
-            role_name?: string | null;
-            size: number;
-            /**
-             * @description The default value for a squash merge commit message:
-             * 
-             * - `PR_BODY` - default to the pull request's body.
-             * - `COMMIT_MESSAGES` - default to the branch's commit messages.
-             * - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /**
-             * @description The default value for a squash merge commit title:
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
-             * @enum {string}
-             */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url: string;
-            stargazers?: number;
-            stargazers_count: number;
-            /** Format: uri */
-            stargazers_url: string;
-            /** Format: uri-template */
-            statuses_url: string;
-            /** Format: uri */
-            subscribers_url: string;
-            /** Format: uri */
-            subscription_url: string;
-            /** Format: uri */
-            svn_url: string;
-            /** Format: uri */
-            tags_url: string;
-            /** Format: uri */
-            teams_url: string;
-            topics: (string)[];
-            /** Format: uri-template */
-            trees_url: string;
-            /** Format: date-time */
-            updated_at: string;
-            /** Format: uri */
-            url: string;
-            /**
-             * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead. 
-             * @default false
-             */
-            use_squash_pr_title_as_default?: boolean;
-            /** @enum {string} */
-            visibility: "public" | "private" | "internal";
-            watchers: number;
-            watchers_count: number;
-            /** @description Whether to require contributors to sign off on web-based commits */
-            web_commit_signoff_required?: boolean;
-          };
-          sha: string;
-          /** User */
-          user: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-        };
-        body: string | null;
-        changed_files?: number;
-        /** Format: date-time */
-        closed_at: string | null;
-        comments?: number;
-        /** Format: uri */
-        comments_url: string;
-        commits?: number;
-        /** Format: uri */
-        commits_url: string;
-        /** Format: date-time */
-        created_at: string;
-        deletions?: number;
-        /** Format: uri */
-        diff_url: string;
-        /** @description Indicates whether or not the pull request is a draft. */
-        draft: boolean;
-        head: {
-          label: string;
-          ref: string;
-          /**
-           * Repository 
-           * @description A git repository
-           */
-          repo: {
-            /**
-             * @description Whether to allow auto-merge for pull requests. 
-             * @default false
-             */
-            allow_auto_merge?: boolean;
-            /** @description Whether to allow private forks */
-            allow_forking?: boolean;
-            /**
-             * @description Whether to allow merge commits for pull requests. 
-             * @default true
-             */
-            allow_merge_commit?: boolean;
-            /**
-             * @description Whether to allow rebase merges for pull requests. 
-             * @default true
-             */
-            allow_rebase_merge?: boolean;
-            /**
-             * @description Whether to allow squash merges for pull requests. 
-             * @default true
-             */
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            /** Format: uri-template */
-            archive_url: string;
-            /**
-             * @description Whether the repository is archived. 
-             * @default false
-             */
-            archived: boolean;
-            /** Format: uri-template */
-            assignees_url: string;
-            /** Format: uri-template */
-            blobs_url: string;
-            /** Format: uri-template */
-            branches_url: string;
-            /** Format: uri */
-            clone_url: string;
-            /** Format: uri-template */
-            collaborators_url: string;
-            /** Format: uri-template */
-            comments_url: string;
-            /** Format: uri-template */
-            commits_url: string;
-            /** Format: uri-template */
-            compare_url: string;
-            /** Format: uri-template */
-            contents_url: string;
-            /** Format: uri */
-            contributors_url: string;
-            created_at: number | string;
-            /** @description The default branch of the repository. */
-            default_branch: string;
-            /**
-             * @description Whether to delete head branches when pull requests are merged 
-             * @default false
-             */
-            delete_branch_on_merge?: boolean;
-            /** Format: uri */
-            deployments_url: string;
-            description: string | null;
-            /** @description Returns whether or not this repository is disabled. */
-            disabled?: boolean;
-            /** Format: uri */
-            downloads_url: string;
-            /** Format: uri */
-            events_url: string;
-            fork: boolean;
-            forks: number;
-            forks_count: number;
-            /** Format: uri */
-            forks_url: string;
-            full_name: string;
-            /** Format: uri-template */
-            git_commits_url: string;
-            /** Format: uri-template */
-            git_refs_url: string;
-            /** Format: uri-template */
-            git_tags_url: string;
-            /** Format: uri */
-            git_url: string;
-            /**
-             * @description Whether downloads are enabled. 
-             * @default true
-             */
-            has_downloads: boolean;
-            /**
-             * @description Whether issues are enabled. 
-             * @default true
-             */
-            has_issues: boolean;
-            has_pages: boolean;
-            /**
-             * @description Whether projects are enabled. 
-             * @default true
-             */
-            has_projects: boolean;
-            /**
-             * @description Whether the wiki is enabled. 
-             * @default true
-             */
-            has_wiki: boolean;
-            homepage: string | null;
-            /** Format: uri */
-            hooks_url: string;
-            /** Format: uri */
-            html_url: string;
-            /** @description Unique identifier of the repository */
-            id: number;
-            is_template?: boolean;
-            /** Format: uri-template */
-            issue_comment_url: string;
-            /** Format: uri-template */
-            issue_events_url: string;
-            /** Format: uri-template */
-            issues_url: string;
-            /** Format: uri-template */
-            keys_url: string;
-            /** Format: uri-template */
-            labels_url: string;
-            language: string | null;
-            /** Format: uri */
-            languages_url: string;
-            /** License */
-            license: ({
-              key: string;
-              name: string;
-              node_id: string;
-              spdx_id: string;
-              /** Format: uri */
-              url: string | null;
-            }) | null;
-            master_branch?: string;
-            /**
-             * @description The default value for a merge commit message. 
-             * @enum {string}
-             */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /**
-             * @description The default value for a merge commit message title. 
-             * @enum {string}
-             */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            /** Format: uri */
-            merges_url: string;
-            /** Format: uri-template */
-            milestones_url: string;
-            /** Format: uri */
-            mirror_url: string | null;
-            /** @description The name of the repository. */
-            name: string;
-            node_id: string;
-            /** Format: uri-template */
-            notifications_url: string;
-            open_issues: number;
-            open_issues_count: number;
-            organization?: string;
-            /** User */
-            owner: ({
-              /** Format: uri */
-              avatar_url?: string;
-              deleted?: boolean;
-              email?: string | null;
-              /** Format: uri-template */
-              events_url?: string;
-              /** Format: uri */
-              followers_url?: string;
-              /** Format: uri-template */
-              following_url?: string;
-              /** Format: uri-template */
-              gists_url?: string;
-              gravatar_id?: string;
-              /** Format: uri */
-              html_url?: string;
-              id: number;
-              login: string;
-              name?: string;
-              node_id?: string;
-              /** Format: uri */
-              organizations_url?: string;
-              /** Format: uri */
-              received_events_url?: string;
-              /** Format: uri */
-              repos_url?: string;
-              site_admin?: boolean;
-              /** Format: uri-template */
-              starred_url?: string;
-              /** Format: uri */
-              subscriptions_url?: string;
-              /** @enum {string} */
-              type?: "Bot" | "User" | "Organization";
-              /** Format: uri */
-              url?: string;
-            }) | null;
-            permissions?: {
-              admin: boolean;
-              maintain?: boolean;
-              pull: boolean;
-              push: boolean;
-              triage?: boolean;
-            };
-            /** @description Whether the repository is private or public. */
-            private: boolean;
-            public?: boolean;
-            /** Format: uri-template */
-            pulls_url: string;
-            pushed_at: number | string;
-            /** Format: uri-template */
-            releases_url: string;
-            role_name?: string | null;
-            size: number;
-            /**
-             * @description The default value for a squash merge commit message:
-             * 
-             * - `PR_BODY` - default to the pull request's body.
-             * - `COMMIT_MESSAGES` - default to the branch's commit messages.
-             * - `BLANK` - default to a blank commit message. 
-             * @enum {string}
-             */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /**
-             * @description The default value for a squash merge commit title:
-             * 
-             * - `PR_TITLE` - default to the pull request's title.
-             * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
-             * @enum {string}
-             */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url: string;
-            stargazers?: number;
-            stargazers_count: number;
-            /** Format: uri */
-            stargazers_url: string;
-            /** Format: uri-template */
-            statuses_url: string;
-            /** Format: uri */
-            subscribers_url: string;
-            /** Format: uri */
-            subscription_url: string;
-            /** Format: uri */
-            svn_url: string;
-            /** Format: uri */
-            tags_url: string;
-            /** Format: uri */
-            teams_url: string;
-            topics: (string)[];
-            /** Format: uri-template */
-            trees_url: string;
-            /** Format: date-time */
-            updated_at: string;
-            /** Format: uri */
-            url: string;
-            /**
-             * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead. 
-             * @default false
-             */
-            use_squash_pr_title_as_default?: boolean;
-            /** @enum {string} */
-            visibility: "public" | "private" | "internal";
-            watchers: number;
-            watchers_count: number;
-            /** @description Whether to require contributors to sign off on web-based commits */
-            web_commit_signoff_required?: boolean;
-          };
-          sha: string;
-          /** User */
-          user: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-        };
-        /** Format: uri */
-        html_url: string;
-        id: number;
-        /** Format: uri */
-        issue_url: string;
-        labels: ({
-            /** @description 6-character hex code, without the leading #, identifying the color */
-            color: string;
-            default: boolean;
-            description: string | null;
-            id: number;
-            /** @description The name of the label. */
-            name: string;
-            node_id: string;
-            /**
-             * Format: uri 
-             * @description URL for the label
-             */
-            url: string;
-          })[];
-        locked: boolean;
-        /** @description Indicates whether maintainers can modify the pull request. */
-        maintainer_can_modify?: boolean;
-        merge_commit_sha: string | null;
-        mergeable?: boolean | null;
-        mergeable_state?: string;
-        merged?: boolean | null;
-        /** Format: date-time */
-        merged_at: string | null;
-        /** User */
-        merged_by?: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-        /**
-         * Milestone 
-         * @description A collection of related issues and pull requests.
-         */
-        milestone: ({
-          /** Format: date-time */
-          closed_at: string | null;
-          closed_issues: number;
-          /** Format: date-time */
-          created_at: string;
-          /** User */
-          creator: ({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization";
-            /** Format: uri */
-            url?: string;
-          }) | null;
-          description: string | null;
-          /** Format: date-time */
-          due_on: string | null;
-          /** Format: uri */
-          html_url: string;
-          id: number;
-          /** Format: uri */
-          labels_url: string;
-          node_id: string;
-          /** @description The number of the milestone. */
-          number: number;
-          open_issues: number;
-          /**
-           * @description The state of the milestone. 
-           * @enum {string}
-           */
-          state: "open" | "closed";
-          /** @description The title of the milestone. */
-          title: string;
-          /** Format: date-time */
-          updated_at: string;
-          /** Format: uri */
-          url: string;
-        }) | null;
-        node_id: string;
-        /** @description Number uniquely identifying the pull request within its repository. */
-        number: number;
-        /** Format: uri */
-        patch_url: string;
-        rebaseable?: boolean | null;
-        requested_reviewers: (OneOf<[({
-            /** Format: uri */
-            avatar_url?: string;
-            deleted?: boolean;
-            email?: string | null;
-            /** Format: uri-template */
-            events_url?: string;
-            /** Format: uri */
-            followers_url?: string;
-            /** Format: uri-template */
-            following_url?: string;
-            /** Format: uri-template */
-            gists_url?: string;
-            gravatar_id?: string;
-            /** Format: uri */
-            html_url?: string;
-            id: number;
-            login: string;
-            name?: string;
-            node_id?: string;
-            /** Format: uri */
-            organizations_url?: string;
-            /** Format: uri */
-            received_events_url?: string;
-            /** Format: uri */
-            repos_url?: string;
-            site_admin?: boolean;
-            /** Format: uri-template */
-            starred_url?: string;
-            /** Format: uri */
-            subscriptions_url?: string;
-            /** @enum {string} */
-            type?: "Bot" | "User" | "Organization" | "Mannequin";
-            /** Format: uri */
-            url?: string;
-          }) | null, {
-            deleted?: boolean;
-            /** @description Description of the team */
-            description: string | null;
-            /** Format: uri */
-            html_url: string;
-            /** @description Unique identifier of the team */
-            id: number;
-            /** Format: uri-template */
-            members_url: string;
-            /** @description Name of the team */
-            name: string;
-            node_id: string;
-            parent?: ({
-              /** @description Description of the team */
-              description: string | null;
-              /** Format: uri */
-              html_url: string;
-              /** @description Unique identifier of the team */
-              id: number;
-              /** Format: uri-template */
-              members_url: string;
-              /** @description Name of the team */
-              name: string;
-              node_id: string;
-              /** @description Permission that the team will have for its repositories */
-              permission: string;
-              /** @enum {string} */
-              privacy: "open" | "closed" | "secret";
-              /** Format: uri */
-              repositories_url: string;
-              slug: string;
-              /**
-               * Format: uri 
-               * @description URL for the team
-               */
-              url: string;
-            }) | null;
-            /** @description Permission that the team will have for its repositories */
-            permission: string;
-            /** @enum {string} */
-            privacy: "open" | "closed" | "secret";
-            /** Format: uri */
-            repositories_url: string;
-            slug: string;
-            /**
-             * Format: uri 
-             * @description URL for the team
-             */
-            url: string;
-          }]>)[];
-        requested_teams: ({
-            deleted?: boolean;
-            /** @description Description of the team */
-            description?: string | null;
-            /** Format: uri */
-            html_url?: string;
-            /** @description Unique identifier of the team */
-            id: number;
-            /** Format: uri-template */
-            members_url?: string;
-            /** @description Name of the team */
-            name: string;
-            node_id?: string;
-            parent?: ({
-              /** @description Description of the team */
-              description: string | null;
-              /** Format: uri */
-              html_url: string;
-              /** @description Unique identifier of the team */
-              id: number;
-              /** Format: uri-template */
-              members_url: string;
-              /** @description Name of the team */
-              name: string;
-              node_id: string;
-              /** @description Permission that the team will have for its repositories */
-              permission: string;
-              /** @enum {string} */
-              privacy: "open" | "closed" | "secret";
-              /** Format: uri */
-              repositories_url: string;
-              slug: string;
-              /**
-               * Format: uri 
-               * @description URL for the team
-               */
-              url: string;
-            }) | null;
-            /** @description Permission that the team will have for its repositories */
-            permission?: string;
-            /** @enum {string} */
-            privacy?: "open" | "closed" | "secret";
-            /** Format: uri */
-            repositories_url?: string;
-            slug?: string;
-            /**
-             * Format: uri 
-             * @description URL for the team
-             */
-            url?: string;
-          })[];
-        /** Format: uri-template */
-        review_comment_url: string;
-        review_comments?: number;
-        /** Format: uri */
-        review_comments_url: string;
-        /**
-         * @description State of this Pull Request. Either `open` or `closed`. 
+         * @description The default value for a merge commit title.
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `MERGE_MESSAGE` - default to the classic title for a merge message (e.g., "Merge pull request #123 from branch-name"). 
          * @enum {string}
          */
-        state: "open" | "closed";
-        /** Format: uri */
-        statuses_url: string;
-        /** @description The title of the pull request. */
-        title: string;
-        /** Format: date-time */
-        updated_at: string;
-        /** Format: uri */
-        url: string;
-        /** User */
-        user: ({
-          /** Format: uri */
-          avatar_url?: string;
-          deleted?: boolean;
-          email?: string | null;
-          /** Format: uri-template */
-          events_url?: string;
-          /** Format: uri */
-          followers_url?: string;
-          /** Format: uri-template */
-          following_url?: string;
-          /** Format: uri-template */
-          gists_url?: string;
-          gravatar_id?: string;
-          /** Format: uri */
-          html_url?: string;
-          id: number;
-          login: string;
-          name?: string;
-          node_id?: string;
-          /** Format: uri */
-          organizations_url?: string;
-          /** Format: uri */
-          received_events_url?: string;
-          /** Format: uri */
-          repos_url?: string;
-          site_admin?: boolean;
-          /** Format: uri-template */
-          starred_url?: string;
-          /** Format: uri */
-          subscriptions_url?: string;
-          /** @enum {string} */
-          type?: "Bot" | "User" | "Organization" | "Mannequin";
-          /** Format: uri */
-          url?: string;
-        }) | null;
-      }) & ({
-        _links?: {
-          comments?: {
-            href?: string;
-          };
-          commits?: {
-            href?: string;
-          };
-          html?: {
-            href?: string;
-          };
-          issue?: {
-            href?: string;
-          };
-          review_comment?: {
-            href?: string;
-          };
-          review_comments?: {
-            href?: string;
-          };
-          self?: {
-            href?: string;
-          };
-          statuses?: {
-            href?: string;
-          };
-        };
-        active_lock_reason?: string | null;
-        additions?: number;
-        assignee?: Record<string, unknown> | null;
-        assignees?: (Record<string, unknown> | null)[];
-        author_association?: string;
-        auto_merge?: Record<string, unknown> | null;
-        base?: {
-          label?: string;
-          ref?: string;
-          repo?: {
-            allow_auto_merge?: boolean;
-            allow_forking?: boolean;
-            allow_merge_commit?: boolean;
-            allow_rebase_merge?: boolean;
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            archive_url?: string;
-            archived?: boolean;
-            assignees_url?: string;
-            blobs_url?: string;
-            branches_url?: string;
-            clone_url?: string;
-            collaborators_url?: string;
-            comments_url?: string;
-            commits_url?: string;
-            compare_url?: string;
-            contents_url?: string;
-            contributors_url?: string;
-            created_at?: string;
-            default_branch?: string;
-            delete_branch_on_merge?: boolean;
-            deployments_url?: string;
-            description?: string | null;
-            disabled?: boolean;
-            downloads_url?: string;
-            events_url?: string;
-            fork?: boolean;
-            forks?: number;
-            forks_count?: number;
-            forks_url?: string;
-            full_name?: string;
-            git_commits_url?: string;
-            git_refs_url?: string;
-            git_tags_url?: string;
-            git_url?: string;
-            has_downloads?: boolean;
-            has_issues?: boolean;
-            has_pages?: boolean;
-            has_projects?: boolean;
-            has_wiki?: boolean;
-            homepage?: string | null;
-            hooks_url?: string;
-            html_url?: string;
-            id?: number;
-            is_template?: boolean;
-            issue_comment_url?: string;
-            issue_events_url?: string;
-            issues_url?: string;
-            keys_url?: string;
-            labels_url?: string;
-            language?: string | null;
-            languages_url?: string;
-            license?: Record<string, unknown> | null;
-            /** @enum {string} */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /** @enum {string} */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            merges_url?: string;
-            milestones_url?: string;
-            mirror_url?: Record<string, unknown> | null;
-            name?: string;
-            node_id?: string;
-            notifications_url?: string;
-            open_issues?: number;
-            open_issues_count?: number;
-            owner?: {
-              avatar_url?: string;
-              events_url?: string;
-              followers_url?: string;
-              following_url?: string;
-              gists_url?: string;
-              gravatar_id?: string;
-              html_url?: string;
-              id?: number;
-              login?: string;
-              node_id?: string;
-              organizations_url?: string;
-              received_events_url?: string;
-              repos_url?: string;
-              site_admin?: boolean;
-              starred_url?: string;
-              subscriptions_url?: string;
-              type?: string;
-              url?: string;
-            };
-            private?: boolean;
-            pulls_url?: string;
-            pushed_at?: string;
-            releases_url?: string;
-            size?: number;
-            /** @enum {string} */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /** @enum {string} */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url?: string;
-            stargazers_count?: number;
-            stargazers_url?: string;
-            statuses_url?: string;
-            subscribers_url?: string;
-            subscription_url?: string;
-            svn_url?: string;
-            tags_url?: string;
-            teams_url?: string;
-            topics?: (string | null)[];
-            trees_url?: string;
-            updated_at?: string;
-            url?: string;
-            use_squash_pr_title_as_default?: boolean;
-            visibility?: string;
-            watchers?: number;
-            watchers_count?: number;
-            web_commit_signoff_required?: boolean;
-          };
-          sha?: string;
-          user?: {
-            avatar_url?: string;
-            events_url?: string;
-            followers_url?: string;
-            following_url?: string;
-            gists_url?: string;
-            gravatar_id?: string;
-            html_url?: string;
-            id?: number;
-            login?: string;
-            node_id?: string;
-            organizations_url?: string;
-            received_events_url?: string;
-            repos_url?: string;
-            site_admin?: boolean;
-            starred_url?: string;
-            subscriptions_url?: string;
-            type?: string;
-            url?: string;
-          };
-        };
-        body?: string | null;
-        changed_files?: number;
-        closed_at: string | null;
-        comments?: number;
-        comments_url?: string;
-        commits?: number;
-        commits_url?: string;
-        created_at?: string;
-        deletions?: number;
-        diff_url?: string;
-        draft?: boolean;
-        head?: {
-          label?: string;
-          ref?: string;
-          repo?: {
-            allow_auto_merge?: boolean;
-            allow_forking?: boolean;
-            allow_merge_commit?: boolean;
-            allow_rebase_merge?: boolean;
-            allow_squash_merge?: boolean;
-            allow_update_branch?: boolean;
-            archive_url?: string;
-            archived?: boolean;
-            assignees_url?: string;
-            blobs_url?: string;
-            branches_url?: string;
-            clone_url?: string;
-            collaborators_url?: string;
-            comments_url?: string;
-            commits_url?: string;
-            compare_url?: string;
-            contents_url?: string;
-            contributors_url?: string;
-            created_at?: string;
-            default_branch?: string;
-            delete_branch_on_merge?: boolean;
-            deployments_url?: string;
-            description?: string | null;
-            disabled?: boolean;
-            downloads_url?: string;
-            events_url?: string;
-            fork?: boolean;
-            forks?: number;
-            forks_count?: number;
-            forks_url?: string;
-            full_name?: string;
-            git_commits_url?: string;
-            git_refs_url?: string;
-            git_tags_url?: string;
-            git_url?: string;
-            has_downloads?: boolean;
-            has_issues?: boolean;
-            has_pages?: boolean;
-            has_projects?: boolean;
-            has_wiki?: boolean;
-            homepage?: string | null;
-            hooks_url?: string;
-            html_url?: string;
-            id?: number;
-            is_template?: boolean;
-            issue_comment_url?: string;
-            issue_events_url?: string;
-            issues_url?: string;
-            keys_url?: string;
-            labels_url?: string;
-            language?: string | null;
-            languages_url?: string;
-            license?: Record<string, unknown> | null;
-            /** @enum {string} */
-            merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
-            /** @enum {string} */
-            merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
-            merges_url?: string;
-            milestones_url?: string;
-            mirror_url?: Record<string, unknown> | null;
-            name?: string;
-            node_id?: string;
-            notifications_url?: string;
-            open_issues?: number;
-            open_issues_count?: number;
-            owner?: {
-              avatar_url?: string;
-              events_url?: string;
-              followers_url?: string;
-              following_url?: string;
-              gists_url?: string;
-              gravatar_id?: string;
-              html_url?: string;
-              id?: number;
-              login?: string;
-              node_id?: string;
-              organizations_url?: string;
-              received_events_url?: string;
-              repos_url?: string;
-              site_admin?: boolean;
-              starred_url?: string;
-              subscriptions_url?: string;
-              type?: string;
-              url?: string;
-            };
-            private?: boolean;
-            pulls_url?: string;
-            pushed_at?: string;
-            releases_url?: string;
-            size?: number;
-            /** @enum {string} */
-            squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
-            /** @enum {string} */
-            squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
-            ssh_url?: string;
-            stargazers_count?: number;
-            stargazers_url?: string;
-            statuses_url?: string;
-            subscribers_url?: string;
-            subscription_url?: string;
-            svn_url?: string;
-            tags_url?: string;
-            teams_url?: string;
-            topics?: (string | null)[];
-            trees_url?: string;
-            updated_at?: string;
-            url?: string;
-            use_squash_pr_title_as_default?: boolean;
-            visibility?: string;
-            watchers?: number;
-            watchers_count?: number;
-            web_commit_signoff_required?: boolean;
-          };
-          sha?: string;
-          user?: {
-            avatar_url?: string;
-            events_url?: string;
-            followers_url?: string;
-            following_url?: string;
-            gists_url?: string;
-            gravatar_id?: string;
-            html_url?: string;
-            id?: number;
-            login?: string;
-            node_id?: string;
-            organizations_url?: string;
-            received_events_url?: string;
-            repos_url?: string;
-            site_admin?: boolean;
-            starred_url?: string;
-            subscriptions_url?: string;
-            type?: string;
-            url?: string;
-          };
-        };
-        html_url?: string;
-        id?: number;
-        issue_url?: string;
-        labels?: (Record<string, unknown> | null)[];
-        locked?: boolean;
-        maintainer_can_modify?: boolean;
-        merge_commit_sha?: string | null;
-        mergeable?: boolean | null;
-        mergeable_state?: string;
-        merged: boolean;
-        merged_at: string | null;
-        merged_by: Record<string, unknown> | null;
-        milestone?: Record<string, unknown> | null;
-        node_id?: string;
-        number?: number;
-        patch_url?: string;
-        rebaseable?: boolean | null;
-        requested_reviewers?: (Record<string, unknown> | null)[];
-        requested_teams?: (Record<string, unknown> | null)[];
-        review_comment_url?: string;
-        review_comments?: number;
-        review_comments_url?: string;
-        /** @enum {string} */
-        state: "open" | "closed";
-        statuses_url?: string;
-        title?: string;
-        updated_at?: string;
-        url?: string;
-        user?: {
-          avatar_url?: string;
-          events_url?: string;
-          followers_url?: string;
-          following_url?: string;
-          gists_url?: string;
-          gravatar_id?: string;
-          html_url?: string;
-          id?: number;
-          login?: string;
-          node_id?: string;
-          organizations_url?: string;
-          received_events_url?: string;
-          repos_url?: string;
-          site_admin?: boolean;
-          starred_url?: string;
-          subscriptions_url?: string;
-          type?: string;
-          url?: string;
-        };
+        merge_commit_title?: "PR_TITLE" | "MERGE_MESSAGE";
+        /**
+         * @description The default value for a squash merge commit message:
+         * - `PR_BODY` - default to the pull request's body.
+         * - `COMMIT_MESSAGES` - default to the branch's commit messages.
+         * - `BLANK` - default to a blank commit message. 
+         * @enum {string}
+         */
+        squash_merge_commit_message?: "PR_BODY" | "COMMIT_MESSAGES" | "BLANK";
+        /**
+         * @description The default value for a squash merge commit title:
+         * - `PR_TITLE` - default to the pull request's title.
+         * - `COMMIT_OR_PR_TITLE` - default to the commit's title (if only one commit) or the pull request's title (when more than one commit). 
+         * @enum {string}
+         */
+        squash_merge_commit_title?: "PR_TITLE" | "COMMIT_OR_PR_TITLE";
+        /**
+         * @description Whether a squash merge commit can use the pull request title as default. **This property has been deprecated. Please use `squash_merge_commit_title` instead.** 
+         * @default false
+         */
+        use_squash_pr_title_as_default?: boolean;
       });
       repository: components["schemas"]["repository"];
       sender: components["schemas"]["simple-user"];
@@ -79189,7 +71000,7 @@ export interface components {
           };
           created_at?: string;
           description: string;
-          docker_metadata?: (Record<string, never>)[];
+          docker_metadata?: (unknown)[];
           draft?: boolean;
           html_url: string;
           id: number;
@@ -79295,7 +71106,7 @@ export interface components {
             target_commitish?: string;
             url?: string;
           };
-          rubygems_metadata?: (Record<string, never>)[];
+          rubygems_metadata?: (unknown)[];
           summary: string;
           tag_name?: string;
           target_commitish?: string;
@@ -79380,7 +71191,7 @@ export interface components {
           id: number;
           installation_command: string;
           manifest?: string;
-          metadata: (Record<string, never>)[];
+          metadata: (unknown)[];
           name: string;
           package_files: ({
               content_type?: string;
@@ -79429,7 +71240,7 @@ export interface components {
             target_commitish: string;
             url: string;
           };
-          rubygems_metadata?: (Record<string, never>)[];
+          rubygems_metadata?: (unknown)[];
           summary: string;
           tag_name?: string;
           target_commitish: string;
@@ -81333,53 +73144,6 @@ export interface components {
       installation?: components["schemas"]["simple-installation"];
       organization?: components["schemas"]["organization-simple"];
       repository: components["schemas"]["repository"];
-      sender?: components["schemas"]["simple-user"];
-    };
-    /** security_advisory performed event */
-    "webhook-security-advisory-performed": {
-      /** @enum {string} */
-      action: "performed";
-      enterprise?: components["schemas"]["enterprise"];
-      installation?: components["schemas"]["simple-installation"];
-      organization?: components["schemas"]["organization-simple"];
-      repository?: components["schemas"]["repository"];
-      /** @description The details of the security advisory, including summary, description, and severity. */
-      security_advisory: {
-        cvss: {
-          score: number;
-          vector_string: string | null;
-        };
-        cwes: ({
-            cwe_id: string;
-            name: string;
-          })[];
-        description: string;
-        ghsa_id: string;
-        identifiers: ({
-            type: string;
-            value: string;
-          })[];
-        published_at: string;
-        references: ({
-            /** Format: uri */
-            url: string;
-          })[];
-        severity: string;
-        summary: string;
-        updated_at: string;
-        vulnerabilities: ({
-            first_patched_version: {
-              identifier: string;
-            } | null;
-            package: {
-              ecosystem: string;
-              name: string;
-            };
-            severity: string;
-            vulnerable_version_range: string;
-          })[];
-        withdrawn_at: string | null;
-      };
       sender?: components["schemas"]["simple-user"];
     };
     /** security_advisory published event */
@@ -84109,52 +75873,6 @@ export interface components {
         url?: string;
       };
     };
-    "webhook-user-created": {
-      /** @enum {string} */
-      action: "created";
-      enterprise?: components["schemas"]["enterprise"];
-      installation?: components["schemas"]["simple-installation"];
-      organization?: components["schemas"]["organization-simple"];
-      repository?: components["schemas"]["repository"];
-      sender?: components["schemas"]["simple-user"];
-      /** User */
-      user?: ({
-        /** Format: uri */
-        avatar_url?: string;
-        deleted?: boolean;
-        email?: string | null;
-        /** Format: uri-template */
-        events_url?: string;
-        /** Format: uri */
-        followers_url?: string;
-        /** Format: uri-template */
-        following_url?: string;
-        /** Format: uri-template */
-        gists_url?: string;
-        gravatar_id?: string;
-        /** Format: uri */
-        html_url?: string;
-        id: number;
-        login: string;
-        name?: string;
-        node_id?: string;
-        /** Format: uri */
-        organizations_url?: string;
-        /** Format: uri */
-        received_events_url?: string;
-        /** Format: uri */
-        repos_url?: string;
-        site_admin?: boolean;
-        /** Format: uri-template */
-        starred_url?: string;
-        /** Format: uri */
-        subscriptions_url?: string;
-        /** @enum {string} */
-        type?: "Bot" | "User" | "Organization";
-        /** Format: uri */
-        url?: string;
-      }) | null;
-    };
     /** watch started event */
     "webhook-watch-started": {
       /** @enum {string} */
@@ -84168,10 +75886,9 @@ export interface components {
     /** workflow_dispatch event */
     "webhook-workflow-dispatch": {
       enterprise?: components["schemas"]["enterprise"];
-      inputs: {
-        name?: string;
-        number?: string;
-      } | null;
+      inputs: ({
+        [key: string]: unknown | undefined;
+      }) | null;
       installation?: components["schemas"]["simple-installation"];
       organization?: components["schemas"]["organization-simple"];
       ref: string;
@@ -84194,6 +75911,8 @@ export interface components {
         completed_at: string | null;
         /** @enum {string|null} */
         conclusion: "success" | "failure" | "" | "skipped" | "cancelled" | "action_required" | "neutral" | "timed_out" | null;
+        /** @description The time that the job created. */
+        created_at: string;
         head_sha: string;
         /** Format: uri */
         html_url: string;
@@ -84216,10 +75935,14 @@ export interface components {
         runner_name: string | null;
         started_at: string;
         /**
-         * @description The current status of the job. Can be `queued`, `in_progress`, or `completed`. 
+         * @description The current status of the job. Can be `queued`, `in_progress`, `waiting`, or `completed`. 
          * @enum {string}
          */
         status: "queued" | "in_progress" | "completed" | "waiting";
+        /** @description The name of the current branch. */
+        head_branch: string | null;
+        /** @description The name of the workflow. */
+        workflow_name: string | null;
         steps: ({
             completed_at: string | null;
             /** @enum {string|null} */
@@ -84237,6 +75960,8 @@ export interface components {
         completed_at?: string;
         /** @enum {string} */
         conclusion: "success" | "failure" | "skipped" | "cancelled" | "action_required" | "neutral" | "timed_out";
+        /** @description The time that the job created. */
+        created_at?: string;
         head_sha?: string;
         html_url?: string;
         id?: number;
@@ -84252,9 +75977,14 @@ export interface components {
         runner_name?: string | null;
         started_at?: string;
         status?: string;
+        /** @description The name of the current branch. */
+        head_branch?: string | null;
+        /** @description The name of the workflow. */
+        workflow_name?: string | null;
         steps?: (Record<string, unknown> | null)[];
         url?: string;
       });
+      deployment?: components["schemas"]["deployment"];
     };
     /** workflow_job in_progress event */
     "webhook-workflow-job-in-progress": {
@@ -84271,6 +76001,8 @@ export interface components {
         completed_at: string | null;
         /** @enum {string|null} */
         conclusion: "success" | "failure" | "" | "cancelled" | "neutral" | null;
+        /** @description The time that the job created. */
+        created_at: string;
         head_sha: string;
         /** Format: uri */
         html_url: string;
@@ -84297,6 +76029,10 @@ export interface components {
          * @enum {string}
          */
         status: "queued" | "in_progress" | "completed";
+        /** @description The name of the current branch. */
+        head_branch: string | null;
+        /** @description The name of the workflow. */
+        workflow_name: string | null;
         steps: ({
             completed_at: string | null;
             /** @enum {string|null} */
@@ -84313,6 +76049,8 @@ export interface components {
         check_run_url?: string;
         completed_at?: string | null;
         conclusion?: string | null;
+        /** @description The time that the job created. */
+        created_at?: string;
         head_sha?: string;
         html_url?: string;
         id?: number;
@@ -84329,6 +76067,10 @@ export interface components {
         started_at?: string;
         /** @enum {string} */
         status: "in_progress" | "completed" | "queued";
+        /** @description The name of the current branch. */
+        head_branch?: string | null;
+        /** @description The name of the workflow. */
+        workflow_name?: string | null;
         steps: ({
             completed_at: string | null;
             conclusion: string | null;
@@ -84340,6 +76082,7 @@ export interface components {
           })[];
         url?: string;
       });
+      deployment?: components["schemas"]["deployment"];
     };
     /** workflow_job queued event */
     "webhook-workflow-job-queued": {
@@ -84355,6 +76098,8 @@ export interface components {
         check_run_url: string;
         completed_at: string | null;
         conclusion: string | null;
+        /** @description The time that the job created. */
+        created_at: string;
         head_sha: string;
         /** Format: uri */
         html_url: string;
@@ -84374,6 +76119,10 @@ export interface components {
         started_at: string;
         /** @enum {string} */
         status: "queued" | "in_progress" | "completed" | "waiting";
+        /** @description The name of the current branch. */
+        head_branch: string | null;
+        /** @description The name of the workflow. */
+        workflow_name: string | null;
         steps: ({
             completed_at: string | null;
             /** @enum {string|null} */
@@ -84387,6 +76136,61 @@ export interface components {
         /** Format: uri */
         url: string;
       };
+      deployment?: components["schemas"]["deployment"];
+    };
+    /** workflow_job waiting event */
+    "webhook-workflow-job-waiting": {
+      /** @enum {string} */
+      action: "waiting";
+      enterprise?: components["schemas"]["enterprise"];
+      installation?: components["schemas"]["simple-installation"];
+      organization?: components["schemas"]["organization-simple"];
+      repository: components["schemas"]["repository"];
+      sender: components["schemas"]["simple-user"];
+      workflow_job: {
+        /** Format: uri */
+        check_run_url: string;
+        completed_at: string | null;
+        conclusion: string | null;
+        /** @description The time that the job created. */
+        created_at: string;
+        head_sha: string;
+        /** Format: uri */
+        html_url: string;
+        id: number;
+        labels: (string)[];
+        name: string;
+        node_id: string;
+        run_attempt: number;
+        run_id: number;
+        /** Format: uri */
+        run_url: string;
+        runner_group_id: number | null;
+        runner_group_name: string | null;
+        runner_id: number | null;
+        runner_name: string | null;
+        /** Format: date-time */
+        started_at: string;
+        /** @description The name of the current branch. */
+        head_branch: string | null;
+        /** @description The name of the workflow. */
+        workflow_name: string | null;
+        /** @enum {string} */
+        status: "queued" | "in_progress" | "completed" | "waiting";
+        steps: ({
+            completed_at: string | null;
+            /** @enum {string|null} */
+            conclusion: "failure" | "skipped" | "success" | "cancelled" | "" | null;
+            name: string;
+            number: number;
+            started_at: string | null;
+            /** @enum {string} */
+            status: "completed" | "in_progress" | "queued" | "pending" | "waiting";
+          })[];
+        /** Format: uri */
+        url: string;
+      };
+      deployment?: components["schemas"]["deployment"];
     };
     /** workflow_run completed event */
     "webhook-workflow-run-completed": {
@@ -86261,36 +78065,18 @@ export interface components {
         "application/json": Record<string, never>;
       };
     };
-    /** @description Forbidden */
-    forbidden: {
-      content: {
-        "application/json": components["schemas"]["basic-error"];
-      };
-    };
+    /** @description Not modified */
+    not_modified: never;
     /** @description Requires authentication */
     requires_authentication: {
       content: {
         "application/json": components["schemas"]["basic-error"];
       };
     };
-    /** @description Not modified */
-    not_modified: never;
-    /** @description Response */
-    actions_runner_labels: {
+    /** @description Forbidden */
+    forbidden: {
       content: {
-        "application/json": {
-          total_count: number;
-          labels: (components["schemas"]["runner-label"])[];
-        };
-      };
-    };
-    /** @description Response */
-    actions_runner_labels_readonly: {
-      content: {
-        "application/json": {
-          total_count: number;
-          labels: (components["schemas"]["runner-label"])[];
-        };
+        "application/json": components["schemas"]["basic-error"];
       };
     };
     /** @description Service unavailable */
@@ -86301,12 +78087,6 @@ export interface components {
           message?: string;
           documentation_url?: string;
         };
-      };
-    };
-    /** @description Response if GitHub Advanced Security is not enabled for this repository */
-    code_scanning_forbidden_read: {
-      content: {
-        "application/json": components["schemas"]["basic-error"];
       };
     };
     /** @description Forbidden Gist */
@@ -86335,6 +78115,24 @@ export interface components {
         "application/json": components["schemas"]["basic-error"];
       };
     };
+    /** @description Response */
+    actions_runner_labels: {
+      content: {
+        "application/json": {
+          total_count: number;
+          labels: (components["schemas"]["runner-label"])[];
+        };
+      };
+    };
+    /** @description Response */
+    actions_runner_labels_readonly: {
+      content: {
+        "application/json": {
+          total_count: number;
+          labels: (components["schemas"]["runner-label"])[];
+        };
+      };
+    };
     /** @description Internal Error */
     internal_error: {
       content: {
@@ -86349,6 +78147,12 @@ export interface components {
     };
     /** @description Temporary Redirect */
     temporary_redirect: {
+      content: {
+        "application/json": components["schemas"]["basic-error"];
+      };
+    };
+    /** @description Response if GitHub Advanced Security is not enabled for this repository */
+    code_scanning_forbidden_read: {
       content: {
         "application/json": components["schemas"]["basic-error"];
       };
@@ -86385,30 +78189,8 @@ export interface components {
     /** @description The client ID of the GitHub app. */
     "client-id": string;
     "app-slug": string;
-    /** @description The slug version of the enterprise name or the login of an organization. */
-    "enterprise-or-org": string;
     /** @description The slug version of the enterprise name. You can also substitute this value with the enterprise id. */
     enterprise: string;
-    /** @description The unique identifier of the organization. */
-    "org-id": number;
-    /** @description Only return runner groups that are allowed to be used by this organization. */
-    "visible-to-organization": string;
-    /** @description Unique identifier of the self-hosted runner group. */
-    "runner-group-id": number;
-    /** @description Unique identifier of the self-hosted runner. */
-    "runner-id": number;
-    /** @description The name of a self-hosted runner's custom label. */
-    "runner-label-name": string;
-    /** @description The name of a code scanning tool. Only results by this tool will be listed. You can specify the tool by using either `tool_name` or `tool_guid`, but not both. */
-    "tool-name": components["schemas"]["code-scanning-analysis-tool-name"];
-    /** @description The GUID of a code scanning tool. Only results by this tool will be listed. Note that some code scanning tools may not include a GUID in their analysis data. You can specify the tool by using either `tool_guid` or `tool_name`, but not both. */
-    "tool-guid": components["schemas"]["code-scanning-analysis-tool-guid"];
-    /** @description A cursor, as given in the [Link header](https://docs.github.com/rest/overview/resources-in-the-rest-api#link-header). If specified, the query only searches for results before this cursor. */
-    "pagination-before": string;
-    /** @description A cursor, as given in the [Link header](https://docs.github.com/rest/overview/resources-in-the-rest-api#link-header). If specified, the query only searches for results after this cursor. */
-    "pagination-after": string;
-    /** @description The direction to sort the results by. */
-    direction: "asc" | "desc";
     /**
      * @description A comma-separated list of states. If specified, only alerts with these states will be returned.
      * 
@@ -86437,14 +78219,22 @@ export interface components {
      * `updated` means when the alert's state last changed.
      */
     "dependabot-alert-sort": "created" | "updated";
+    /** @description The direction to sort the results by. */
+    direction: "asc" | "desc";
+    /** @description A cursor, as given in the [Link header](https://docs.github.com/rest/overview/resources-in-the-rest-api#link-header). If specified, the query only searches for results before this cursor. */
+    "pagination-before": string;
+    /** @description A cursor, as given in the [Link header](https://docs.github.com/rest/overview/resources-in-the-rest-api#link-header). If specified, the query only searches for results after this cursor. */
+    "pagination-after": string;
     /**
-     * @description The number of results per page (max 100), starting from the first matching result.
+     * @description **Deprecated**. The number of results per page (max 100), starting from the first matching result.
      * This parameter must not be used in combination with `last`.
+     * Instead, use `per_page` in combination with `after` to fetch the first page of results.
      */
     "pagination-first": number;
     /**
-     * @description The number of results per page (max 100), starting from the last matching result.
+     * @description **Deprecated**. The number of results per page (max 100), starting from the last matching result.
      * This parameter must not be used in combination with `first`.
+     * Instead, use `per_page` in combination with `before` to fetch the last page of results.
      */
     "pagination-last": number;
     /** @description Set to `open` or `resolved` to only list secret scanning alerts in a specific state. */
@@ -86489,14 +78279,24 @@ export interface components {
     org: string;
     /** @description The unique identifier of the repository. */
     "repository-id": number;
-    /** @description Only return runner groups that are allowed to be used by this repository. */
-    "visible-to-repository": string;
+    /** @description The unique identifier of the required workflow. */
+    "required-workflow-id": number;
+    /** @description Unique identifier of the self-hosted runner. */
+    "runner-id": number;
+    /** @description The name of a self-hosted runner's custom label. */
+    "runner-label-name": string;
     /** @description The name of the secret. */
     "secret-name": string;
+    /** @description The number of results per page (max 30). */
+    "variables-per-page": number;
+    /** @description The name of the variable. */
+    "variable-name": string;
     /** @description The handle for the GitHub user account. */
     username: string;
-    /** @description The unique identifier of the role. */
-    "role-id": number;
+    /** @description The name of a code scanning tool. Only results by this tool will be listed. You can specify the tool by using either `tool_name` or `tool_guid`, but not both. */
+    "tool-name": components["schemas"]["code-scanning-analysis-tool-name"];
+    /** @description The GUID of a code scanning tool. Only results by this tool will be listed. Note that some code scanning tools may not include a GUID in their analysis data. You can specify the tool by using either `tool_guid` or `tool_name`, but not both. */
+    "tool-guid": components["schemas"]["code-scanning-analysis-tool-guid"];
     /** @description The unique identifier of the hook. */
     "hook-id": number;
     /** @description The unique identifier of the invitation. */
@@ -86507,7 +78307,12 @@ export interface components {
     "migration-id": number;
     /** @description repo_name parameter */
     "repo-name": string;
-    /** @description The selected visibility of the packages. Only `container` package_types currently support `internal` visibility properly. For other ecosystems `internal` is synonymous with `private`. This parameter is optional and only filters an existing result set. */
+    /**
+     * @description The selected visibility of the packages.  This parameter is optional and only filters an existing result set.
+     * 
+     * The `internal` visibility is only supported for GitHub Packages registries that allow for granular permissions. For other ecosystems `internal` is synonymous with `private`.
+     * For the list of GitHub Packages registries that support granular permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
+     */
     "package-visibility": "public" | "private" | "internal";
     /** @description The type of supported package. Packages in GitHub's Gradle registry have the type `maven`. Docker images pushed to GitHub's Container registry (`ghcr.io`) have the type `container`. You can use the type `docker` to find images that were pushed to GitHub's Docker registry (`docker.pkg.github.com`), even if these have now been migrated to the Container registry. */
     "package-type": "npm" | "maven" | "rubygems" | "docker" | "nuget" | "container";
@@ -86542,6 +78347,8 @@ export interface components {
     "card-id": number;
     /** @description The unique identifier of the column. */
     "column-id": number;
+    /** @description The ID of the required workflow that has run at least once in a repository. */
+    "repo-required-workflow-id": number;
     /** @description The unique identifier of the artifact. */
     "artifact-id": number;
     /** @description The Git reference for the results you want to list. The `ref` for a branch can be formatted either as `refs/heads/<branch name>` or simply `<branch name>`. To reference a pull request use `refs/pull/<number>/merge`. */
@@ -86563,7 +78370,7 @@ export interface components {
     /** @description Returns workflow run triggered by the event you specify. For example, `push`, `pull_request` or `issue`. For more information, see "[Events that trigger workflows](https://docs.github.com/actions/automating-your-workflow-with-github-actions/events-that-trigger-workflows)." */
     event: string;
     /** @description Returns workflow runs with the check run `status` or `conclusion` that you specify. For example, a conclusion can be `success` or a status can be `in_progress`. Only GitHub can set a status of `waiting` or `requested`. */
-    "workflow-run-status": "completed" | "action_required" | "cancelled" | "failure" | "neutral" | "skipped" | "stale" | "success" | "timed_out" | "in_progress" | "queued" | "requested" | "waiting";
+    "workflow-run-status": "completed" | "action_required" | "cancelled" | "failure" | "neutral" | "skipped" | "stale" | "success" | "timed_out" | "in_progress" | "queued" | "requested" | "waiting" | "pending";
     /** @description Returns workflow runs created within the given date-time range. For more information on the syntax, see "[Understanding the search syntax](https://docs.github.com/search-github/getting-started-with-searching-on-github/understanding-the-search-syntax#query-for-dates)." */
     created: string;
     /** @description If `true` pull requests are omitted from the response (empty array). */
@@ -86580,7 +78387,7 @@ export interface components {
     "workflow-id": number | string;
     /** @description The unique identifier of the autolink. */
     "autolink-id": number;
-    /** @description The name of the branch. */
+    /** @description The name of the branch. Cannot contain wildcard characters. To use wildcard characters in branch names, use [the GraphQL API](https://docs.github.com/graphql). */
     branch: string;
     /** @description The unique identifier of the check run. */
     "check-run-id": number;
@@ -86630,7 +78437,7 @@ export interface components {
     /** @description The unique identifier of the tag protection. */
     "tag-protection-id": number;
     /** @description The time frame to display results for. */
-    per: "" | "day" | "week";
+    per: "day" | "week";
     /** @description A repository ID. Only return repositories with an ID greater than this ID. */
     "since-repo": number;
     /** @description Determines whether the first search result returned is the highest number of matches (`desc`) or lowest number of matches (`asc`). This parameter is ignored unless you provide `sort`. */
@@ -86643,6 +78450,10 @@ export interface components {
     "export-id": string;
     /** @description The unique identifier of the GPG key. */
     "gpg-key-id": number;
+    /** @description Only show repositories updated after the given time. This is a timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`. */
+    "since-repo-date": string;
+    /** @description Only show repositories updated before the given time. This is a timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`. */
+    "before-repo-date": string;
     /** @description The unique identifier of the SSH signing key. */
     "ssh-signing-key-id": number;
   };
@@ -86776,6 +78587,11 @@ export interface operations {
    * You must use a [JWT](https://docs.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app) to access this endpoint.
    */
   "apps/list-webhook-deliveries": {
+    parameters: {
+      query: {
+        redelivery?: boolean;
+      };
+    };
     responses: {
       /** @description Response */
       200: {
@@ -86816,6 +78632,22 @@ export interface operations {
       202: components["responses"]["accepted"];
       400: components["responses"]["bad_request"];
       422: components["responses"]["validation_failed"];
+    };
+  };
+  /**
+   * List installation requests for the authenticated app 
+   * @description Lists all the pending installation requests for the authenticated GitHub App.
+   */
+  "apps/list-installation-requests-for-authenticated-app": {
+    responses: {
+      /** @description List of integration installation requests */
+      200: {
+        content: {
+          "application/json": (components["schemas"]["integration-installation-request"])[];
+        };
+      };
+      304: components["responses"]["not_modified"];
+      401: components["responses"]["requires_authentication"];
     };
   };
   /**
@@ -86936,8 +78768,8 @@ export interface operations {
   };
   /**
    * Delete an app authorization 
-   * @description OAuth application owners can revoke a grant for their OAuth application and a specific user. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the OAuth application's `client_id` and `client_secret` as the username and password. You must also provide a valid OAuth `access_token` as an input parameter and the grant for the token's owner will be deleted.
-   * Deleting an OAuth application's grant will also delete all OAuth tokens associated with the application for the user. Once deleted, the application will have no access to the user's account and will no longer be listed on [the application authorizations settings screen within GitHub](https://github.com/settings/applications#authorized).
+   * @description OAuth and GitHub application owners can revoke a grant for their application and a specific user. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the OAuth application's `client_id` and `client_secret` as the username and password. You must also provide a valid OAuth `access_token` as an input parameter and the grant for the token's owner will be deleted.
+   * Deleting an application's grant will also delete all OAuth tokens associated with the application for the user. Once deleted, the application will have no access to the user's account and will no longer be listed on [the application authorizations settings screen within GitHub](https://github.com/settings/applications#authorized).
    */
   "apps/delete-authorization": {
     requestBody: {
@@ -86956,13 +78788,13 @@ export interface operations {
   };
   /**
    * Check a token 
-   * @description OAuth applications can use a special API method for checking OAuth token validity without exceeding the normal rate limits for failed login attempts. Authentication works differently with this particular endpoint. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) to use this endpoint, where the username is the OAuth application `client_id` and the password is its `client_secret`. Invalid tokens will return `404 NOT FOUND`.
+   * @description OAuth applications and GitHub applications with OAuth authorizations can use this API method for checking OAuth token validity without exceeding the normal rate limits for failed login attempts. Authentication works differently with this particular endpoint. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) to use this endpoint, where the username is the application `client_id` and the password is its `client_secret`. Invalid tokens will return `404 NOT FOUND`.
    */
   "apps/check-token": {
     requestBody: {
       content: {
         "application/json": {
-          /** @description The access_token of the OAuth application. */
+          /** @description The access_token of the OAuth or GitHub application. */
           access_token: string;
         };
       };
@@ -86980,7 +78812,7 @@ export interface operations {
   };
   /**
    * Delete an app token 
-   * @description OAuth application owners can revoke a single token for an OAuth application. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the OAuth application's `client_id` and `client_secret` as the username and password.
+   * @description OAuth  or GitHub application owners can revoke a single token for an OAuth application or a GitHub application with an OAuth authorization. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the application's `client_id` and `client_secret` as the username and password.
    */
   "apps/delete-token": {
     requestBody: {
@@ -86999,13 +78831,13 @@ export interface operations {
   };
   /**
    * Reset a token 
-   * @description OAuth applications can use this API method to reset a valid OAuth token without end-user involvement. Applications must save the "token" property in the response because changes take effect immediately. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the OAuth application's `client_id` and `client_secret` as the username and password. Invalid tokens will return `404 NOT FOUND`.
+   * @description OAuth applications and GitHub applications with OAuth authorizations can use this API method to reset a valid OAuth token without end-user involvement. Applications must save the "token" property in the response because changes take effect immediately. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the application's `client_id` and `client_secret` as the username and password. Invalid tokens will return `404 NOT FOUND`.
    */
   "apps/reset-token": {
     requestBody: {
       content: {
         "application/json": {
-          /** @description The access_token of the OAuth application. */
+          /** @description The access_token of the OAuth or GitHub application. */
           access_token: string;
         };
       };
@@ -87022,14 +78854,14 @@ export interface operations {
   };
   /**
    * Create a scoped access token 
-   * @description Use a non-scoped user-to-server OAuth access token to create a repository scoped and/or permission scoped user-to-server OAuth access token. You can specify which repositories the token can access and which permissions are granted to the token. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the OAuth application's `client_id` and `client_secret` as the username and password. Invalid tokens will return `404 NOT FOUND`.
+   * @description Use a non-scoped user-to-server access token to create a repository scoped and/or permission scoped user-to-server access token. You can specify which repositories the token can access and which permissions are granted to the token. You must use [Basic Authentication](https://docs.github.com/rest/overview/other-authentication-methods#basic-authentication) when accessing this endpoint, using the `client_id` and `client_secret` of the GitHub App as the username and password. Invalid tokens will return `404 NOT FOUND`.
    */
   "apps/scope-token": {
     requestBody: {
       content: {
         "application/json": {
           /**
-           * @description The OAuth access token used to authenticate to the GitHub API. 
+           * @description The access token used to authenticate to the GitHub API. 
            * @example e72e16c7e42f292c6912e7710c838347ae178b4a
            */
           access_token: string;
@@ -87135,721 +78967,6 @@ export interface operations {
     };
   };
   /**
-   * Get GitHub Enterprise Server statistics 
-   * @description Returns aggregate usage metrics for your GitHub Enterprise Server 3.5+ instance for a specified time period up to 365 days.
-   * 
-   * To use this endpoint, your GitHub Enterprise Server instance must be connected to GitHub Enterprise Cloud using GitHub Connect. You must enable Server Statistics, and for the API request provide your enterprise account name or organization name connected to the GitHub Enterprise Server. For more information, see "[Enabling Server Statistics for your enterprise](/admin/configuration/configuring-github-connect/enabling-server-statistics-for-your-enterprise)" in the GitHub Enterprise Server documentation.
-   * 
-   * You'll need to use a personal access token:
-   *   - If you connected your GitHub Enterprise Server to an enterprise account and enabled Server Statistics, you'll need a personal access token with the `read:enterprise` permission.
-   *   - If you connected your GitHub Enterprise Server to an organization account and enabled Server Statistics, you'll need a personal access token with the `read:org` permission.
-   * 
-   * For more information on creating a personal access token, see "[Creating a personal access token](/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)."
-   */
-  "enterprise-admin/get-server-statistics": {
-    parameters: {
-      query: {
-        /** @description A cursor, as given in the [Link header](https://docs.github.com/rest/overview/resources-in-the-rest-api#link-header). If specified, the query only searches for events after this cursor. */
-        date_start?: string;
-        /** @description A cursor, as given in the [Link header](https://docs.github.com/rest/overview/resources-in-the-rest-api#link-header). If specified, the query only searches for events before this cursor. */
-        date_end?: string;
-      };
-    };
-    responses: {
-      /** @description Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["server-statistics"];
-        };
-      };
-    };
-  };
-  /**
-   * Get GitHub Actions cache usage for an enterprise 
-   * @description Gets the total GitHub Actions cache usage for an enterprise.
-   * The data fetched using this API is refreshed approximately every 5 minutes, so values returned from this endpoint may take at least 5 minutes to get updated.
-   * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-   */
-  "actions/get-actions-cache-usage-for-enterprise": {
-    responses: {
-      /** @description Response */
-      200: {
-        headers: {
-          Link: components["headers"]["link"];
-        };
-        content: {
-          "application/json": components["schemas"]["actions-cache-usage-org-enterprise"];
-        };
-      };
-    };
-  };
-  /**
-   * Get GitHub Actions permissions for an enterprise 
-   * @description Gets the GitHub Actions permissions policy for organizations and allowed actions and reusable workflows in an enterprise.
-   * 
-   * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/get-github-actions-permissions-enterprise": {
-    responses: {
-      /** @description Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["actions-enterprise-permissions"];
-        };
-      };
-    };
-  };
-  /**
-   * Set GitHub Actions permissions for an enterprise 
-   * @description Sets the GitHub Actions permissions policy for organizations and allowed actions and reusable workflows in an enterprise.
-   * 
-   * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/set-github-actions-permissions-enterprise": {
-    requestBody: {
-      content: {
-        "application/json": {
-          enabled_organizations: components["schemas"]["enabled-organizations"];
-          allowed_actions?: components["schemas"]["allowed-actions"];
-        };
-      };
-    };
-    responses: {
-      /** @description Response */
-      204: never;
-    };
-  };
-  /**
-   * List selected organizations enabled for GitHub Actions in an enterprise 
-   * @description Lists the organizations that are selected to have GitHub Actions enabled in an enterprise. To use this endpoint, the enterprise permission policy for `enabled_organizations` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for an enterprise](#set-github-actions-permissions-for-an-enterprise)."
-   * 
-   * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/list-selected-organizations-enabled-github-actions-enterprise": {
-    responses: {
-      /** @description Response */
-      200: {
-        content: {
-          "application/json": {
-            total_count: number;
-            organizations: (components["schemas"]["organization-simple"])[];
-          };
-        };
-      };
-    };
-  };
-  /**
-   * Set selected organizations enabled for GitHub Actions in an enterprise 
-   * @description Replaces the list of selected organizations that are enabled for GitHub Actions in an enterprise. To use this endpoint, the enterprise permission policy for `enabled_organizations` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for an enterprise](#set-github-actions-permissions-for-an-enterprise)."
-   * 
-   * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/set-selected-organizations-enabled-github-actions-enterprise": {
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description List of organization IDs to enable for GitHub Actions. */
-          selected_organization_ids: (number)[];
-        };
-      };
-    };
-    responses: {
-      /** @description Response */
-      204: never;
-    };
-  };
-  /**
-   * Enable a selected organization for GitHub Actions in an enterprise 
-   * @description Adds an organization to the list of selected organizations that are enabled for GitHub Actions in an enterprise. To use this endpoint, the enterprise permission policy for `enabled_organizations` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for an enterprise](#set-github-actions-permissions-for-an-enterprise)."
-   * 
-   * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/enable-selected-organization-github-actions-enterprise": {
-    responses: {
-      /** @description Response */
-      204: never;
-    };
-  };
-  /**
-   * Disable a selected organization for GitHub Actions in an enterprise 
-   * @description Removes an organization from the list of selected organizations that are enabled for GitHub Actions in an enterprise. To use this endpoint, the enterprise permission policy for `enabled_organizations` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for an enterprise](#set-github-actions-permissions-for-an-enterprise)."
-   * 
-   * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/disable-selected-organization-github-actions-enterprise": {
-    responses: {
-      /** @description Response */
-      204: never;
-    };
-  };
-  /**
-   * Get allowed actions and reusable workflows for an enterprise 
-   * @description Gets the selected actions and reusable workflows that are allowed in an enterprise. To use this endpoint, the enterprise permission policy for `allowed_actions` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for an enterprise](#set-github-actions-permissions-for-an-enterprise)."
-   * 
-   * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/get-allowed-actions-enterprise": {
-    responses: {
-      /** @description Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["selected-actions"];
-        };
-      };
-    };
-  };
-  /**
-   * Set allowed actions and reusable workflows for an enterprise 
-   * @description Sets the actions and reusable workflows that are allowed in an enterprise. To use this endpoint, the enterprise permission policy for `allowed_actions` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for an enterprise](#set-github-actions-permissions-for-an-enterprise)."
-   * 
-   * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/set-allowed-actions-enterprise": {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["selected-actions"];
-      };
-    };
-    responses: {
-      /** @description Response */
-      204: never;
-    };
-  };
-  /**
-   * Get default workflow permissions for an enterprise 
-   * @description Gets the default workflow permissions granted to the `GITHUB_TOKEN` when running workflows in an enterprise,
-   * as well as whether GitHub Actions can submit approving pull request reviews. For more information, see
-   * "[Enforcing a policy for workflow permissions in your enterprise](https://docs.github.com/enterprise-cloud@latest/admin/policies/enforcing-policies-for-your-enterprise/enforcing-policies-for-github-actions-in-your-enterprise#enforcing-a-policy-for-workflow-permissions-in-your-enterprise)."
-   * 
-   * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-   * GitHub Apps must have the `enterprise_administration:write` permission to use this endpoint.
-   */
-  "actions/get-github-actions-default-workflow-permissions-enterprise": {
-    responses: {
-      /** @description Success response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["actions-get-default-workflow-permissions"];
-        };
-      };
-    };
-  };
-  /**
-   * Set default workflow permissions for an enterprise 
-   * @description Sets the default workflow permissions granted to the `GITHUB_TOKEN` when running workflows in an enterprise, and sets
-   * whether GitHub Actions can submit approving pull request reviews. For more information, see
-   * "[Enforcing a policy for workflow permissions in your enterprise](https://docs.github.com/enterprise-cloud@latest/admin/policies/enforcing-policies-for-your-enterprise/enforcing-policies-for-github-actions-in-your-enterprise#enforcing-a-policy-for-workflow-permissions-in-your-enterprise)."
-   * 
-   * You must authenticate using an access token with the `admin:enterprise` scope to use this endpoint.
-   * GitHub Apps must have the `enterprise_administration:write` permission to use this endpoint.
-   */
-  "actions/set-github-actions-default-workflow-permissions-enterprise": {
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["actions-set-default-workflow-permissions"];
-      };
-    };
-    responses: {
-      /** @description Success response */
-      204: never;
-    };
-  };
-  /**
-   * List self-hosted runner groups for an enterprise 
-   * @description Lists all self-hosted runner groups for an enterprise.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/list-self-hosted-runner-groups-for-enterprise": {
-    responses: {
-      /** @description Response */
-      200: {
-        content: {
-          "application/json": {
-            total_count: number;
-            runner_groups: (components["schemas"]["runner-groups-enterprise"])[];
-          };
-        };
-      };
-    };
-  };
-  /**
-   * Create a self-hosted runner group for an enterprise 
-   * @description Creates a new self-hosted runner group for an enterprise.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/create-self-hosted-runner-group-for-enterprise": {
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description Name of the runner group. */
-          name: string;
-          /**
-           * @description Visibility of a runner group. You can select all organizations or select individual organization. 
-           * @enum {string}
-           */
-          visibility?: "selected" | "all";
-          /** @description List of organization IDs that can access the runner group. */
-          selected_organization_ids?: (number)[];
-          /** @description List of runner IDs to add to the runner group. */
-          runners?: (number)[];
-          /**
-           * @description Whether the runner group can be used by `public` repositories. 
-           * @default false
-           */
-          allows_public_repositories?: boolean;
-          /**
-           * @description If `true`, the runner group will be restricted to running only the workflows specified in the `selected_workflows` array. 
-           * @default false
-           */
-          restricted_to_workflows?: boolean;
-          /** @description List of workflows the runner group should be allowed to run. This setting will be ignored unless `restricted_to_workflows` is set to `true`. */
-          selected_workflows?: (string)[];
-        };
-      };
-    };
-    responses: {
-      /** @description Response */
-      201: {
-        content: {
-          "application/json": components["schemas"]["runner-groups-enterprise"];
-        };
-      };
-    };
-  };
-  /**
-   * Get a self-hosted runner group for an enterprise 
-   * @description Gets a specific self-hosted runner group for an enterprise.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/get-self-hosted-runner-group-for-enterprise": {
-    responses: {
-      /** @description Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["runner-groups-enterprise"];
-        };
-      };
-    };
-  };
-  /**
-   * Delete a self-hosted runner group from an enterprise 
-   * @description Deletes a self-hosted runner group for an enterprise.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/delete-self-hosted-runner-group-from-enterprise": {
-    responses: {
-      /** @description Response */
-      204: never;
-    };
-  };
-  /**
-   * Update a self-hosted runner group for an enterprise 
-   * @description Updates the `name` and `visibility` of a self-hosted runner group in an enterprise.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/update-self-hosted-runner-group-for-enterprise": {
-    requestBody?: {
-      content: {
-        "application/json": {
-          /** @description Name of the runner group. */
-          name?: string;
-          /**
-           * @description Visibility of a runner group. You can select all organizations or select individual organizations. 
-           * @default all 
-           * @enum {string}
-           */
-          visibility?: "selected" | "all";
-          /**
-           * @description Whether the runner group can be used by `public` repositories. 
-           * @default false
-           */
-          allows_public_repositories?: boolean;
-          /**
-           * @description If `true`, the runner group will be restricted to running only the workflows specified in the `selected_workflows` array. 
-           * @default false
-           */
-          restricted_to_workflows?: boolean;
-          /** @description List of workflows the runner group should be allowed to run. This setting will be ignored unless `restricted_to_workflows` is set to `true`. */
-          selected_workflows?: (string)[];
-        };
-      };
-    };
-    responses: {
-      /** @description Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["runner-groups-enterprise"];
-        };
-      };
-    };
-  };
-  /**
-   * List organization access to a self-hosted runner group in an enterprise 
-   * @description Lists the organizations with access to a self-hosted runner group.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/list-org-access-to-self-hosted-runner-group-in-enterprise": {
-    responses: {
-      /** @description Response */
-      200: {
-        content: {
-          "application/json": {
-            total_count: number;
-            organizations: (components["schemas"]["organization-simple"])[];
-          };
-        };
-      };
-    };
-  };
-  /**
-   * Set organization access for a self-hosted runner group in an enterprise 
-   * @description Replaces the list of organizations that have access to a self-hosted runner configured in an enterprise.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/set-org-access-to-self-hosted-runner-group-in-enterprise": {
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description List of organization IDs that can access the runner group. */
-          selected_organization_ids: (number)[];
-        };
-      };
-    };
-    responses: {
-      /** @description Response */
-      204: never;
-    };
-  };
-  /**
-   * Add organization access to a self-hosted runner group in an enterprise 
-   * @description Adds an organization to the list of selected organizations that can access a self-hosted runner group. The runner group must have `visibility` set to `selected`. For more information, see "[Create a self-hosted runner group for an enterprise](#create-a-self-hosted-runner-group-for-an-enterprise)."
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/add-org-access-to-self-hosted-runner-group-in-enterprise": {
-    responses: {
-      /** @description Response */
-      204: never;
-    };
-  };
-  /**
-   * Remove organization access to a self-hosted runner group in an enterprise 
-   * @description Removes an organization from the list of selected organizations that can access a self-hosted runner group. The runner group must have `visibility` set to `selected`. For more information, see "[Create a self-hosted runner group for an enterprise](#create-a-self-hosted-runner-group-for-an-enterprise)."
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/remove-org-access-to-self-hosted-runner-group-in-enterprise": {
-    responses: {
-      /** @description Response */
-      204: never;
-    };
-  };
-  /**
-   * List self-hosted runners in a group for an enterprise 
-   * @description Lists the self-hosted runners that are in a specific enterprise group.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/list-self-hosted-runners-in-group-for-enterprise": {
-    responses: {
-      /** @description Response */
-      200: {
-        headers: {
-          Link: components["headers"]["link"];
-        };
-        content: {
-          "application/json": {
-            total_count: number;
-            runners: (components["schemas"]["runner"])[];
-          };
-        };
-      };
-    };
-  };
-  /**
-   * Set self-hosted runners in a group for an enterprise 
-   * @description Replaces the list of self-hosted runners that are part of an enterprise runner group.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/set-self-hosted-runners-in-group-for-enterprise": {
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description List of runner IDs to add to the runner group. */
-          runners: (number)[];
-        };
-      };
-    };
-    responses: {
-      /** @description Response */
-      204: never;
-    };
-  };
-  /**
-   * Add a self-hosted runner to a group for an enterprise 
-   * @description Adds a self-hosted runner to a runner group configured in an enterprise.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise`
-   * scope to use this endpoint.
-   */
-  "enterprise-admin/add-self-hosted-runner-to-group-for-enterprise": {
-    responses: {
-      /** @description Response */
-      204: never;
-    };
-  };
-  /**
-   * Remove a self-hosted runner from a group for an enterprise 
-   * @description Removes a self-hosted runner from a group configured in an enterprise. The runner is then returned to the default group.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/remove-self-hosted-runner-from-group-for-enterprise": {
-    responses: {
-      /** @description Response */
-      204: never;
-    };
-  };
-  /**
-   * List self-hosted runners for an enterprise 
-   * @description Lists all self-hosted runners configured for an enterprise.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/list-self-hosted-runners-for-enterprise": {
-    responses: {
-      /** @description Response */
-      200: {
-        headers: {
-          Link: components["headers"]["link"];
-        };
-        content: {
-          "application/json": {
-            total_count?: number;
-            runners?: (components["schemas"]["runner"])[];
-          };
-        };
-      };
-    };
-  };
-  /**
-   * List runner applications for an enterprise 
-   * @description Lists binaries for the runner application that you can download and run.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/list-runner-applications-for-enterprise": {
-    responses: {
-      /** @description Response */
-      200: {
-        content: {
-          "application/json": (components["schemas"]["runner-application"])[];
-        };
-      };
-    };
-  };
-  /**
-   * Create a registration token for an enterprise 
-   * @description Returns a token that you can pass to the `config` script. The token expires after one hour.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   * 
-   * #### Example using registration token
-   * 
-   * Configure your self-hosted runner, replacing `TOKEN` with the registration token provided by this endpoint.
-   * 
-   * ```
-   * ./config.sh --url https://github.com/enterprises/octo-enterprise --token TOKEN
-   * ```
-   */
-  "enterprise-admin/create-registration-token-for-enterprise": {
-    responses: {
-      /** @description Response */
-      201: {
-        content: {
-          "application/json": components["schemas"]["authentication-token"];
-        };
-      };
-    };
-  };
-  /**
-   * Create a remove token for an enterprise 
-   * @description Returns a token that you can pass to the `config` script to remove a self-hosted runner from an enterprise. The token expires after one hour.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   * 
-   * #### Example using remove token
-   * 
-   * To remove your self-hosted runner from an enterprise, replace `TOKEN` with the remove token provided by this
-   * endpoint.
-   * 
-   * ```
-   * ./config.sh remove --token TOKEN
-   * ```
-   */
-  "enterprise-admin/create-remove-token-for-enterprise": {
-    responses: {
-      /** @description Response */
-      201: {
-        content: {
-          "application/json": components["schemas"]["authentication-token"];
-        };
-      };
-    };
-  };
-  /**
-   * Get a self-hosted runner for an enterprise 
-   * @description Gets a specific self-hosted runner configured in an enterprise.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/get-self-hosted-runner-for-enterprise": {
-    responses: {
-      /** @description Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["runner"];
-        };
-      };
-    };
-  };
-  /**
-   * Delete a self-hosted runner from an enterprise 
-   * @description Forces the removal of a self-hosted runner from an enterprise. You can use this endpoint to completely remove the runner when the machine you were using no longer exists.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/delete-self-hosted-runner-from-enterprise": {
-    responses: {
-      /** @description Response */
-      204: never;
-    };
-  };
-  /**
-   * List labels for a self-hosted runner for an enterprise 
-   * @description Lists all labels for a self-hosted runner configured in an enterprise.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/list-labels-for-self-hosted-runner-for-enterprise": {
-    responses: {
-      200: components["responses"]["actions_runner_labels"];
-      404: components["responses"]["not_found"];
-    };
-  };
-  /**
-   * Set custom labels for a self-hosted runner for an enterprise 
-   * @description Remove all previous custom labels and set the new custom labels for a specific
-   * self-hosted runner configured in an enterprise.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/set-custom-labels-for-self-hosted-runner-for-enterprise": {
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description The names of the custom labels to set for the runner. You can pass an empty array to remove all custom labels. */
-          labels: (string)[];
-        };
-      };
-    };
-    responses: {
-      200: components["responses"]["actions_runner_labels"];
-      404: components["responses"]["not_found"];
-      422: components["responses"]["validation_failed_simple"];
-    };
-  };
-  /**
-   * Add custom labels to a self-hosted runner for an enterprise 
-   * @description Add custom labels to a self-hosted runner configured in an enterprise.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/add-custom-labels-to-self-hosted-runner-for-enterprise": {
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description The names of the custom labels to add to the runner. */
-          labels: (string)[];
-        };
-      };
-    };
-    responses: {
-      200: components["responses"]["actions_runner_labels"];
-      404: components["responses"]["not_found"];
-      422: components["responses"]["validation_failed_simple"];
-    };
-  };
-  /**
-   * Remove all custom labels from a self-hosted runner for an enterprise 
-   * @description Remove all custom labels from a self-hosted runner configured in an
-   * enterprise. Returns the remaining read-only labels from the runner.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/remove-all-custom-labels-from-self-hosted-runner-for-enterprise": {
-    responses: {
-      200: components["responses"]["actions_runner_labels_readonly"];
-      404: components["responses"]["not_found"];
-      422: components["responses"]["validation_failed_simple"];
-    };
-  };
-  /**
-   * Remove a custom label from a self-hosted runner for an enterprise 
-   * @description Remove a custom label from a self-hosted runner configured
-   * in an enterprise. Returns the remaining labels from the runner.
-   * 
-   * This endpoint returns a `404 Not Found` status if the custom label is not
-   * present on the runner.
-   * 
-   * You must authenticate using an access token with the `manage_runners:enterprise` scope to use this endpoint.
-   */
-  "enterprise-admin/remove-custom-label-from-self-hosted-runner-for-enterprise": {
-    responses: {
-      200: components["responses"]["actions_runner_labels"];
-      404: components["responses"]["not_found"];
-      422: components["responses"]["validation_failed_simple"];
-    };
-  };
-  /**
-   * List code scanning alerts for an enterprise 
-   * @description Lists code scanning alerts for the default branch for all eligible repositories in an enterprise. Eligible repositories are repositories that are owned by organizations that you own or for which you are a security manager. For more information, see "[Managing security managers in your organization](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization)."
-   * 
-   * To use this endpoint, you must be a member of the enterprise,
-   * and you must use an access token with the `repo` scope or `security_events` scope.
-   */
-  "code-scanning/list-alerts-for-enterprise": {
-    parameters: {
-      query: {
-        /** @description If specified, only code scanning alerts with this state will be returned. */
-        state?: components["schemas"]["code-scanning-alert-state"];
-        /** @description The property by which to sort the results. */
-        sort?: "created" | "updated";
-      };
-    };
-    responses: {
-      /** @description Response */
-      200: {
-        headers: {
-          Link: components["headers"]["link"];
-        };
-        content: {
-          "application/json": (components["schemas"]["code-scanning-organization-alert-items"])[];
-        };
-      };
-      404: components["responses"]["not_found"];
-      503: components["responses"]["service_unavailable"];
-    };
-  };
-  /**
    * List Dependabot alerts for an enterprise 
    * @description Lists Dependabot alerts for repositories that are owned by the specified enterprise.
    * To use this endpoint, you must be a member of the enterprise, and you must use an
@@ -87888,25 +79005,6 @@ export interface operations {
       };
       404: components["responses"]["not_found"];
       503: components["responses"]["service_unavailable"];
-    };
-  };
-  /**
-   * Get GitHub Advanced Security active committers for an enterprise 
-   * @description Gets the GitHub Advanced Security active committers for an enterprise per repository.
-   * 
-   * Each distinct user login across all repositories is counted as a single Advanced Security seat, so the `total_advanced_security_committers` is not the sum of active_users for each repository.
-   * 
-   * The total number of repositories with committer information is tracked by the `total_count` field.
-   */
-  "billing/get-github-advanced-security-billing-ghe": {
-    responses: {
-      /** @description Success */
-      200: {
-        content: {
-          "application/json": components["schemas"]["advanced-security-active-committers"];
-        };
-      };
-      403: components["responses"]["code_scanning_forbidden_read"];
     };
   };
   /**
@@ -88116,9 +79214,9 @@ export interface operations {
               content?: string;
               /** @description The new filename for the file. */
               filename?: string | null;
-            }) & (Record<string, never> | Record<string, never> | Record<string, never>)) | null) | undefined;
+            }) & (unknown | unknown | Record<string, never>)) | null) | undefined;
           };
-        }) & (Record<string, never> | Record<string, never>)) | null;
+        }) & (unknown | unknown)) | null;
       };
     };
     responses: {
@@ -88691,6 +79789,8 @@ export interface operations {
    * Get GitHub meta information 
    * @description Returns meta information about GitHub, including a list of GitHub's IP addresses. For more information, see "[About GitHub's IP addresses](https://docs.github.com/articles/about-github-s-ip-addresses/)."
    * 
+   * **Note:** This endpoint returns both IPv4 and IPv6 addresses. However, not all features support IPv6. You should refer to the specific documentation for each feature to determine if IPv6 is supported.
+   * 
    * **Note:** The IP addresses shown in the documentation's response are only example values. You must always query the API directly to get the latest list of IP addresses.
    */
   "meta/get": {
@@ -88915,39 +80015,6 @@ export interface operations {
     };
   };
   /**
-   * List custom repository roles in an organization 
-   * @description List the custom repository roles available in this organization. In order to see custom
-   * repository roles in an organization, the authenticated user must be an organization owner.
-   * 
-   * To use this endpoint the authenticated user must be an administrator for the organization or of an repository of the organizaiton and must use an access token with `admin:org repo` scope.
-   * GitHub Apps must have the `organization_custom_roles:read` organization permission to use this endpoint.
-   * 
-   * For more information on custom repository roles, see "[About custom repository roles](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/about-custom-repository-roles)."
-   */
-  "orgs/list-custom-roles": {
-    parameters: {
-      path: {
-        /** @description The unique identifier of the organization. */
-        organization_id: string;
-      };
-    };
-    responses: {
-      /** @description Response - list of custom role names */
-      200: {
-        content: {
-          "application/json": {
-            /**
-             * @description The number of custom roles in this organization 
-             * @example 3
-             */
-            total_count?: number;
-            custom_roles?: (components["schemas"]["organization-custom-repository-role"])[];
-          };
-        };
-      };
-    };
-  };
-  /**
    * Get an organization 
    * @description To see many of the organization response values, you need to be an authenticated organization owner with the `admin:org` scope. When the value of `two_factor_requirement_enabled` is `true`, the organization requires all members, billing managers, and outside collaborators to enable [two-factor authentication](https://docs.github.com/articles/securing-your-account-with-two-factor-authentication-2fa/).
    * 
@@ -89155,6 +80222,45 @@ export interface operations {
     };
   };
   /**
+   * Get the customization template for an OIDC subject claim for an organization 
+   * @description Gets the customization template for an OpenID Connect (OIDC) subject claim.
+   * You must authenticate using an access token with the `read:org` scope to use this endpoint.
+   * GitHub Apps must have the `organization_administration:write` permission to use this endpoint.
+   */
+  "oidc/get-oidc-custom-sub-template-for-org": {
+    responses: {
+      /** @description A JSON serialized template for OIDC subject claim customization */
+      200: {
+        content: {
+          "application/json": components["schemas"]["oidc-custom-sub"];
+        };
+      };
+    };
+  };
+  /**
+   * Set the customization template for an OIDC subject claim for an organization 
+   * @description Creates or updates the customization template for an OpenID Connect (OIDC) subject claim.
+   * You must authenticate using an access token with the `write:org` scope to use this endpoint.
+   * GitHub Apps must have the `admin:org` permission to use this endpoint.
+   */
+  "oidc/update-oidc-custom-sub-template-for-org": {
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["oidc-custom-sub"];
+      };
+    };
+    responses: {
+      /** @description Empty response */
+      201: {
+        content: {
+          "application/json": components["schemas"]["empty-object"];
+        };
+      };
+      403: components["responses"]["forbidden"];
+      404: components["responses"]["not_found"];
+    };
+  };
+  /**
    * Get GitHub Actions permissions for an organization 
    * @description Gets the GitHub Actions permissions policy for repositories and allowed actions and reusable workflows in an organization.
    * 
@@ -89173,8 +80279,6 @@ export interface operations {
   /**
    * Set GitHub Actions permissions for an organization 
    * @description Sets the GitHub Actions permissions policy for repositories and allowed actions and reusable workflows in an organization.
-   * 
-   * If the organization belongs to an enterprise that has set restrictive permissions at the enterprise level, such as `allowed_actions` to `selected` actions and reusable workflows, then you cannot override them for the organization.
    * 
    * You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `administration` organization permission to use this API.
    */
@@ -89275,10 +80379,6 @@ export interface operations {
    * Set allowed actions and reusable workflows for an organization 
    * @description Sets the actions and reusable workflows that are allowed in an organization. To use this endpoint, the organization permission policy for `allowed_actions` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for an organization](#set-github-actions-permissions-for-an-organization)."
    * 
-   * If the organization belongs to an enterprise that has `selected` actions and reusable workflows set at the enterprise level, then you cannot override any of the enterprise's allowed actions and reusable workflows settings.
-   * 
-   * To use the `patterns_allowed` setting for private repositories, the organization must belong to an enterprise. If the organization does not belong to an enterprise, then the `patterns_allowed` setting only applies to public repositories in the organization.
-   * 
    * You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `administration` organization permission to use this API.
    */
   "actions/set-allowed-actions-organization": {
@@ -89327,67 +80427,53 @@ export interface operations {
     responses: {
       /** @description Success response */
       204: never;
-      /** @description Conflict response when changing a setting is prevented by the owning enterprise */
-      409: never;
     };
   };
   /**
-   * List self-hosted runner groups for an organization 
-   * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
+   * List required workflows 
+   * @description List all required workflows in an organization.
    * 
-   * Lists all self-hosted runner groups configured in an organization and inherited from an enterprise.
+   * You must authenticate using an access token with the `read:org` scope to use this endpoint.
    * 
-   * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+   * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
    */
-  "actions/list-self-hosted-runner-groups-for-org": {
+  "actions/list-required-workflows": {
     responses: {
       /** @description Response */
       200: {
         content: {
           "application/json": {
             total_count: number;
-            runner_groups: (components["schemas"]["runner-groups-org"])[];
+            required_workflows: (components["schemas"]["required-workflow"])[];
           };
         };
       };
     };
   };
   /**
-   * Create a self-hosted runner group for an organization 
-   * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud and GitHub Enterprise Server. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
-   * 
-   * Creates a new self-hosted runner group for an organization.
+   * Create a required workflow 
+   * @description Create a required workflow in an organization.
    * 
    * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+   * 
+   * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
    */
-  "actions/create-self-hosted-runner-group-for-org": {
+  "actions/create-required-workflow": {
     requestBody: {
       content: {
         "application/json": {
-          /** @description Name of the runner group. */
-          name: string;
+          /** @description Path of the workflow file to be configured as a required workflow. */
+          workflow_file_path: string;
+          /** @description The ID of the repository that contains the workflow file. */
+          repository_id: string;
           /**
-           * @description Visibility of a runner group. You can select all repositories, select individual repositories, or limit access to private repositories. 
+           * @description Enable the required workflow for all repositories or selected repositories in the organization. 
            * @default all 
            * @enum {string}
            */
-          visibility?: "selected" | "all" | "private";
-          /** @description List of repository IDs that can access the runner group. */
+          scope?: "selected" | "all";
+          /** @description A list of repository IDs where you want to enable the required workflow. You can only provide a list of repository ids when the `scope` is set to `selected`. */
           selected_repository_ids?: (number)[];
-          /** @description List of runner IDs to add to the runner group. */
-          runners?: (number)[];
-          /**
-           * @description Whether the runner group can be used by `public` repositories. 
-           * @default false
-           */
-          allows_public_repositories?: boolean;
-          /**
-           * @description If `true`, the runner group will be restricted to running only the workflows specified in the `selected_workflows` array. 
-           * @default false
-           */
-          restricted_to_workflows?: boolean;
-          /** @description List of workflows the runner group should be allowed to run. This setting will be ignored unless `restricted_to_workflows` is set to `true`. */
-          selected_workflows?: (string)[];
         };
       };
     };
@@ -89395,74 +80481,68 @@ export interface operations {
       /** @description Response */
       201: {
         content: {
-          "application/json": components["schemas"]["runner-groups-org"];
+          "application/json": components["schemas"]["required-workflow"];
         };
       };
+      422: components["responses"]["validation_failed_simple"];
     };
   };
   /**
-   * Get a self-hosted runner group for an organization 
-   * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
+   * Get a required workflow 
+   * @description Get a required workflow configured in an organization.
    * 
-   * Gets a specific self-hosted runner group for an organization.
+   * You must authenticate using an access token with the `read:org` scope to use this endpoint.
    * 
-   * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+   * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
    */
-  "actions/get-self-hosted-runner-group-for-org": {
+  "actions/get-required-workflow": {
     responses: {
       /** @description Response */
       200: {
         content: {
-          "application/json": components["schemas"]["runner-groups-org"];
+          "application/json": components["schemas"]["required-workflow"];
         };
       };
     };
   };
   /**
-   * Delete a self-hosted runner group from an organization 
-   * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
-   * 
-   * Deletes a self-hosted runner group for an organization.
+   * Delete a required workflow 
+   * @description Deletes a required workflow configured in an organization.
    * 
    * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+   * 
+   * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
    */
-  "actions/delete-self-hosted-runner-group-from-org": {
+  "actions/delete-required-workflow": {
     responses: {
       /** @description Response */
       204: never;
     };
   };
   /**
-   * Update a self-hosted runner group for an organization 
-   * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
-   * 
-   * Updates the `name` and `visibility` of a self-hosted runner group in an organization.
+   * Update a required workflow 
+   * @description Update a required workflow in an organization.
    * 
    * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+   * 
+   * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
    */
-  "actions/update-self-hosted-runner-group-for-org": {
+  "actions/update-required-workflow": {
     requestBody: {
       content: {
         "application/json": {
-          /** @description Name of the runner group. */
-          name: string;
+          /** @description Path of the workflow file to be configured as a required workflow. */
+          workflow_file_path?: string;
+          /** @description The ID of the repository that contains the workflow file. */
+          repository_id?: string;
           /**
-           * @description Visibility of a runner group. You can select all repositories, select individual repositories, or all private repositories. 
+           * @description Enable the required workflow for all repositories or selected repositories in the organization. 
+           * @default all 
            * @enum {string}
            */
-          visibility?: "selected" | "all" | "private";
-          /**
-           * @description Whether the runner group can be used by `public` repositories. 
-           * @default false
-           */
-          allows_public_repositories?: boolean;
-          /**
-           * @description If `true`, the runner group will be restricted to running only the workflows specified in the `selected_workflows` array. 
-           * @default false
-           */
-          restricted_to_workflows?: boolean;
-          /** @description List of workflows the runner group should be allowed to run. This setting will be ignored unless `restricted_to_workflows` is set to `true`. */
-          selected_workflows?: (string)[];
+          scope?: "selected" | "all";
+          /** @description A list of repository IDs where you want to enable the required workflow. A list of repository IDs where you want to enable the required workflow. You can only provide a list of repository ids when the `scope` is set to `selected`. */
+          selected_repository_ids?: (number)[];
         };
       };
     };
@@ -89470,45 +80550,48 @@ export interface operations {
       /** @description Response */
       200: {
         content: {
-          "application/json": components["schemas"]["runner-groups-org"];
+          "application/json": components["schemas"]["required-workflow"];
         };
       };
+      422: components["responses"]["validation_failed_simple"];
     };
   };
   /**
-   * List repository access to a self-hosted runner group in an organization 
-   * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud and GitHub Enterprise Server. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
+   * List selected repositories for a required workflow 
+   * @description Lists the selected repositories that are configured for a required workflow in an organization. To use this endpoint, the required workflow must be configured to run on selected repositories.
    * 
-   * Lists the repositories with access to a self-hosted runner group configured in an organization.
+   * You must authenticate using an access token with the `read:org` scope to use this endpoint. GitHub Apps must have the `administration` organization permission to use this endpoint.
    * 
-   * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+   * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
    */
-  "actions/list-repo-access-to-self-hosted-runner-group-in-org": {
+  "actions/list-selected-repositories-required-workflow": {
     responses: {
-      /** @description Response */
+      /** @description Success */
       200: {
         content: {
           "application/json": {
             total_count: number;
-            repositories: (components["schemas"]["minimal-repository"])[];
+            repositories: (components["schemas"]["repository"])[];
           };
         };
       };
+      /** @description Resource Not Found */
+      404: never;
     };
   };
   /**
-   * Set repository access for a self-hosted runner group in an organization 
-   * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
-   * 
-   * Replaces the list of repositories that have access to a self-hosted runner group configured in an organization.
+   * Sets repositories for a required workflow 
+   * @description Sets the repositories for a required workflow that is required for selected repositories.
    * 
    * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+   * 
+   * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
    */
-  "actions/set-repo-access-to-self-hosted-runner-group-in-org": {
+  "actions/set-selected-repos-to-required-workflow": {
     requestBody: {
       content: {
         "application/json": {
-          /** @description List of repository IDs that can access the runner group. */
+          /** @description The IDs of the repositories for which the workflow should be required. */
           selected_repository_ids: (number)[];
         };
       };
@@ -89519,95 +80602,39 @@ export interface operations {
     };
   };
   /**
-   * Remove repository access to a self-hosted runner group in an organization 
-   * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
-   * 
-   * 
-   * Removes a repository from the list of selected repositories that can access a self-hosted runner group. The runner group must have `visibility` set to `selected`. For more information, see "[Create a self-hosted runner group for an organization](#create-a-self-hosted-runner-group-for-an-organization)."
+   * Add a repository to a required workflow 
+   * @description Adds a repository to a required workflow. To use this endpoint, the required workflow must be configured to run on selected repositories.
    * 
    * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+   * 
+   * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
    */
-  "actions/remove-repo-access-to-self-hosted-runner-group-in-org": {
+  "actions/add-selected-repo-to-required-workflow": {
     responses: {
-      /** @description Response */
+      /** @description Success */
       204: never;
+      /** @description Resource Not Found */
+      404: never;
+      /** @description Validation Error */
+      422: never;
     };
   };
   /**
-   * List self-hosted runners in a group for an organization 
-   * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
-   * 
-   * Lists self-hosted runners that are in a specific organization group.
+   * Remove a selected repository from required workflow 
+   * @description Removes a repository from a required workflow. To use this endpoint, the required workflow must be configured to run on selected repositories.
    * 
    * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
-   */
-  "actions/list-self-hosted-runners-in-group-for-org": {
-    responses: {
-      /** @description Response */
-      200: {
-        headers: {
-          Link: components["headers"]["link"];
-        };
-        content: {
-          "application/json": {
-            total_count: number;
-            runners: (components["schemas"]["runner"])[];
-          };
-        };
-      };
-    };
-  };
-  /**
-   * Set self-hosted runners in a group for an organization 
-   * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
    * 
-   * Replaces the list of self-hosted runners that are part of an organization runner group.
-   * 
-   * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+   * For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
    */
-  "actions/set-self-hosted-runners-in-group-for-org": {
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description List of runner IDs to add to the runner group. */
-          runners: (number)[];
-        };
-      };
-    };
+  "actions/remove-selected-repo-from-required-workflow": {
     responses: {
-      /** @description Response */
+      /** @description Success */
       204: never;
-    };
-  };
-  /**
-   * Add a self-hosted runner to a group for an organization 
-   * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
-   * 
-   * 
-   * Adds a self-hosted runner to a runner group configured in an organization.
-   * 
-   * You must authenticate using an access token with the `admin:org`
-   * scope to use this endpoint.
-   */
-  "actions/add-self-hosted-runner-to-group-for-org": {
-    responses: {
-      /** @description Response */
-      204: never;
-    };
-  };
-  /**
-   * Remove a self-hosted runner from a group for an organization 
-   * @description The self-hosted runner groups REST API is available with GitHub Enterprise Cloud. For more information, see "[GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products)."
-   * 
-   * 
-   * Removes a self-hosted runner from a group configured in an organization. The runner is then returned to the default group.
-   * 
-   * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
-   */
-  "actions/remove-self-hosted-runner-from-group-for-org": {
-    responses: {
-      /** @description Response */
-      204: never;
+      /** @description Resource Not Found */
+      404: never;
+      /** @description Validation Error */
+      422: never;
     };
   };
   /**
@@ -90046,6 +81073,187 @@ export interface operations {
     };
   };
   /**
+   * List organization variables 
+   * @description Lists all organization variables. You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `organization_actions_variables:read` organization permission to use this endpoint.
+   */
+  "actions/list-org-variables": {
+    responses: {
+      /** @description Response */
+      200: {
+        headers: {
+          Link: components["headers"]["link"];
+        };
+        content: {
+          "application/json": {
+            total_count: number;
+            variables: (components["schemas"]["organization-actions-variable"])[];
+          };
+        };
+      };
+    };
+  };
+  /**
+   * Create an organization variable 
+   * @description Creates an organization variable that you can reference in a GitHub Actions workflow.
+   * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+   * GitHub Apps must have the `organization_actions_variables:write` organization permission to use this endpoint.
+   */
+  "actions/create-org-variable": {
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the variable. */
+          name: string;
+          /** @description The value of the variable. */
+          value: string;
+          /**
+           * @description The type of repositories in the organization that can access the variable. `selected` means only the repositories specified by `selected_repository_ids` can access the variable. 
+           * @enum {string}
+           */
+          visibility: "all" | "private" | "selected";
+          /** @description An array of repository ids that can access the organization variable. You can only provide a list of repository ids when the `visibility` is set to `selected`. */
+          selected_repository_ids?: (number)[];
+        };
+      };
+    };
+    responses: {
+      /** @description Response when creating a variable */
+      201: {
+        content: {
+          "application/json": components["schemas"]["empty-object"];
+        };
+      };
+    };
+  };
+  /**
+   * Get an organization variable 
+   * @description Gets a specific variable in an organization. You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `organization_actions_variables:read` organization permission to use this endpoint.
+   */
+  "actions/get-org-variable": {
+    responses: {
+      /** @description Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["organization-actions-variable"];
+        };
+      };
+    };
+  };
+  /**
+   * Delete an organization variable 
+   * @description Deletes an organization variable using the variable name.
+   * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+   * GitHub Apps must have the `organization_actions_variables:write` organization permission to use this endpoint.
+   */
+  "actions/delete-org-variable": {
+    responses: {
+      /** @description Response */
+      204: never;
+    };
+  };
+  /**
+   * Update an organization variable 
+   * @description Updates an organization variable that you can reference in a GitHub Actions workflow.
+   * You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+   * GitHub Apps must have the `organization_actions_variables:write` organization permission to use this endpoint.
+   */
+  "actions/update-org-variable": {
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the variable. */
+          name?: string;
+          /** @description The value of the variable. */
+          value?: string;
+          /**
+           * @description The type of repositories in the organization that can access the variable. `selected` means only the repositories specified by `selected_repository_ids` can access the variable. 
+           * @enum {string}
+           */
+          visibility?: "all" | "private" | "selected";
+          /** @description An array of repository ids that can access the organization variable. You can only provide a list of repository ids when the `visibility` is set to `selected`. */
+          selected_repository_ids?: (number)[];
+        };
+      };
+    };
+    responses: {
+      /** @description Response */
+      204: never;
+    };
+  };
+  /**
+   * List selected repositories for an organization variable 
+   * @description Lists all repositories that can access an organization variable that is available to selected repositories. You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `organization_actions_variables:read` organization permission to use this endpoint.
+   */
+  "actions/list-selected-repos-for-org-variable": {
+    responses: {
+      /** @description Response */
+      200: {
+        content: {
+          "application/json": {
+            total_count: number;
+            repositories: (components["schemas"]["minimal-repository"])[];
+          };
+        };
+      };
+      /** @description Response when the visibility of the variable is not set to `selected` */
+      409: never;
+    };
+  };
+  /**
+   * Set selected repositories for an organization variable 
+   * @description Replaces all repositories for an organization variable that is available to selected repositories. Organization variables that are available to selected repositories have their `visibility` field set to `selected`. You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `organization_actions_variables:write` organization permission to use this endpoint.
+   */
+  "actions/set-selected-repos-for-org-variable": {
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The IDs of the repositories that can access the organization variable. */
+          selected_repository_ids: (number)[];
+        };
+      };
+    };
+    responses: {
+      /** @description Response */
+      204: never;
+      /** @description Response when the visibility of the variable is not set to `selected` */
+      409: never;
+    };
+  };
+  /**
+   * Add selected repository to an organization variable 
+   * @description Adds a repository to an organization variable that is available to selected repositories. Organization variables that are available to selected repositories have their `visibility` field set to `selected`. You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `organization_actions_variables:write` organization permission to use this endpoint.
+   */
+  "actions/add-selected-repo-to-org-variable": {
+    parameters: {
+      path: {
+        repository_id: number;
+      };
+    };
+    responses: {
+      /** @description Response */
+      204: never;
+      /** @description Response when the visibility of the variable is not set to `selected` */
+      409: never;
+    };
+  };
+  /**
+   * Remove selected repository from an organization variable 
+   * @description Removes a repository from an organization variable that is available to selected repositories. Organization variables that are available to selected repositories have their `visibility` field set to `selected`. You must authenticate using an access token with the `admin:org` scope to use this endpoint. GitHub Apps must have the `organization_actions_variables:write` organization permission to use this endpoint.
+   */
+  "actions/remove-selected-repo-from-org-variable": {
+    parameters: {
+      path: {
+        repository_id: number;
+      };
+    };
+    responses: {
+      /** @description Response */
+      204: never;
+      /** @description Response when the visibility of the variable is not set to `selected` */
+      409: never;
+    };
+  };
+  /**
    * List users blocked by an organization 
    * @description List the users blocked by an organization.
    */
@@ -90104,6 +81312,8 @@ export interface operations {
         state?: components["schemas"]["code-scanning-alert-state"];
         /** @description The property by which to sort the results. */
         sort?: "created" | "updated";
+        /** @description If specified, only code scanning alerts with this severity will be returned. */
+        severity?: components["schemas"]["code-scanning-alert-severity"];
       };
     };
     responses: {
@@ -90158,8 +81368,58 @@ export interface operations {
            * @enum {string}
            */
           visibility: "disabled" | "selected_members" | "all_members" | "all_members_and_outside_collaborators";
-          /** @description The usernames of the organization members who should be granted access to codespaces in the organization. Required when `visibility` is `selected_members`. */
+          /** @description The usernames of the organization members who should have access to codespaces in the organization. Required when `visibility` is `selected_members`. The provided list of usernames will replace any existing value. */
           selected_usernames?: (string)[];
+        };
+      };
+    };
+    responses: {
+      /** @description Response when successfully modifying permissions. */
+      204: never;
+      304: components["responses"]["not_modified"];
+      /** @description Users are neither members nor collaborators of this organization. */
+      400: never;
+      404: components["responses"]["not_found"];
+      422: components["responses"]["validation_failed"];
+      500: components["responses"]["internal_error"];
+    };
+  };
+  /**
+   * Add users to Codespaces billing for an organization 
+   * @description Codespaces for the specified users will be billed to the organization.
+   * To use this endpoint, the billing settings for the organization must be set to `selected_members`. For information on how to change this setting please see [these docs].(https://docs.github.com/rest/codespaces/organizations#manage-access-control-for-organization-codespaces) You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+   */
+  "codespaces/set-codespaces-billing-users": {
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The usernames of the organization members whose codespaces be billed to the organization. */
+          selected_usernames: (string)[];
+        };
+      };
+    };
+    responses: {
+      /** @description Response when successfully modifying permissions. */
+      204: never;
+      304: components["responses"]["not_modified"];
+      /** @description Users are neither members nor collaborators of this organization. */
+      400: never;
+      404: components["responses"]["not_found"];
+      422: components["responses"]["validation_failed"];
+      500: components["responses"]["internal_error"];
+    };
+  };
+  /**
+   * Removes users from Codespaces billing for an organization 
+   * @description Codespaces for the specified users will no longer be billed to the organization.
+   * To use this endpoint, the billing settings for the organization must be set to `selected_members`. For information on how to change this setting please see [these docs].(https://docs.github.com/rest/codespaces/organizations#manage-access-control-for-organization-codespaces) You must authenticate using an access token with the `admin:org` scope to use this endpoint.
+   */
+  "codespaces/delete-codespaces-billing-users": {
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The usernames of the organization members whose codespaces should not be billed to the organization. */
+          selected_usernames: (string)[];
         };
       };
     };
@@ -90421,126 +81681,6 @@ export interface operations {
       404: components["responses"]["not_found"];
       /** @description Conflict when visibility type not set to selected */
       409: never;
-      422: components["responses"]["validation_failed"];
-    };
-  };
-  /**
-   * Create a custom role 
-   * @description **Note**: This operation is in beta and is subject to change.
-   * 
-   * Creates a custom repository role that can be used by all repositories owned by the organization.
-   * 
-   * To use this endpoint the authenticated user must be an administrator for the organization and must use an access token with `admin:org` scope.
-   * GitHub Apps must have the `organization_custom_roles:write` organization permission to use this endpoint.
-   * 
-   * For more information on custom repository roles, see "[About custom repository roles](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/about-custom-repository-roles)."
-   */
-  "orgs/create-custom-role": {
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description The name of the custom role. */
-          name: string;
-          /** @description A short description about the intended usage of this role or what permissions it grants. */
-          description?: string;
-          /**
-           * @description The system role from which this role inherits permissions. 
-           * @enum {string}
-           */
-          base_role: "read" | "triage" | "write" | "maintain";
-          /** @description A list of additional permissions included in this role. */
-          permissions: (string)[];
-        };
-      };
-    };
-    responses: {
-      /** @description Response */
-      201: {
-        content: {
-          "application/json": components["schemas"]["organization-custom-repository-role"];
-        };
-      };
-      404: components["responses"]["not_found"];
-      422: components["responses"]["validation_failed"];
-    };
-  };
-  /**
-   * Get a custom role 
-   * @description **Note**: This operation is in beta and is subject to change.
-   * 
-   * Gets a custom repository role that is available to all repositories owned by the organization.
-   * 
-   * To use this operation, the authenticated user must be an administrator for the organization and must use an access token with `admin:org` scope.
-   * GitHub Apps must have the `organization_custom_roles:write` organization permission to use this endpoint.
-   * 
-   * For more information on custom repository roles, see "[About custom repository roles](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/about-custom-repository-roles)."
-   */
-  "orgs/get-custom-role": {
-    responses: {
-      /** @description Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["organization-custom-repository-role"];
-        };
-      };
-      404: components["responses"]["not_found"];
-    };
-  };
-  /**
-   * Delete a custom role 
-   * @description **Note**: This operation is in beta and is subject to change.
-   * 
-   * Deletes a custom role from an organization. Once the custom role has been deleted, any
-   * user, team, or invitation with the deleted custom role will be reassigned the inherited role.
-   * 
-   * To use this endpoint the authenticated user must be an administrator for the organization and must use an access token with `admin:org` scope.
-   * GitHub Apps must have the `organization_custom_roles:write` organization permission to use this endpoint.
-   * 
-   * For more information about custom repository roles, see "[About custom repository roles](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/about-custom-repository-roles)."
-   */
-  "orgs/delete-custom-role": {
-    responses: {
-      /** @description Response */
-      204: never;
-    };
-  };
-  /**
-   * Update a custom role 
-   * @description **Note**: This operation is in beta and subject to change.
-   * 
-   * Updates a custom repository role that can be used by all repositories owned by the organization.
-   * 
-   * To use this endpoint the authenticated user must be an administrator for the organization and must use an access token with `admin:org` scope.
-   * GitHub Apps must have the `organization_custom_roles:write` organization permission to use this endpoint.
-   * 
-   * For more information about custom repository roles, see "[About custom repository roles](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/about-custom-repository-roles)."
-   */
-  "orgs/update-custom-role": {
-    requestBody: {
-      content: {
-        "application/json": {
-          /** @description The name of the custom role. */
-          name?: string;
-          /** @description A short description about who this role is for or what permissions it grants. */
-          description?: string;
-          /**
-           * @description The system role from which this role inherits permissions. 
-           * @enum {string}
-           */
-          base_role?: "read" | "triage" | "write" | "maintain";
-          /** @description A list of additional permissions included in this role. If specified, these permissions will replace any currently set on the role. */
-          permissions?: (string)[];
-        };
-      };
-    };
-    responses: {
-      /** @description Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["organization-custom-repository-role"];
-        };
-      };
-      404: components["responses"]["not_found"];
       422: components["responses"]["validation_failed"];
     };
   };
@@ -90833,25 +81973,6 @@ export interface operations {
       404: components["responses"]["not_found"];
     };
   };
-  /**
-   * List fine-grained permissions for an organization 
-   * @description **Note**: This operation is in beta and subject to change.
-   * 
-   * Lists the fine-grained permissions available for an organization.
-   * 
-   * To use this endpoint the authenticated user must be an administrator for the organization or of an repository of the organizaiton and must use an access token with `admin:org repo` scope.
-   * GitHub Apps must have the `organization_custom_roles:read` organization permission to use this endpoint.
-   */
-  "orgs/list-fine-grained-permissions": {
-    responses: {
-      /** @description Response */
-      200: {
-        content: {
-          "application/json": (components["schemas"]["organization-fine-grained-permission"])[];
-        };
-      };
-    };
-  };
   /** List organization webhooks */
   "orgs/list-webhooks": {
     responses: {
@@ -91031,6 +82152,11 @@ export interface operations {
    * @description Returns a list of webhook deliveries for a webhook configured in an organization.
    */
   "orgs/list-webhook-deliveries": {
+    parameters: {
+      query: {
+        redelivery?: boolean;
+      };
+    };
     responses: {
       /** @description Response */
       200: {
@@ -91162,9 +82288,17 @@ export interface operations {
   };
   /**
    * List pending organization invitations 
-   * @description The return hash contains a `role` field which refers to the Organization Invitation role and will be one of the following values: `direct_member`, `admin`, `billing_manager`, `hiring_manager`, or `reinstate`. If the invitee is not a GitHub member, the `login` field in the return hash will be `null`.
+   * @description The return hash contains a `role` field which refers to the Organization Invitation role and will be one of the following values: `direct_member`, `admin`, `billing_manager`, or `hiring_manager`. If the invitee is not a GitHub member, the `login` field in the return hash will be `null`.
    */
   "orgs/list-pending-invitations": {
+    parameters: {
+      query: {
+        /** @description Filter invitations by their member role. */
+        role?: "all" | "admin" | "direct_member" | "billing_manager" | "hiring_manager";
+        /** @description Filter invitations by their invitation source. */
+        invitation_source?: "all" | "member" | "scim";
+      };
+    };
     responses: {
       /** @description Response */
       200: {
@@ -91194,9 +82328,9 @@ export interface operations {
           email?: string;
           /**
            * @description The role for the new member. 
-           * \* `admin` - Organization owners with full administrative rights to the organization and complete access to all repositories and teams.  
-           * \* `direct_member` - Non-owner organization members with ability to see other members and join teams by invitation.  
-           * \* `billing_manager` - Non-owner organization members with ability to manage the billing settings of your organization. 
+           *  * `admin` - Organization owners with full administrative rights to the organization and complete access to all repositories and teams.  
+           *  * `direct_member` - Non-owner organization members with ability to see other members and join teams by invitation.  
+           *  * `billing_manager` - Non-owner organization members with ability to manage the billing settings of your organization. 
            * @default direct_member 
            * @enum {string}
            */
@@ -91428,8 +82562,8 @@ export interface operations {
         "application/json": {
           /**
            * @description The role to give the user in the organization. Can be one of:  
-           * \* `admin` - The user will become an owner of the organization.  
-           * \* `member` - The user will become a non-owner member of the organization. 
+           *  * `admin` - The user will become an owner of the organization.  
+           *  * `member` - The user will become a non-owner member of the organization. 
            * @default member 
            * @enum {string}
            */
@@ -91464,7 +82598,9 @@ export interface operations {
   };
   /**
    * List organization migrations 
-   * @description Lists the most recent migrations.
+   * @description Lists the most recent migrations, including both exports (which can be started through the REST API) and imports (which cannot be started using the REST API).
+   * 
+   * A list of `repositories` is only returned for export migrations.
    */
   "migrations/list-for-org": {
     parameters: {
@@ -91608,7 +82744,7 @@ export interface operations {
   };
   /**
    * Unlock an organization repository 
-   * @description Unlocks a repository that was locked for migration. You should unlock each migrated repository and [delete them](https://docs.github.com/rest/reference/repos#delete-a-repository) when the migration is complete and you no longer need the source data.
+   * @description Unlocks a repository that was locked for migration. You should unlock each migrated repository and [delete them](https://docs.github.com/rest/repos/repos#delete-a-repository) when the migration is complete and you no longer need the source data.
    */
   "migrations/unlock-repo-for-org": {
     responses: {
@@ -91660,7 +82796,7 @@ export interface operations {
   };
   /**
    * Convert an organization member to outside collaborator 
-   * @description When an organization member is converted to an outside collaborator, they'll only have access to the repositories that their current team membership allows. The user will no longer be a member of the organization. For more information, see "[Converting an organization member to an outside collaborator](https://docs.github.com/articles/converting-an-organization-member-to-an-outside-collaborator/)". Converting an organization member to an outside collaborator may be restricted by enterprise administrators. For more information, see "[Enforcing repository management policies in your enterprise](https://docs.github.com/enterprise-cloud@latest/admin/policies/enforcing-policies-for-your-enterprise/enforcing-repository-management-policies-in-your-enterprise#enforcing-a-policy-for-inviting-outside-collaborators-to-repositories)."
+   * @description When an organization member is converted to an outside collaborator, they'll only have access to the repositories that their current team membership allows. The user will no longer be a member of the organization. For more information, see "[Converting an organization member to an outside collaborator](https://docs.github.com/articles/converting-an-organization-member-to-an-outside-collaborator/)". Converting an organization member to an outside collaborator may be restricted by enterprise administrators. For more information, see "[Enforcing repository management policies in your enterprise](https://docs.github.com/admin/policies/enforcing-policies-for-your-enterprise/enforcing-repository-management-policies-in-your-enterprise#enforcing-a-policy-for-inviting-outside-collaborators-to-repositories)."
    */
   "orgs/convert-member-to-outside-collaborator": {
     requestBody?: {
@@ -91683,7 +82819,7 @@ export interface operations {
       };
       /** @description User was converted */
       204: never;
-      /** @description Forbidden if user is the last owner of the organization, not a member of the organization, or if the enterprise enforces a policy for inviting outside collaborators. For more information, see "[Enforcing repository management policies in your enterprise](https://docs.github.com/enterprise-cloud@latest/admin/policies/enforcing-policies-for-your-enterprise/enforcing-repository-management-policies-in-your-enterprise#enforcing-a-policy-for-inviting-outside-collaborators-to-repositories)." */
+      /** @description Forbidden if user is the last owner of the organization, not a member of the organization, or if the enterprise enforces a policy for inviting outside collaborators. For more information, see "[Enforcing repository management policies in your enterprise](https://docs.github.com/admin/policies/enforcing-policies-for-your-enterprise/enforcing-repository-management-policies-in-your-enterprise#enforcing-a-policy-for-inviting-outside-collaborators-to-repositories)." */
       403: never;
       404: components["responses"]["not_found"];
     };
@@ -91709,16 +82845,19 @@ export interface operations {
   };
   /**
    * List packages for an organization 
-   * @description Lists all packages in an organization readable by the user.
+   * @description Lists packages in an organization readable by the user.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-   * If `package_type` is not `container`, your token must also include the `repo` scope.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/list-packages-for-organization": {
     parameters: {
       query: {
         /** @description The type of supported package. Packages in GitHub's Gradle registry have the type `maven`. Docker images pushed to GitHub's Container registry (`ghcr.io`) have the type `container`. You can use the type `docker` to find images that were pushed to GitHub's Docker registry (`docker.pkg.github.com`), even if these have now been migrated to the Container registry. */
         package_type: "npm" | "maven" | "rubygems" | "docker" | "nuget" | "container";
+        /** @description Page number of the results to fetch. */
+        page?: number;
+        /** @description The number of results per page (max 100). */
+        per_page?: number;
       };
     };
     responses: {
@@ -91736,8 +82875,7 @@ export interface operations {
    * Get a package for an organization 
    * @description Gets a specific package in an organization.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-   * If `package_type` is not `container`, your token must also include the `repo` scope.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/get-package-for-organization": {
     responses: {
@@ -91753,9 +82891,9 @@ export interface operations {
    * Delete a package for an organization 
    * @description Deletes an entire package in an organization. You cannot delete a public package if any version of the package has more than 5,000 downloads. In this scenario, contact GitHub support for further assistance.
    * 
-   * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `packages:read` and `packages:delete` scopes. In addition:
-   * - If `package_type` is not `container`, your token must also include the `repo` scope.
-   * - If `package_type` is `container`, you must also have admin permissions to the container you want to delete.
+   * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `read:packages` and `delete:packages` scopes. In addition:
+   * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+   * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package you want to delete. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
    */
   "packages/delete-package-for-org": {
     responses: {
@@ -91774,9 +82912,9 @@ export interface operations {
    *   - The package was deleted within the last 30 days.
    *   - The same package namespace and version is still available and not reused for a new package. If the same package namespace is not available, you will not be able to restore your package. In this scenario, to restore the deleted package, you must delete the new package that uses the deleted package's namespace first.
    * 
-   * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `packages:read` and `packages:write` scopes. In addition:
-   * - If `package_type` is not `container`, your token must also include the `repo` scope.
-   * - If `package_type` is `container`, you must also have admin permissions to the container that you want to restore.
+   * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `read:packages` and `write:packages` scopes. In addition:
+   * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+   * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package you want to restore. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
    */
   "packages/restore-package-for-org": {
     parameters: {
@@ -91797,8 +82935,7 @@ export interface operations {
    * List package versions for a package owned by an organization 
    * @description Lists package versions for a package owned by an organization.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-   * If `package_type` is not `container`, your token must also include the `repo` scope.
+   * If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/get-all-package-versions-for-package-owned-by-org": {
     parameters: {
@@ -91823,8 +82960,7 @@ export interface operations {
    * Get a package version for an organization 
    * @description Gets a specific package version in an organization.
    * 
-   * You must authenticate using an access token with the `packages:read` scope.
-   * If `package_type` is not `container`, your token must also include the `repo` scope.
+   * You must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/get-package-version-for-organization": {
     responses: {
@@ -91840,9 +82976,9 @@ export interface operations {
    * Delete package version for an organization 
    * @description Deletes a specific package version in an organization. If the package is public and the package version has more than 5,000 downloads, you cannot delete the package version. In this scenario, contact GitHub support for further assistance.
    * 
-   * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `packages:read` and `packages:delete` scopes. In addition:
-   * - If `package_type` is not `container`, your token must also include the `repo` scope.
-   * - If `package_type` is `container`, you must also have admin permissions to the container you want to delete.
+   * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `read:packages` and `delete:packages` scopes. In addition:
+   * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+   * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package whose version you want to delete. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
    */
   "packages/delete-package-version-for-org": {
     responses: {
@@ -91861,9 +82997,9 @@ export interface operations {
    *   - The package was deleted within the last 30 days.
    *   - The same package namespace and version is still available and not reused for a new package. If the same package namespace is not available, you will not be able to restore your package. In this scenario, to restore the deleted package, you must delete the new package that uses the deleted package's namespace first.
    * 
-   * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `packages:read` and `packages:write` scopes. In addition:
-   * - If `package_type` is not `container`, your token must also include the `repo` scope.
-   * - If `package_type` is `container`, you must also have admin permissions to the container that you want to restore.
+   * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `read:packages` and `write:packages` scopes. In addition:
+   * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+   * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package whose version you want to restore. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
    */
   "packages/restore-package-version-for-org": {
     responses: {
@@ -91976,12 +83112,14 @@ export interface operations {
   /**
    * List organization repositories 
    * @description Lists repositories for the specified organization.
+   * 
+   * **Note:** In order to see the `security_and_analysis` block for a repository you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see "[Managing security managers in your organization](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization)."
    */
   "repos/list-for-org": {
     parameters: {
       query: {
-        /** @description Specifies the types of repositories you want returned. If your organization is associated with an enterprise account using GitHub Enterprise Cloud or GitHub Enterprise Server 2.20+, `type` can also be `internal`. However, the `internal` value is not yet supported when a GitHub App calls this API with an installation access token. */
-        type?: "all" | "public" | "private" | "forks" | "sources" | "member" | "internal";
+        /** @description Specifies the types of repositories you want returned. */
+        type?: "all" | "public" | "private" | "forks" | "sources" | "member";
         /** @description The property to sort the results by. */
         sort?: "created" | "updated" | "pushed" | "full_name";
         /** @description The order to sort by. Default: `asc` when using `full_name`, otherwise `desc`. */
@@ -92027,10 +83165,10 @@ export interface operations {
            */
           private?: boolean;
           /**
-           * @description Can be `public` or `private`. If your organization is associated with an enterprise account using GitHub Enterprise Cloud or GitHub Enterprise Server 2.20+, `visibility` can also be `internal`. Note: For GitHub Enterprise Server and GitHub AE, this endpoint will only list repositories available to all users on the enterprise. For more information, see "[Creating an internal repository](https://docs.github.com/github/creating-cloning-and-archiving-repositories/about-repository-visibility#about-internal-repositories)" in the GitHub Help documentation. 
+           * @description The visibility of the repository. 
            * @enum {string}
            */
-          visibility?: "public" | "private" | "internal";
+          visibility?: "public" | "private";
           /**
            * @description Either `true` to enable issues for this repository or `false` to disable them. 
            * @default true
@@ -92089,7 +83227,7 @@ export interface operations {
            */
           allow_auto_merge?: boolean;
           /**
-           * @description Either `true` to allow automatically deleting head branches when pull requests are merged, or `false` to prevent automatic deletion. 
+           * @description Either `true` to allow automatically deleting head branches when pull requests are merged, or `false` to prevent automatic deletion. **The authenticated user must be an organization owner to set this property to `true`.** 
            * @default false
            */
           delete_branch_on_merge?: boolean;
@@ -92241,27 +83379,6 @@ export interface operations {
     };
   };
   /**
-   * Get GitHub Advanced Security active committers for an organization 
-   * @description Gets the GitHub Advanced Security active committers for an organization per repository.
-   * 
-   * Each distinct user login across all repositories is counted as a single Advanced Security seat, so the `total_advanced_security_committers` is not the sum of advanced_security_committers for each repository.
-   * 
-   * If this organization defers to an enterprise for billing, the `total_advanced_security_committers` returned from the organization API may include some users that are in more than one organization, so they will only consume a single Advanced Security seat at the enterprise level.
-   * 
-   * The total number of repositories with committer information is tracked by the `total_count` field.
-   */
-  "billing/get-github-advanced-security-billing-org": {
-    responses: {
-      /** @description Success */
-      200: {
-        content: {
-          "application/json": components["schemas"]["advanced-security-active-committers"];
-        };
-      };
-      403: components["responses"]["code_scanning_forbidden_read"];
-    };
-  };
-  /**
    * Get GitHub Packages billing for an organization 
    * @description Gets the free and paid storage used for GitHub Packages in gigabytes.
    * 
@@ -92336,11 +83453,11 @@ export interface operations {
           /**
            * @description The level of privacy this team should have. The options are:  
            * **For a non-nested team:**  
-           * \* `secret` - only visible to organization owners and members of this team.  
-           * \* `closed` - visible to all members of this organization.  
+           *  * `secret` - only visible to organization owners and members of this team.  
+           *  * `closed` - visible to all members of this organization.  
            * Default: `secret`  
            * **For a parent or child team:**  
-           * \* `closed` - visible to all members of this organization.  
+           *  * `closed` - visible to all members of this organization.  
            * Default for child team: `closed` 
            * @enum {string}
            */
@@ -92369,7 +83486,7 @@ export interface operations {
   };
   /**
    * Get a team by name 
-   * @description Gets a team using the team's `slug`. GitHub generates the `slug` from the team `name`.
+   * @description Gets a team using the team's `slug`. To create the `slug`, GitHub replaces special characters in the `name` string, changes all words to lowercase, and replaces spaces with a `-` separator. For example, `"My TEam Näme"` would become `my-team-name`.
    * 
    * **Note:** You can also specify a team by `org_id` and `team_id` using the route `GET /organizations/{org_id}/team/{team_id}`.
    */
@@ -92415,10 +83532,10 @@ export interface operations {
           /**
            * @description The level of privacy this team should have. Editing teams without specifying this parameter leaves `privacy` intact. When a team is nested, the `privacy` for parent teams cannot be `secret`. The options are:  
            * **For a non-nested team:**  
-           * \* `secret` - only visible to organization owners and members of this team.  
-           * \* `closed` - visible to all members of this organization.  
+           *  * `secret` - only visible to organization owners and members of this team.  
+           *  * `closed` - visible to all members of this organization.  
            * **For a parent or child team:**  
-           * \* `closed` - visible to all members of this organization. 
+           *  * `closed` - visible to all members of this organization. 
            * @enum {string}
            */
           privacy?: "secret" | "closed";
@@ -92871,9 +83988,9 @@ export interface operations {
   };
   /**
    * Add or update team membership for a user 
-   * @description Team synchronization is available for organizations using GitHub Enterprise Cloud. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.
+   * @description Adds an organization member to a team. An authenticated organization owner or team maintainer can add organization members to a team.
    * 
-   * Adds an organization member to a team. An authenticated organization owner or team maintainer can add organization members to a team.
+   * Team synchronization is available for organizations using GitHub Enterprise Cloud. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.
    * 
    * **Note:** When you have team synchronization set up for a team with your organization's identity provider (IdP), you will see an error if you attempt to use the API for making changes to the team's membership. If you have access to manage group membership in your IdP, you can manage GitHub team membership through your identity provider, which automatically adds and removes team members in an organization. For more information, see "[Synchronizing teams between your identity provider and GitHub](https://docs.github.com/articles/synchronizing-teams-between-your-identity-provider-and-github/)."
    * 
@@ -92911,9 +84028,9 @@ export interface operations {
   };
   /**
    * Remove team membership for a user 
-   * @description Team synchronization is available for organizations using GitHub Enterprise Cloud. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.
+   * @description To remove a membership between a user and a team, the authenticated user must have 'admin' permissions to the team or be an owner of the organization that the team is associated with. Removing team membership does not delete the user, it just removes their membership from the team.
    * 
-   * To remove a membership between a user and a team, the authenticated user must have 'admin' permissions to the team or be an owner of the organization that the team is associated with. Removing team membership does not delete the user, it just removes their membership from the team.
+   * Team synchronization is available for organizations using GitHub Enterprise Cloud. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.
    * 
    * **Note:** When you have team synchronization set up for a team with your organization's identity provider (IdP), you will see an error if you attempt to use the API for making changes to the team's membership. If you have access to manage group membership in your IdP, you can manage GitHub team membership through your identity provider, which automatically adds and removes team members in an organization. For more information, see "[Synchronizing teams between your identity provider and GitHub](https://docs.github.com/articles/synchronizing-teams-between-your-identity-provider-and-github/)."
    * 
@@ -93663,8 +84780,62 @@ export interface operations {
     };
   };
   /**
+   * List repository required workflows 
+   * @description Lists the required workflows in a repository. Anyone with read access to the repository can use this endpoint. If the repository is private you must use an access token with the `repo` scope. GitHub Apps must have the `actions:read` permission to use this endpoint. For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
+   */
+  "actions/list-repo-required-workflows": {
+    responses: {
+      /** @description Response */
+      200: {
+        content: {
+          "application/json": {
+            total_count: number;
+            required_workflows: (components["schemas"]["repo-required-workflow"])[];
+          };
+        };
+      };
+      404: components["responses"]["not_found"];
+    };
+  };
+  /**
+   * Get a required workflow entity for a repository 
+   * @description Gets a specific required workflow present in a repository. Anyone with read access to the repository can use this endpoint. If the repository is private you must use an access token with the `repo` scope. GitHub Apps must have the `actions:read` permission to use this endpoint. For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
+   */
+  "actions/get-repo-required-workflow": {
+    responses: {
+      /** @description Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["repo-required-workflow"];
+        };
+      };
+      404: components["responses"]["not_found"];
+    };
+  };
+  /**
+   * Get required workflow usage 
+   * @description Gets the number of billable minutes used by a specific required workflow during the current billing cycle.
+   * 
+   * Billable minutes only apply to required workflows running in private repositories that use GitHub-hosted runners. Usage is listed for each GitHub-hosted runner operating system in milliseconds. Any job re-runs are also included in the usage. The usage does not include the multiplier for macOS and Windows runners and is not rounded up to the nearest whole minute. For more information, see "[Managing billing for GitHub Actions](https://docs.github.com/github/setting-up-and-managing-billing-and-payments-on-github/managing-billing-for-github-actions)."
+   * 
+   * Anyone with read access to the repository can use this endpoint. If the repository is private you must use an access token with the `repo` scope. GitHub Apps must have the `actions:read` permission to use this endpoint.
+   */
+  "actions/get-repo-required-workflow-usage": {
+    responses: {
+      /** @description Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["workflow-usage"];
+        };
+      };
+      404: components["responses"]["not_found"];
+    };
+  };
+  /**
    * Get a repository 
    * @description The `parent` and `source` objects are present when the repository is a fork. `parent` is the repository this repository was forked from, `source` is the ultimate source for the network.
+   * 
+   * **Note:** In order to see the `security_and_analysis` block for a repository you must have admin permissions for the repository or be an owner or security manager for the organization that owns the repository. For more information, see "[Managing security managers in your organization](https://docs.github.com/organizations/managing-peoples-access-to-your-organization-with-roles/managing-security-managers-in-your-organization)."
    */
   "repos/get": {
     responses: {
@@ -93724,10 +84895,10 @@ export interface operations {
            */
           private?: boolean;
           /**
-           * @description Can be `public` or `private`. If your organization is associated with an enterprise account using GitHub Enterprise Cloud or GitHub Enterprise Server 2.20+, `visibility` can also be `internal`." 
+           * @description The visibility of the repository. 
            * @enum {string}
            */
-          visibility?: "public" | "private" | "internal";
+          visibility?: "public" | "private";
           /**
            * @description Specify which security and analysis features to enable or disable for the repository.
            * 
@@ -93848,7 +85019,7 @@ export interface operations {
            */
           merge_commit_message?: "PR_BODY" | "PR_TITLE" | "BLANK";
           /**
-           * @description `true` to archive this repository. **Note**: You cannot unarchive repositories through the API. 
+           * @description Whether to archive this repository. `false` will unarchive a previously archived repository. 
            * @default false
            */
           archived?: boolean;
@@ -94068,6 +85239,53 @@ export interface operations {
     };
   };
   /**
+   * Get the customization template for an OIDC subject claim for a repository 
+   * @description Gets the customization template for an OpenID Connect (OIDC) subject claim.
+   * You must authenticate using an access token with the `repo` scope to use this
+   * endpoint. GitHub Apps must have the `organization_administration:read` permission to use this endpoint.
+   */
+  "actions/get-custom-oidc-sub-claim-for-repo": {
+    responses: {
+      /** @description Status response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["oidc-custom-sub-repo"];
+        };
+      };
+      400: components["responses"]["bad_request"];
+      404: components["responses"]["not_found"];
+    };
+  };
+  /**
+   * Set the customization template for an OIDC subject claim for a repository 
+   * @description Sets the customization template and `opt-in` or `opt-out` flag for an OpenID Connect (OIDC) subject claim for a repository.
+   * You must authenticate using an access token with the `repo` scope to use this
+   * endpoint. GitHub Apps must have the `actions:write` permission to use this endpoint.
+   */
+  "actions/set-custom-oidc-sub-claim-for-repo": {
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description Whether to use the default template or not. If `true`, the `include_claim_keys` field is ignored. */
+          use_default: boolean;
+          /** @description Array of unique strings. Each claim key can only contain alphanumeric characters and underscores. */
+          include_claim_keys?: (string)[];
+        };
+      };
+    };
+    responses: {
+      /** @description Empty response */
+      201: {
+        content: {
+          "application/json": components["schemas"]["empty-object"];
+        };
+      };
+      400: components["responses"]["bad_request"];
+      404: components["responses"]["not_found"];
+      422: components["responses"]["validation_failed_simple"];
+    };
+  };
+  /**
    * Get GitHub Actions permissions for a repository 
    * @description Gets the GitHub Actions permissions policy for a repository, including whether GitHub Actions is enabled and the actions and reusable workflows allowed to run in the repository.
    * 
@@ -94086,8 +85304,6 @@ export interface operations {
   /**
    * Set GitHub Actions permissions for a repository 
    * @description Sets the GitHub Actions permissions policy for enabling GitHub Actions and allowed actions and reusable workflows in the repository.
-   * 
-   * If the repository belongs to an organization or enterprise that has set restrictive permissions at the organization or enterprise levels, such as `allowed_actions` to `selected` actions and reusable workflows, then you cannot override them for the repository.
    * 
    * You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `administration` repository permission to use this API.
    */
@@ -94108,7 +85324,8 @@ export interface operations {
   /**
    * Get the level of access for workflows outside of the repository 
    * @description Gets the level of access that workflows outside of the repository have to actions and reusable workflows in the repository.
-   * This endpoint only applies to internal repositories. For more information, see "[Managing GitHub Actions settings for a repository](https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#allowing-access-to-components-in-an-internal-repository)."
+   * This endpoint only applies to private repositories.
+   * For more information, see "[Allowing access to components in a private repository](https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#allowing-access-to-components-in-a-private-repository)."
    * 
    * You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the
    * repository `administration` permission to use this endpoint.
@@ -94126,7 +85343,8 @@ export interface operations {
   /**
    * Set the level of access for workflows outside of the repository 
    * @description Sets the level of access that workflows outside of the repository have to actions and reusable workflows in the repository.
-   * This endpoint only applies to internal repositories. For more information, see "[Managing GitHub Actions settings for a repository](https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#allowing-access-to-components-in-an-internal-repository)."
+   * This endpoint only applies to private repositories.
+   * For more information, see "[Allowing access to components in a private repository](https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#allowing-access-to-components-in-a-private-repository)".
    * 
    * You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the
    * repository `administration` permission to use this endpoint.
@@ -94161,10 +85379,6 @@ export interface operations {
   /**
    * Set allowed actions and reusable workflows for a repository 
    * @description Sets the actions and reusable workflows that are allowed in a repository. To use this endpoint, the repository permission policy for `allowed_actions` must be configured to `selected`. For more information, see "[Set GitHub Actions permissions for a repository](#set-github-actions-permissions-for-a-repository)."
-   * 
-   * If the repository belongs to an organization or enterprise that has `selected` actions and reusable workflows set at the organization or enterprise levels, then you cannot override any of the allowed actions and reusable workflows settings.
-   * 
-   * To use the `patterns_allowed` setting for private repositories, the repository must belong to an enterprise. If the repository does not belong to an enterprise, then the `patterns_allowed` setting only applies to public repositories.
    * 
    * You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `administration` repository permission to use this API.
    */
@@ -94214,8 +85428,30 @@ export interface operations {
     responses: {
       /** @description Success response */
       204: never;
-      /** @description Conflict response when changing a setting is prevented by the owning organization or enterprise */
+      /** @description Conflict response when changing a setting is prevented by the owning organization */
       409: never;
+    };
+  };
+  /**
+   * List workflow runs for a required workflow 
+   * @description List all workflow runs for a required workflow. You can use parameters to narrow the list of results. For more information about using parameters, see [Parameters](https://docs.github.com/rest/overview/resources-in-the-rest-api#parameters).
+   * 
+   * Anyone with read access to the repository can use this endpoint. If the repository is private you must use an access token with the `repo` scope. For more information, see "[Required Workflows](https://docs.github.com/actions/using-workflows/required-workflows)."
+   */
+  "actions/list-required-workflow-runs": {
+    responses: {
+      /** @description Response */
+      200: {
+        headers: {
+          Link: components["headers"]["link"];
+        };
+        content: {
+          "application/json": {
+            total_count: number;
+            workflow_runs: (components["schemas"]["workflow-run"])[];
+          };
+        };
+      };
     };
   };
   /**
@@ -94914,6 +86150,100 @@ export interface operations {
    * @description Deletes a secret in a repository using the secret name. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `secrets` repository permission to use this endpoint.
    */
   "actions/delete-repo-secret": {
+    responses: {
+      /** @description Response */
+      204: never;
+    };
+  };
+  /**
+   * List repository variables 
+   * @description Lists all repository variables. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `actions_variables:read` repository permission to use this endpoint.
+   */
+  "actions/list-repo-variables": {
+    responses: {
+      /** @description Response */
+      200: {
+        headers: {
+          Link: components["headers"]["link"];
+        };
+        content: {
+          "application/json": {
+            total_count: number;
+            variables: (components["schemas"]["actions-variable"])[];
+          };
+        };
+      };
+    };
+  };
+  /**
+   * Create a repository variable 
+   * @description Creates a repository variable that you can reference in a GitHub Actions workflow.
+   * You must authenticate using an access token with the `repo` scope to use this endpoint.
+   * GitHub Apps must have the `actions_variables:write` repository permission to use this endpoint.
+   */
+  "actions/create-repo-variable": {
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the variable. */
+          name: string;
+          /** @description The value of the variable. */
+          value: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Response */
+      201: {
+        content: {
+          "application/json": components["schemas"]["empty-object"];
+        };
+      };
+    };
+  };
+  /**
+   * Get a repository variable 
+   * @description Gets a specific variable in a repository. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `actions_variables:read` repository permission to use this endpoint.
+   */
+  "actions/get-repo-variable": {
+    responses: {
+      /** @description Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["actions-variable"];
+        };
+      };
+    };
+  };
+  /**
+   * Delete a repository variable 
+   * @description Deletes a repository variable using the variable name.
+   * You must authenticate using an access token with the `repo` scope to use this endpoint.
+   * GitHub Apps must have the `actions_variables:write` repository permission to use this endpoint.
+   */
+  "actions/delete-repo-variable": {
+    responses: {
+      /** @description Response */
+      204: never;
+    };
+  };
+  /**
+   * Update a repository variable 
+   * @description Updates a repository variable that you can reference in a GitHub Actions workflow.
+   * You must authenticate using an access token with the `repo` scope to use this endpoint.
+   * GitHub Apps must have the `actions_variables:write` repository permission to use this endpoint.
+   */
+  "actions/update-repo-variable": {
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the variable. */
+          name?: string;
+          /** @description The value of the variable. */
+          value?: string;
+        };
+      };
+    };
     responses: {
       /** @description Response */
       204: never;
@@ -95820,10 +87150,6 @@ export interface operations {
    * @description Protected branches are available in public repositories with GitHub Free and GitHub Free for organizations, and in public and private repositories with GitHub Pro, GitHub Team, GitHub Enterprise Cloud, and GitHub Enterprise Server. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.
    * 
    * Replaces the list of teams that have push access to this branch. This removes all teams that previously had push access and grants push access to the new list of teams. Team restrictions include child teams.
-   * 
-   * | Type    | Description                                                                                                                                |
-   * | ------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-   * | `array` | The teams that can have push access. Use the team's `slug`. **Note**: The list of users, apps, and teams in total is limited to 100 items. |
    */
   "repos/set-team-access-restrictions": {
     requestBody?: {
@@ -95849,10 +87175,6 @@ export interface operations {
    * @description Protected branches are available in public repositories with GitHub Free and GitHub Free for organizations, and in public and private repositories with GitHub Pro, GitHub Team, GitHub Enterprise Cloud, and GitHub Enterprise Server. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.
    * 
    * Grants the specified teams push access for this branch. You can also give push access to child teams.
-   * 
-   * | Type    | Description                                                                                                                                |
-   * | ------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-   * | `array` | The teams that can have push access. Use the team's `slug`. **Note**: The list of users, apps, and teams in total is limited to 100 items. |
    */
   "repos/add-team-access-restrictions": {
     requestBody?: {
@@ -95878,10 +87200,6 @@ export interface operations {
    * @description Protected branches are available in public repositories with GitHub Free and GitHub Free for organizations, and in public and private repositories with GitHub Pro, GitHub Team, GitHub Enterprise Cloud, and GitHub Enterprise Server. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.
    * 
    * Removes the ability of a team to push to this branch. You can also remove push access for child teams.
-   * 
-   * | Type    | Description                                                                                                                                         |
-   * | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-   * | `array` | Teams that should no longer have push access. Use the team's `slug`. **Note**: The list of users, apps, and teams in total is limited to 100 items. |
    */
   "repos/remove-team-access-restrictions": {
     requestBody?: {
@@ -96386,6 +87704,8 @@ export interface operations {
         sort?: "created" | "updated";
         /** @description If specified, only code scanning alerts with this state will be returned. */
         state?: components["schemas"]["code-scanning-alert-state"];
+        /** @description If specified, only code scanning alerts with this severity will be returned. */
+        severity?: components["schemas"]["code-scanning-alert-severity"];
       };
     };
     responses: {
@@ -96404,9 +87724,6 @@ export interface operations {
   /**
    * Get a code scanning alert 
    * @description Gets a single code scanning alert. You must use an access token with the `security_events` scope to use this endpoint with private repos, the `public_repo` scope also grants permission to read security events on public repos only. GitHub Apps must have the `security_events` read permission to use this endpoint.
-   * 
-   * **Deprecation notice**:
-   * The instances field is deprecated and will, in future, not be included in the response for this endpoint. The example response reflects this change. The same information can now be retrieved via a GET request to the URL specified by `instances_url`.
    */
   "code-scanning/get-alert": {
     responses: {
@@ -96715,11 +88032,24 @@ export interface operations {
    * ```
    * gzip -c analysis-data.sarif | base64 -w0
    * ```
+   * <br>
+   * SARIF upload supports a maximum number of entries per the following data objects, and an analysis will be rejected if any of these objects is above its maximum value. For some objects, there are additional values over which the entries will be ignored while keeping the most important entries whenever applicable.
+   * To get the most out of your analysis when it includes data above the supported limits, try to optimize the analysis configuration. For example, for the CodeQL tool, identify and remove the most noisy queries.
    * 
-   * SARIF upload supports a maximum of 5000 results per analysis run. Any results over this limit are ignored and any SARIF uploads with more than 25,000 results are rejected. Typically, but not necessarily, a SARIF file contains a single run of a single tool. If a code scanning tool generates too many results, you should update the analysis configuration to run only the most important rules or queries.
    * 
-   * The `202 Accepted`, response includes an `id` value.
-   * You can use this ID to check the status of the upload by using this for the `/sarifs/{sarif_id}` endpoint.
+   * | **SARIF data**                   | **Maximum values** | **Additional limits**                                                            |
+   * |----------------------------------|:------------------:|----------------------------------------------------------------------------------|
+   * | Runs per file                    |         20         |                                                                                  |
+   * | Results per run                  |       25,000       | Only the top 5,000 results will be included, prioritized by severity.            |
+   * | Rules per run                    |       25,000       |                                                                                  |
+   * | Tool extensions per run          |        100         |                                                                                  |
+   * | Thread Flow Locations per result |       10,000       | Only the top 1,000 Thread Flow Locations will be included, using prioritization. |
+   * | Location per result	             |       1,000        | Only 100 locations will be included.                                             |
+   * | Tags per rule	                   |         20         | Only 10 tags will be included.                                                   |
+   * 
+   * 
+   * The `202 Accepted` response includes an `id` value.
+   * You can use this ID to check the status of the upload by using it in the `/sarifs/{sarif_id}` endpoint.
    * For more information, see "[Get information about a SARIF upload](/rest/reference/code-scanning#get-information-about-a-sarif-upload)."
    */
   "code-scanning/upload-sarif": {
@@ -96916,6 +88246,7 @@ export interface operations {
             devcontainers: ({
                 path: string;
                 name?: string;
+                display_name?: string;
               })[];
           };
         };
@@ -96998,7 +88329,7 @@ export interface operations {
   };
   /**
    * List repository secrets 
-   * @description Lists all secrets available in a repository without revealing their encrypted values. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `codespaces_secrets` repository permission to use this endpoint.
+   * @description Lists all secrets available in a repository without revealing their encrypted values. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have write access to the `codespaces_secrets` repository permission to use this endpoint.
    */
   "codespaces/list-repo-secrets": {
     responses: {
@@ -97018,7 +88349,7 @@ export interface operations {
   };
   /**
    * Get a repository public key 
-   * @description Gets your public key, which you need to encrypt secrets. You need to encrypt a secret before you can create or update secrets. Anyone with read access to the repository can use this endpoint. If the repository is private you must use an access token with the `repo` scope. GitHub Apps must have the `codespaces_secrets` repository permission to use this endpoint.
+   * @description Gets your public key, which you need to encrypt secrets. You need to encrypt a secret before you can create or update secrets. Anyone with read access to the repository can use this endpoint. If the repository is private you must use an access token with the `repo` scope. GitHub Apps must have write access to the `codespaces_secrets` repository permission to use this endpoint.
    */
   "codespaces/get-repo-public-key": {
     responses: {
@@ -97032,7 +88363,7 @@ export interface operations {
   };
   /**
    * Get a repository secret 
-   * @description Gets a single repository secret without revealing its encrypted value. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `codespaces_secrets` repository permission to use this endpoint.
+   * @description Gets a single repository secret without revealing its encrypted value. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have write access to the `codespaces_secrets` repository permission to use this endpoint.
    */
   "codespaces/get-repo-secret": {
     responses: {
@@ -97048,8 +88379,8 @@ export interface operations {
    * Create or update a repository secret 
    * @description Creates or updates a repository secret with an encrypted value. Encrypt your secret using
    * [LibSodium](https://libsodium.gitbook.io/doc/bindings_for_other_languages). You must authenticate using an access
-   * token with the `repo` scope to use this endpoint. GitHub Apps must have the `codespaces_secrets` repository
-   * permission to use this endpoint.
+   * token with the `repo` scope to use this endpoint. GitHub Apps must have write access to the `codespaces_secrets`
+   * repository permission to use this endpoint.
    * 
    * #### Example of encrypting a secret using Node.js
    * 
@@ -97147,7 +88478,7 @@ export interface operations {
   };
   /**
    * Delete a repository secret 
-   * @description Deletes a secret in a repository using the secret name. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `codespaces_secrets` repository permission to use this endpoint.
+   * @description Deletes a secret in a repository using the secret name. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have write access to the `codespaces_secrets` repository permission to use this endpoint.
    */
   "codespaces/delete-repo-secret": {
     responses: {
@@ -97210,7 +88541,7 @@ export interface operations {
    * Add a repository collaborator 
    * @description This endpoint triggers [notifications](https://docs.github.com/github/managing-subscriptions-and-notifications-on-github/about-notifications). Creating content too quickly using this endpoint may result in secondary rate limiting. See "[Secondary rate limits](https://docs.github.com/rest/overview/resources-in-the-rest-api#secondary-rate-limits)" and "[Dealing with secondary rate limits](https://docs.github.com/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits)" for details.
    * 
-   * Adding an outside collaborator may be restricted by enterprise administrators. For more information, see "[Enforcing repository management policies in your enterprise](https://docs.github.com/enterprise-cloud@latest/admin/policies/enforcing-policies-for-your-enterprise/enforcing-repository-management-policies-in-your-enterprise#enforcing-a-policy-for-inviting-outside-collaborators-to-repositories)."
+   * Adding an outside collaborator may be restricted by enterprise administrators. For more information, see "[Enforcing repository management policies in your enterprise](https://docs.github.com/admin/policies/enforcing-policies-for-your-enterprise/enforcing-repository-management-policies-in-your-enterprise#enforcing-a-policy-for-inviting-outside-collaborators-to-repositories)."
    * 
    * For more information on permission levels, see "[Repository permission levels for an organization](https://docs.github.com/github/setting-up-and-managing-organizations-and-teams/repository-permission-levels-for-an-organization#permission-levels-for-repositories-owned-by-an-organization)". There are restrictions on which permissions can be granted to organization members when an organization base role is in place. In this case, the permission being given must be equal to or higher than the org base permission. Otherwise, the request will fail with:
    * 
@@ -97433,7 +88764,7 @@ export interface operations {
    * | `unsigned` | The object does not include a signature. |
    * | `unknown_signature_type` | A non-PGP signature was found in the commit. |
    * | `no_user` | No user was associated with the `committer` email address in the commit. |
-   * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on her/his account. |
+   * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on their account. |
    * | `bad_email` | The `committer` email address in the commit is not included in the identities of the PGP key that made the signature. |
    * | `unknown_key` | The key that made the signature has not been registered with any user's account. |
    * | `malformed_signature` | There was an error parsing the signature. |
@@ -97443,12 +88774,14 @@ export interface operations {
   "repos/list-commits": {
     parameters: {
       query: {
-        /** @description SHA or branch to start listing commits from. Default: the repository’s default branch (usually `master`). */
+        /** @description SHA or branch to start listing commits from. Default: the repository’s default branch (usually `main`). */
         sha?: string;
         /** @description Only commits containing this file path will be returned. */
         path?: string;
-        /** @description GitHub login or email address by which to filter by commit author. */
+        /** @description GitHub username or email address to use to filter by commit author. */
         author?: string;
+        /** @description GitHub username or email address to use to filter by commit committer. */
+        committer?: string;
         /** @description Only commits before this date will be returned. This is a timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`. */
         until?: string;
       };
@@ -97541,7 +88874,7 @@ export interface operations {
   };
   /**
    * List pull requests associated with a commit 
-   * @description Lists the merged pull request that introduced the commit to the repository. If the commit is not present in the default branch, additionally returns open pull requests associated with the commit. The results only include open pull requests.
+   * @description Lists the merged pull request that introduced the commit to the repository. If the commit is not present in the default branch, will only return open pull requests associated with the commit.
    */
   "repos/list-pull-requests-associated-with-commit": {
     responses: {
@@ -97588,7 +88921,7 @@ export interface operations {
    * | `unsigned` | The object does not include a signature. |
    * | `unknown_signature_type` | A non-PGP signature was found in the commit. |
    * | `no_user` | No user was associated with the `committer` email address in the commit. |
-   * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on her/his account. |
+   * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on their account. |
    * | `bad_email` | The `committer` email address in the commit is not included in the identities of the PGP key that made the signature. |
    * | `unknown_key` | The key that made the signature has not been registered with any user's account. |
    * | `malformed_signature` | There was an error parsing the signature. |
@@ -97739,7 +89072,7 @@ export interface operations {
   };
   /**
    * Get community profile metrics 
-   * @description Returns all community profile metrics for a repository. The repository must be public, and cannot be a fork.
+   * @description Returns all community profile metrics for a repository. The repository cannot be a fork.
    * 
    * The returned metrics include an overall health score, the repository description, the presence of documentation, the
    * detected code of conduct, the detected license, and the presence of ISSUE\_TEMPLATE, PULL\_REQUEST\_TEMPLATE,
@@ -97765,21 +89098,26 @@ export interface operations {
   };
   /**
    * Compare two commits 
-   * @description The `basehead` param is comprised of two parts separated by triple dots: `{base}...{head}`. Both must be branch names in `repo`. To compare branches across other repositories in the same network as `repo`, use the format `<USERNAME>:branch`.
+   * @description Compares two commits against one another. You can compare branches in the same repository, or you can compare branches that exist in different repositories within the same repository network, including fork branches. For more information about how to view a repository's network, see "[Understanding connections between repositories](https://docs.github.com/repositories/viewing-activity-and-data-for-your-repository/understanding-connections-between-repositories)."
    * 
-   * The response from the API is equivalent to running the `git log base..head` command; however, commits are returned in chronological order. Pass the appropriate [media type](https://docs.github.com/rest/overview/media-types/#commits-commit-comparison-and-pull-requests) to fetch diff and patch formats.
+   * This endpoint is equivalent to running the `git log BASE..HEAD` command, but it returns commits in a different order. The `git log BASE..HEAD` command returns commits in reverse chronological order, whereas the API returns commits in chronological order. You can pass the appropriate [media type](https://docs.github.com/rest/overview/media-types/#commits-commit-comparison-and-pull-requests) to fetch diff and patch formats.
    * 
-   * The response also includes details on the files that were changed between the two commits. This includes the status of the change (for example, if a file was added, removed, modified, or renamed), and details of the change itself. For example, files with a `renamed` status have a `previous_filename` field showing the previous filename of the file, and files with a `modified` status have a `patch` field showing the changes made to the file.
+   * The API response includes details about the files that were changed between the two commits. This includes the status of the change (if a file was added, removed, modified, or renamed), and details of the change itself. For example, files with a `renamed` status have a `previous_filename` field showing the previous filename of the file, and files with a `modified` status have a `patch` field showing the changes made to the file.
+   * 
+   * When calling this endpoint without any paging parameter (`per_page` or `page`), the returned list is limited to 250 commits, and the last commit in the list is the most recent of the entire comparison.
    * 
    * **Working with large comparisons**
    * 
-   * To process a response with a large number of commits, you can use (`per_page` or `page`) to paginate the results. When using paging, the list of changed files is only returned with page 1, but includes all changed files for the entire comparison. For more information on working with pagination, see "[Traversing with pagination](/rest/guides/traversing-with-pagination)."
+   * To process a response with a large number of commits, use a query parameter (`per_page` or `page`) to paginate the results. When using pagination:
    * 
-   * When calling this API without any paging parameters (`per_page` or `page`), the returned list is limited to 250 commits and the last commit in the list is the most recent of the entire comparison. When a paging parameter is specified, the first commit in the returned list of each page is the earliest.
+   * - The list of changed files is only shown on the first page of results, but it includes all changed files for the entire comparison.
+   * - The results are returned in chronological order, but the last commit in the returned list may not be the most recent one in the entire set if there are more pages of results.
+   * 
+   * For more information on working with pagination, see "[Using pagination in the REST API](https://docs.github.com/rest/guides/using-pagination-in-the-rest-api)."
    * 
    * **Signature verification object**
    * 
-   * The response will include a `verification` object that describes the result of verifying the commit's signature. The following fields are included in the `verification` object:
+   * The response will include a `verification` object that describes the result of verifying the commit's signature. The `verification` object includes the following fields:
    * 
    * | Name | Type | Description |
    * | ---- | ---- | ----------- |
@@ -97799,7 +89137,7 @@ export interface operations {
    * | `unsigned` | The object does not include a signature. |
    * | `unknown_signature_type` | A non-PGP signature was found in the commit. |
    * | `no_user` | No user was associated with the `committer` email address in the commit. |
-   * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on her/his account. |
+   * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on their account. |
    * | `bad_email` | The `committer` email address in the commit is not included in the identities of the PGP key that made the signature. |
    * | `unknown_key` | The key that made the signature has not been registered with any user's account. |
    * | `malformed_signature` | There was an error parsing the signature. |
@@ -97809,7 +89147,7 @@ export interface operations {
   "repos/compare-commits": {
     parameters: {
       path: {
-        /** @description The base branch and head branch to compare. This parameter expects the format `{base}...{head}`. */
+        /** @description The base branch and head branch to compare. This parameter expects the format `BASE...HEAD`. Both must be branch names in `repo`. To compare with a branch that exists in a different repository in the same network as `repo`, the `basehead` parameter expects the format `USERNAME:BASE...USERNAME:HEAD`. */
         basehead: string;
       };
     };
@@ -98055,7 +89393,7 @@ export interface operations {
         page?: number;
         /**
          * @deprecated 
-         * @description **Deprecated**. The number of results per page (max 100). Use cursor-based pagination with `first` or `last` instead.
+         * @description The number of results per page (max 100).
          */
         per_page?: number;
       };
@@ -98504,7 +89842,7 @@ export interface operations {
    * *   Create a new deployment that is active so that the system has a record of the current state, then delete the previously active deployment.
    * *   Mark the active deployment as inactive by adding any non-successful deployment status.
    * 
-   * For more information, see "[Create a deployment](https://docs.github.com/rest/reference/repos/#create-a-deployment)" and "[Create a deployment status](https://docs.github.com/rest/reference/repos#create-a-deployment-status)."
+   * For more information, see "[Create a deployment](https://docs.github.com/rest/deployments/deployments/#create-a-deployment)" and "[Create a deployment status](https://docs.github.com/rest/deployments/deployment-statuses#create-a-deployment-status)."
    */
   "repos/delete-deployment": {
     responses: {
@@ -98980,7 +90318,7 @@ export interface operations {
    * | `unsigned` | The object does not include a signature. |
    * | `unknown_signature_type` | A non-PGP signature was found in the commit. |
    * | `no_user` | No user was associated with the `committer` email address in the commit. |
-   * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on her/his account. |
+   * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on their account. |
    * | `bad_email` | The `committer` email address in the commit is not included in the identities of the PGP key that made the signature. |
    * | `unknown_key` | The key that made the signature has not been registered with any user's account. |
    * | `malformed_signature` | There was an error parsing the signature. |
@@ -99067,7 +90405,7 @@ export interface operations {
    * | `unsigned` | The object does not include a signature. |
    * | `unknown_signature_type` | A non-PGP signature was found in the commit. |
    * | `no_user` | No user was associated with the `committer` email address in the commit. |
-   * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on her/his account. |
+   * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on their account. |
    * | `bad_email` | The `committer` email address in the commit is not included in the identities of the PGP key that made the signature. |
    * | `unknown_key` | The key that made the signature has not been registered with any user's account. |
    * | `malformed_signature` | There was an error parsing the signature. |
@@ -99242,7 +90580,7 @@ export interface operations {
    * | `unsigned` | The object does not include a signature. |
    * | `unknown_signature_type` | A non-PGP signature was found in the commit. |
    * | `no_user` | No user was associated with the `committer` email address in the commit. |
-   * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on her/his account. |
+   * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on their account. |
    * | `bad_email` | The `committer` email address in the commit is not included in the identities of the PGP key that made the signature. |
    * | `unknown_key` | The key that made the signature has not been registered with any user's account. |
    * | `malformed_signature` | There was an error parsing the signature. |
@@ -99317,7 +90655,7 @@ export interface operations {
    * | `unsigned` | The object does not include a signature. |
    * | `unknown_signature_type` | A non-PGP signature was found in the commit. |
    * | `no_user` | No user was associated with the `committer` email address in the commit. |
-   * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on her/his account. |
+   * | `unverified_email` | The `committer` email address in the commit was associated with a user, but the email address is not verified on their account. |
    * | `bad_email` | The `committer` email address in the commit is not included in the identities of the PGP key that made the signature. |
    * | `unknown_key` | The key that made the signature has not been registered with any user's account. |
    * | `malformed_signature` | There was an error parsing the signature. |
@@ -99623,6 +90961,11 @@ export interface operations {
    * @description Returns a list of webhook deliveries for a webhook configured in a repository.
    */
   "repos/list-webhook-deliveries": {
+    parameters: {
+      query: {
+        redelivery?: boolean;
+      };
+    };
     responses: {
       /** @description Response */
       200: {
@@ -99703,11 +91046,11 @@ export interface operations {
    * 
    * If there are problems, you will see one of these in the `status` field:
    * 
-   * *   `auth_failed` - the import requires authentication in order to connect to the original repository. To update authentication for the import, please see the [Update an import](https://docs.github.com/rest/reference/migrations#update-an-import) section.
+   * *   `auth_failed` - the import requires authentication in order to connect to the original repository. To update authentication for the import, please see the [Update an import](https://docs.github.com/rest/migrations/source-imports#update-an-import) section.
    * *   `error` - the import encountered an error. The import progress response will include the `failed_step` and an error message. Contact [GitHub Support](https://support.github.com/contact?tags=dotcom-rest-api) for more information.
-   * *   `detection_needs_auth` - the importer requires authentication for the originating repository to continue detection. To update authentication for the import, please see the [Update an import](https://docs.github.com/rest/reference/migrations#update-an-import) section.
-   * *   `detection_found_nothing` - the importer didn't recognize any source control at the URL. To resolve, [Cancel the import](https://docs.github.com/rest/reference/migrations#cancel-an-import) and [retry](https://docs.github.com/rest/reference/migrations#start-an-import) with the correct URL.
-   * *   `detection_found_multiple` - the importer found several projects or repositories at the provided URL. When this is the case, the Import Progress response will also include a `project_choices` field with the possible project choices as values. To update project choice, please see the [Update an import](https://docs.github.com/rest/reference/migrations#update-an-import) section.
+   * *   `detection_needs_auth` - the importer requires authentication for the originating repository to continue detection. To update authentication for the import, please see the [Update an import](https://docs.github.com/rest/migrations/source-imports#update-an-import) section.
+   * *   `detection_found_nothing` - the importer didn't recognize any source control at the URL. To resolve, [Cancel the import](https://docs.github.com/rest/migrations/source-imports#cancel-an-import) and [retry](https://docs.github.com/rest/migrations/source-imports#start-an-import) with the correct URL.
+   * *   `detection_found_multiple` - the importer found several projects or repositories at the provided URL. When this is the case, the Import Progress response will also include a `project_choices` field with the possible project choices as values. To update project choice, please see the [Update an import](https://docs.github.com/rest/migrations/source-imports#update-an-import) section.
    * 
    * **The project_choices field**
    * 
@@ -99736,7 +91079,7 @@ export interface operations {
   };
   /**
    * Start an import 
-   * @description Start a source import to a GitHub repository using GitHub Importer.
+   * @description Start a source import to a GitHub repository using GitHub Importer. Importing into a GitHub repository with GitHub Actions enabled is not supported and will return a status `422 Unprocessable Entity` response.
    */
   "migrations/start-import": {
     requestBody: {
@@ -99830,7 +91173,7 @@ export interface operations {
    * Get commit authors 
    * @description Each type of source control system represents authors in a different way. For example, a Git commit author has a display name and an email address, but a Subversion commit author just has a username. The GitHub Importer will make the author information valid, but the author might not be correct. For example, it will change the bare Subversion username `hubot` into something like `hubot <hubot@12341234-abab-fefe-8787-fedcba987654>`.
    * 
-   * This endpoint and the [Map a commit author](https://docs.github.com/rest/reference/migrations#map-a-commit-author) endpoint allow you to provide correct Git author information.
+   * This endpoint and the [Map a commit author](https://docs.github.com/rest/migrations/source-imports#map-a-commit-author) endpoint allow you to provide correct Git author information.
    */
   "migrations/get-commit-authors": {
     responses: {
@@ -99893,7 +91236,7 @@ export interface operations {
   };
   /**
    * Update Git LFS preference 
-   * @description You can import repositories from Subversion, Mercurial, and TFS that include files larger than 100MB. This ability is powered by [Git LFS](https://git-lfs.github.com). You can learn more about our LFS feature and working with large files [on our help site](https://docs.github.com/articles/versioning-large-files/).
+   * @description You can import repositories from Subversion, Mercurial, and TFS that include files larger than 100MB. This ability is powered by [Git LFS](https://git-lfs.com). You can learn more about our LFS feature and working with large files [on our help site](https://docs.github.com/repositories/working-with-files/managing-large-files).
    */
   "migrations/set-lfs-preference": {
     requestBody: {
@@ -100119,7 +91462,9 @@ export interface operations {
   };
   /**
    * List issue comments for a repository 
-   * @description By default, Issue Comments are ordered by ascending ID.
+   * @description You can use the REST API to list comments on issues and pull requests for a repository. Every pull request is an issue, but not every issue is a pull request.
+   * 
+   * By default, issue comments are ordered by ascending ID.
    */
   "issues/list-comments-for-repo": {
     parameters: {
@@ -100142,7 +91487,10 @@ export interface operations {
       422: components["responses"]["validation_failed"];
     };
   };
-  /** Get an issue comment */
+  /**
+   * Get an issue comment 
+   * @description You can use the REST API to get comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.
+   */
   "issues/get-comment": {
     responses: {
       /** @description Response */
@@ -100154,14 +91502,20 @@ export interface operations {
       404: components["responses"]["not_found"];
     };
   };
-  /** Delete an issue comment */
+  /**
+   * Delete an issue comment 
+   * @description You can use the REST API to delete comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.
+   */
   "issues/delete-comment": {
     responses: {
       /** @description Response */
       204: never;
     };
   };
-  /** Update an issue comment */
+  /**
+   * Update an issue comment 
+   * @description You can use the REST API to update comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.
+   */
   "issues/update-comment": {
     requestBody: {
       content: {
@@ -100323,28 +91677,28 @@ export interface operations {
           title?: string | number;
           /** @description The contents of the issue. */
           body?: string | null;
-          /** @description Login for the user that this issue should be assigned to. **This field is deprecated.** */
+          /** @description Username to assign to this issue. **This field is deprecated.** */
           assignee?: string | null;
           /**
-           * @description State of the issue. Either `open` or `closed`. 
+           * @description The open or closed state of the issue. 
            * @enum {string}
            */
           state?: "open" | "closed";
           /**
-           * @description The reason for the current state 
+           * @description The reason for the state change. Ignored unless `state` is changed. 
            * @example not_planned 
            * @enum {string|null}
            */
           state_reason?: "completed" | "not_planned" | "reopened" | null;
           milestone?: string | number;
-          /** @description Labels to associate with this issue. Pass one or more Labels to _replace_ the set of Labels on this Issue. Send an empty array (`[]`) to clear all Labels from the Issue. _NOTE: Only users with push access can set labels for issues. Labels are silently dropped otherwise._ */
+          /** @description Labels to associate with this issue. Pass one or more labels to _replace_ the set of labels on this issue. Send an empty array (`[]`) to clear all labels from the issue. Only users with push access can set labels for issues. Without push access to the repository, label changes are silently dropped. */
           labels?: (OneOf<[string, {
               id?: number;
               name?: string;
               description?: string | null;
               color?: string | null;
             }]>)[];
-          /** @description Logins for Users to assign to this issue. Pass one or more user logins to _replace_ the set of assignees on this Issue. Send an empty array (`[]`) to clear all assignees from the Issue. _NOTE: Only users with push access can set assignees for new issues. Assignees are silently dropped otherwise._ */
+          /** @description Usernames to assign to this issue. Pass one or more user logins to _replace_ the set of assignees on this issue. Send an empty array (`[]`) to clear all assignees from the issue. Only users with push access can set assignees for new issues. Without push access to the repository, assignee changes are silently dropped. */
           assignees?: (string)[];
         };
       };
@@ -100409,8 +91763,35 @@ export interface operations {
     };
   };
   /**
+   * Check if a user can be assigned to a issue 
+   * @description Checks if a user has permission to be assigned to a specific issue.
+   * 
+   * If the `assignee` can be assigned to this issue, a `204` status code with no content is returned.
+   * 
+   * Otherwise a `404` status code is returned.
+   */
+  "issues/check-user-can-be-assigned-to-issue": {
+    parameters: {
+      path: {
+        assignee: string;
+      };
+    };
+    responses: {
+      /** @description Response if `assignee` can be assigned to `issue_number` */
+      204: never;
+      /** @description Response if `assignee` can not be assigned to `issue_number` */
+      404: {
+        content: {
+          "application/json": components["schemas"]["basic-error"];
+        };
+      };
+    };
+  };
+  /**
    * List issue comments 
-   * @description Issue Comments are ordered by ascending ID.
+   * @description You can use the REST API to list comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.
+   * 
+   * Issue comments are ordered by ascending ID.
    */
   "issues/list-comments": {
     responses: {
@@ -100429,7 +91810,14 @@ export interface operations {
   };
   /**
    * Create an issue comment 
-   * @description This endpoint triggers [notifications](https://docs.github.com/github/managing-subscriptions-and-notifications-on-github/about-notifications). Creating content too quickly using this endpoint may result in secondary rate limiting. See "[Secondary rate limits](https://docs.github.com/rest/overview/resources-in-the-rest-api#secondary-rate-limits)" and "[Dealing with secondary rate limits](https://docs.github.com/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits)" for details.
+   * @description 
+   * You can use the REST API to create comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.
+   * 
+   * This endpoint triggers [notifications](https://docs.github.com/github/managing-subscriptions-and-notifications-on-github/about-notifications).
+   * Creating content too quickly using this endpoint may result in secondary rate limiting.
+   * See "[Secondary rate limits](https://docs.github.com/rest/overview/resources-in-the-rest-api#secondary-rate-limits)"
+   * and "[Dealing with secondary rate limits](https://docs.github.com/rest/guides/best-practices-for-integrators#dealing-with-secondary-rate-limits)"
+   * for details.
    */
   "issues/create-comment": {
     requestBody: {
@@ -100594,10 +91982,10 @@ export interface operations {
         "application/json": ({
           /**
            * @description The reason for locking the issue or pull request conversation. Lock will fail if you don't use one of these reasons:  
-           * \* `off-topic`  
-           * \* `too heated`  
-           * \* `resolved`  
-           * \* `spam` 
+           *  * `off-topic`  
+           *  * `too heated`  
+           *  * `resolved`  
+           *  * `spam` 
            * @enum {string}
            */
           lock_reason?: "off-topic" | "too heated" | "resolved" | "spam";
@@ -101187,6 +92575,8 @@ export interface operations {
   /**
    * Update information about a GitHub Pages site 
    * @description Updates information for a GitHub Pages site. For more information, see "[About GitHub Pages](/github/working-with-github-pages/about-github-pages).
+   * 
+   * To use this endpoint, you must be a repository administrator, maintainer, or have the 'manage GitHub Pages settings' permission. A token with the `repo` scope or Pages write permission is required. GitHub Apps must have the `administration:write` and `pages:write` permissions.
    */
   "repos/update-information-about-pages-site": {
     requestBody: {
@@ -101196,8 +92586,6 @@ export interface operations {
           cname?: string | null;
           /** @description Specify whether HTTPS should be enforced for the repository. */
           https_enforced?: boolean;
-          /** @description Configures access controls for the GitHub Pages site. If public is set to `true`, the site is accessible to anyone on the internet. If set to `false`, the site will only be accessible to users who have at least `read` access to the repository that published the site. This includes anyone in your Enterprise if the repository is set to `internal` visibility. This feature is only available to repositories in an organization on an Enterprise plan. */
-          public?: boolean;
           /**
            * @description The process by which the GitHub Pages site will be built. `workflow` means that the site is built by a custom GitHub Actions workflow. `legacy` means that the site is built by GitHub when changes are pushed to a specific branch. 
            * @enum {string}
@@ -101212,7 +92600,7 @@ export interface operations {
              */
             path: "/" | "/docs";
           });
-        }) & (Record<string, never> | Record<string, never> | Record<string, never> | Record<string, never> | Record<string, never>);
+        }) & (unknown | unknown | unknown | unknown | unknown);
       };
     };
     responses: {
@@ -101225,7 +92613,9 @@ export interface operations {
   };
   /**
    * Create a GitHub Pages site 
-   * @description Configures a GitHub Pages site. For more information, see "[About GitHub Pages](/github/working-with-github-pages/about-github-pages)." You must be an admin of the repository in order to use this operation.
+   * @description Configures a GitHub Pages site. For more information, see "[About GitHub Pages](/github/working-with-github-pages/about-github-pages)."
+   * 
+   * To use this endpoint, you must be a repository administrator, maintainer, or have the 'manage GitHub Pages settings' permission. A token with the `repo` scope or Pages write permission is required. GitHub Apps must have the `administration:write` and `pages:write` permissions.
    */
   "repos/create-pages-site": {
     requestBody: {
@@ -101247,7 +92637,7 @@ export interface operations {
              */
             path?: "/" | "/docs";
           };
-        }) & (Record<string, never> | Record<string, never>)) | null;
+        }) & (unknown | unknown)) | null;
       };
     };
     responses: {
@@ -101263,7 +92653,9 @@ export interface operations {
   };
   /**
    * Delete a GitHub Pages site 
-   * @description Deletes a GitHub Pages site. You must be an admin of the repository in order to use this operation.
+   * @description Deletes a GitHub Pages site. For more information, see "[About GitHub Pages](/github/working-with-github-pages/about-github-pages).
+   * 
+   * To use this endpoint, you must be a repository administrator, maintainer, or have the 'manage GitHub Pages settings' permission. A token with the `repo` scope or Pages write permission is required. GitHub Apps must have the `administration:write` and `pages:write` permissions.
    */
   "repos/delete-pages-site": {
     responses: {
@@ -101376,7 +92768,7 @@ export interface operations {
    * 
    * The first request to this endpoint returns a `202 Accepted` status and starts an asynchronous background task to get the results for the domain. After the background task completes, subsequent requests to this endpoint return a `200 OK` status with the health check results in the response.
    * 
-   * Users must have admin or owner permissions. GitHub Apps must have the `pages:write` and `administration:write` permission to use this endpoint.
+   * To use this endpoint, you must be a repository administrator, maintainer, or have the 'manage GitHub Pages settings' permission. A token with the `repo` scope or Pages write permission is required. GitHub Apps must have the `administrative:write` and `pages:write` permissions.
    */
   "repos/get-pages-health-check": {
     responses: {
@@ -101505,6 +92897,12 @@ export interface operations {
           title?: string;
           /** @description The name of the branch where your changes are implemented. For cross-repository pull requests in the same network, namespace `head` with a user like this: `username:branch`. */
           head: string;
+          /**
+           * Format: repo.nwo 
+           * @description The name of the repository where the changes in the pull request were made. This field is required for cross-repository pull requests if both repositories are owned by the same organization. 
+           * @example octo-org/octo-repo
+           */
+          head_repo?: string;
           /** @description The name of the branch you want the changes pulled into. This should be an existing branch on the current repository. You cannot submit a pull request to one repository that requests a merge to a base of another repository. */
           base: string;
           /** @description The contents of the pull request. */
@@ -102039,7 +93437,7 @@ export interface operations {
           reviewers?: (string)[];
           /** @description An array of team `slug`s that will be requested. */
           team_reviewers?: (string)[];
-        } & (Record<string, never> | Record<string, never>);
+        } & (unknown | unknown);
       };
     };
     responses: {
@@ -102638,7 +94036,7 @@ export interface operations {
   /**
    * Upload a release asset 
    * @description This endpoint makes use of [a Hypermedia relation](https://docs.github.com/rest/overview/resources-in-the-rest-api#hypermedia) to determine which URL to access. The endpoint you call to upload release assets is specific to your release. Use the `upload_url` returned in
-   * the response of the [Create a release endpoint](https://docs.github.com/rest/reference/repos#create-a-release) to upload a release asset.
+   * the response of the [Create a release endpoint](https://docs.github.com/rest/releases/releases#create-a-release) to upload a release asset.
    * 
    * You need to use an HTTP client which supports [SNI](http://en.wikipedia.org/wiki/Server_Name_Indication) to make calls to this endpoint.
    * 
@@ -102654,6 +94052,7 @@ export interface operations {
    * **Notes:**
    * *   GitHub renames asset filenames that have special characters, non-alphanumeric characters, and leading or trailing periods. The "[List assets for a release](https://docs.github.com/rest/reference/repos#list-assets-for-a-release)"
    * endpoint lists the renamed filenames. For more information and help, contact [GitHub Support](https://support.github.com/contact?tags=dotcom-rest-api).
+   * *   To find the `release_id` query the [`GET /repos/{owner}/{repo}/releases/latest` endpoint](https://docs.github.com/rest/releases/releases#get-the-latest-release). 
    * *   If you upload an asset with the same filename as another uploaded asset, you'll receive an error and must delete the old file before you can re-upload the new asset.
    */
   "repos/upload-release-asset": {
@@ -102665,7 +94064,7 @@ export interface operations {
     };
     requestBody?: {
       content: {
-        "*/*": string;
+        "application/octet-stream": string;
       };
     };
     responses: {
@@ -103147,7 +94546,7 @@ export interface operations {
   /**
    * Download a repository archive (tar) 
    * @description Gets a redirect URL to download a tar archive for a repository. If you omit `:ref`, the repository’s default branch (usually
-   * `master`) will be used. Please make sure your HTTP framework is configured to follow redirects or you will need to use
+   * `main`) will be used. Please make sure your HTTP framework is configured to follow redirects or you will need to use
    * the `Location` header to make a second `GET` request.
    * **Note**: For private repositories, these links are temporary and expire after five minutes.
    */
@@ -103319,7 +94718,9 @@ export interface operations {
   };
   /**
    * Disable vulnerability alerts 
-   * @description Disables dependency alerts and the dependency graph for a repository. The authenticated user must have admin access to the repository. For more information, see "[About security alerts for vulnerable dependencies](https://docs.github.com/articles/about-security-alerts-for-vulnerable-dependencies)".
+   * @description Disables dependency alerts and the dependency graph for a repository.
+   * The authenticated user must have admin access to the repository. For more information,
+   * see "[About security alerts for vulnerable dependencies](https://docs.github.com/articles/about-security-alerts-for-vulnerable-dependencies)".
    */
   "repos/disable-vulnerability-alerts": {
     responses: {
@@ -103330,7 +94731,7 @@ export interface operations {
   /**
    * Download a repository archive (zip) 
    * @description Gets a redirect URL to download a zip archive for a repository. If you omit `:ref`, the repository’s default branch (usually
-   * `master`) will be used. Please make sure your HTTP framework is configured to follow redirects or you will need to use
+   * `main`) will be used. Please make sure your HTTP framework is configured to follow redirects or you will need to use
    * the `Location` header to make a second `GET` request.
    * 
    * **Note**: For private repositories, these links are temporary and expire after five minutes. If the repository is empty, you will receive a 404 when you follow the redirect.
@@ -103583,6 +94984,100 @@ export interface operations {
     };
   };
   /**
+   * List environment variables 
+   * @description Lists all environment variables. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `environments:read` repository permission to use this endpoint.
+   */
+  "actions/list-environment-variables": {
+    responses: {
+      /** @description Response */
+      200: {
+        headers: {
+          Link: components["headers"]["link"];
+        };
+        content: {
+          "application/json": {
+            total_count: number;
+            variables: (components["schemas"]["actions-variable"])[];
+          };
+        };
+      };
+    };
+  };
+  /**
+   * Create an environment variable 
+   * @description Create an environment variable that you can reference in a GitHub Actions workflow.
+   * You must authenticate using an access token with the `repo` scope to use this endpoint.
+   * GitHub Apps must have the `environment:write` repository permission to use this endpoint.
+   */
+  "actions/create-environment-variable": {
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the variable. */
+          name: string;
+          /** @description The value of the variable. */
+          value: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Response */
+      201: {
+        content: {
+          "application/json": components["schemas"]["empty-object"];
+        };
+      };
+    };
+  };
+  /**
+   * Get an environment variable 
+   * @description Gets a specific variable in an environment. You must authenticate using an access token with the `repo` scope to use this endpoint. GitHub Apps must have the `environments:read` repository permission to use this endpoint.
+   */
+  "actions/get-environment-variable": {
+    responses: {
+      /** @description Response */
+      200: {
+        content: {
+          "application/json": components["schemas"]["actions-variable"];
+        };
+      };
+    };
+  };
+  /**
+   * Delete an environment variable 
+   * @description Deletes an environment variable using the variable name.
+   * You must authenticate using an access token with the `repo` scope to use this endpoint.
+   * GitHub Apps must have the `environment:write` repository permission to use this endpoint.
+   */
+  "actions/delete-environment-variable": {
+    responses: {
+      /** @description Response */
+      204: never;
+    };
+  };
+  /**
+   * Update an environment variable 
+   * @description Updates an environment variable that you can reference in a GitHub Actions workflow.
+   * You must authenticate using an access token with the `repo` scope to use this endpoint.
+   * GitHub Apps must have the `environment:write` repository permission to use this endpoint.
+   */
+  "actions/update-environment-variable": {
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description The name of the variable. */
+          name?: string;
+          /** @description The value of the variable. */
+          value?: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Response */
+      204: never;
+    };
+  };
+  /**
    * Search code 
    * @description Searches for query terms inside of a file. This method returns up to 100 results [per page](https://docs.github.com/rest/overview/resources-in-the-rest-api#pagination).
    * 
@@ -103631,7 +95126,7 @@ export interface operations {
   };
   /**
    * Search commits 
-   * @description Find commits via various criteria on the default branch (usually `master`). This method returns up to 100 results [per page](https://docs.github.com/rest/overview/resources-in-the-rest-api#pagination).
+   * @description Find commits via various criteria on the default branch (usually `main`). This method returns up to 100 results [per page](https://docs.github.com/rest/overview/resources-in-the-rest-api#pagination).
    * 
    * When searching for commits, you can get text match metadata for the **message** field when you provide the `text-match` media type. For more details about how to receive highlighted search results, see [Text match
    * metadata](https://docs.github.com/rest/reference/search#text-match-metadata).
@@ -103904,10 +95399,10 @@ export interface operations {
           /**
            * @description The level of privacy this team should have. Editing teams without specifying this parameter leaves `privacy` intact. The options are:  
            * **For a non-nested team:**  
-           * \* `secret` - only visible to organization owners and members of this team.  
-           * \* `closed` - visible to all members of this organization.  
+           *  * `secret` - only visible to organization owners and members of this team.  
+           *  * `closed` - visible to all members of this organization.  
            * **For a parent or child team:**  
-           * \* `closed` - visible to all members of this organization. 
+           *  * `closed` - visible to all members of this organization. 
            * @enum {string}
            */
           privacy?: "secret" | "closed";
@@ -104957,7 +96452,7 @@ export interface operations {
    * 
    * You must authenticate using an access token with the `codespace` or `codespace:secrets` scope to use this endpoint. User must also have Codespaces access to use this endpoint.
    * 
-   * GitHub Apps must have read access to the `codespaces_user_secrets` user permission and `codespaces_secrets` repository permission on all referenced repositories to use this endpoint.
+   * GitHub Apps must have write access to the `codespaces_user_secrets` user permission and `codespaces_secrets` repository permission on all referenced repositories to use this endpoint.
    * 
    * #### Example encrypting a secret using Node.js
    * 
@@ -105040,7 +96535,7 @@ export interface operations {
           /** @description ID of the key you used to encrypt the secret. */
           key_id: string;
           /** @description An array of repository ids that can access the user secret. You can manage the list of selected repositories using the [List selected repositories for a user secret](https://docs.github.com/rest/reference/codespaces#list-selected-repositories-for-a-user-secret), [Set selected repositories for a user secret](https://docs.github.com/rest/reference/codespaces#set-selected-repositories-for-a-user-secret), and [Remove a selected repository from a user secret](https://docs.github.com/rest/reference/codespaces#remove-a-selected-repository-from-a-user-secret) endpoints. */
-          selected_repository_ids?: (string)[];
+          selected_repository_ids?: (number | string)[];
         };
       };
     };
@@ -105244,6 +96739,8 @@ export interface operations {
    * Export a codespace for the authenticated user 
    * @description Triggers an export of the specified codespace and returns a URL and ID where the status of the export can be monitored.
    * 
+   * If changes cannot be pushed to the codespace's repository, they will be pushed to a new or previously-existing fork instead.
+   * 
    * You must authenticate using a personal access token with the `codespace` scope to use this endpoint.
    * 
    * GitHub Apps must have write access to the `codespaces_lifecycle_admin` repository permission to use this endpoint.
@@ -105306,6 +96803,45 @@ export interface operations {
       403: components["responses"]["forbidden"];
       404: components["responses"]["not_found"];
       500: components["responses"]["internal_error"];
+    };
+  };
+  /**
+   * Create a repository from an unpublished codespace 
+   * @description Publishes an unpublished codespace, creating a new repository and assigning it to the codespace.
+   * 
+   * The codespace's token is granted write permissions to the repository, allowing the user to push their changes.
+   * 
+   * This will fail for a codespace that is already published, meaning it has an associated repository.
+   * 
+   * You must authenticate using a personal access token with the `codespace` scope to use this endpoint.
+   * 
+   * GitHub Apps must have write access to the `codespaces` repository permission to use this endpoint.
+   */
+  "codespaces/publish-for-authenticated-user": {
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description A name for the new repository. */
+          name?: string;
+          /**
+           * @description Whether the new repository should be private. 
+           * @default false
+           */
+          private?: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Response */
+      201: {
+        content: {
+          "application/json": components["schemas"]["codespace-with-full-repository"];
+        };
+      };
+      401: components["responses"]["requires_authentication"];
+      403: components["responses"]["forbidden"];
+      404: components["responses"]["not_found"];
+      422: components["responses"]["validation_failed"];
     };
   };
   /**
@@ -106086,7 +97622,7 @@ export interface operations {
    * *   `exported` - the migration finished successfully.
    * *   `failed` - the migration failed.
    * 
-   * Once the migration has been `exported` you can [download the migration archive](https://docs.github.com/rest/reference/migrations#download-a-user-migration-archive).
+   * Once the migration has been `exported` you can [download the migration archive](https://docs.github.com/rest/migrations/users#download-a-user-migration-archive).
    */
   "migrations/get-status-for-authenticated-user": {
     parameters: {
@@ -106142,7 +97678,7 @@ export interface operations {
   };
   /**
    * Delete a user migration archive 
-   * @description Deletes a previous migration archive. Downloadable migration archives are automatically deleted after seven days. Migration metadata, which is returned in the [List user migrations](https://docs.github.com/rest/reference/migrations#list-user-migrations) and [Get a user migration status](https://docs.github.com/rest/reference/migrations#get-a-user-migration-status) endpoints, will continue to be available even after an archive is deleted.
+   * @description Deletes a previous migration archive. Downloadable migration archives are automatically deleted after seven days. Migration metadata, which is returned in the [List user migrations](https://docs.github.com/rest/migrations/users#list-user-migrations) and [Get a user migration status](https://docs.github.com/rest/migrations/users#get-a-user-migration-status) endpoints, will continue to be available even after an archive is deleted.
    */
   "migrations/delete-archive-for-authenticated-user": {
     responses: {
@@ -106156,7 +97692,7 @@ export interface operations {
   };
   /**
    * Unlock a user repository 
-   * @description Unlocks a repository. You can lock repositories when you [start a user migration](https://docs.github.com/rest/reference/migrations#start-a-user-migration). Once the migration is complete you can unlock each repository to begin using it again or [delete the repository](https://docs.github.com/rest/reference/repos#delete-a-repository) if you no longer need the source data. Returns a status of `404 Not Found` if the repository is not locked.
+   * @description Unlocks a repository. You can lock repositories when you [start a user migration](https://docs.github.com/rest/migrations/users#start-a-user-migration). Once the migration is complete you can unlock each repository to begin using it again or [delete the repository](https://docs.github.com/rest/repos/repos#delete-a-repository) if you no longer need the source data. Returns a status of `404 Not Found` if the repository is not locked.
    */
   "migrations/unlock-repo-for-authenticated-user": {
     responses: {
@@ -106214,8 +97750,7 @@ export interface operations {
    * List packages for the authenticated user's namespace 
    * @description Lists packages owned by the authenticated user within the user's namespace.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-   * If `package_type` is not `container`, your token must also include the `repo` scope.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/list-packages-for-authenticated-user": {
     parameters: {
@@ -106237,8 +97772,7 @@ export interface operations {
    * Get a package for the authenticated user 
    * @description Gets a specific package for a package owned by the authenticated user.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-   * If `package_type` is not `container`, your token must also include the `repo` scope.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/get-package-for-authenticated-user": {
     responses: {
@@ -106254,8 +97788,8 @@ export interface operations {
    * Delete a package for the authenticated user 
    * @description Deletes a package owned by the authenticated user. You cannot delete a public package if any version of the package has more than 5,000 downloads. In this scenario, contact GitHub support for further assistance.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` and `packages:delete` scopes.
-   * If `package_type` is not `container`, your token must also include the `repo` scope.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` and `delete:packages` scopes.
+   * If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/delete-package-for-authenticated-user": {
     responses: {
@@ -106274,7 +97808,7 @@ export interface operations {
    *   - The package was deleted within the last 30 days.
    *   - The same package namespace and version is still available and not reused for a new package. If the same package namespace is not available, you will not be able to restore your package. In this scenario, to restore the deleted package, you must delete the new package that uses the deleted package's namespace first.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` and `packages:write` scopes. If `package_type` is not `container`, your token must also include the `repo` scope.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` and `write:packages` scopes. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/restore-package-for-authenticated-user": {
     parameters: {
@@ -106295,8 +97829,7 @@ export interface operations {
    * List package versions for a package owned by the authenticated user 
    * @description Lists package versions for a package owned by the authenticated user.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-   * If `package_type` is not `container`, your token must also include the `repo` scope.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/get-all-package-versions-for-package-owned-by-authenticated-user": {
     parameters: {
@@ -106321,8 +97854,7 @@ export interface operations {
    * Get a package version for the authenticated user 
    * @description Gets a specific package version for a package owned by the authenticated user.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-   * If `package_type` is not `container`, your token must also include the `repo` scope.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/get-package-version-for-authenticated-user": {
     responses: {
@@ -106338,8 +97870,8 @@ export interface operations {
    * Delete a package version for the authenticated user 
    * @description Deletes a specific package version for a package owned by the authenticated user.  If the package is public and the package version has more than 5,000 downloads, you cannot delete the package version. In this scenario, contact GitHub support for further assistance.
    * 
-   * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `packages:read` and `packages:delete` scopes.
-   * If `package_type` is not `container`, your token must also include the `repo` scope.
+   * To use this endpoint, you must have admin permissions in the organization and authenticate using an access token with the `read:packages` and `delete:packages` scopes.
+   * If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/delete-package-version-for-authenticated-user": {
     responses: {
@@ -106358,7 +97890,7 @@ export interface operations {
    *   - The package was deleted within the last 30 days.
    *   - The same package namespace and version is still available and not reused for a new package. If the same package namespace is not available, you will not be able to restore your package. In this scenario, to restore the deleted package, you must delete the new package that uses the deleted package's namespace first.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` and `packages:write` scopes. If `package_type` is not `container`, your token must also include the `repo` scope.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` and `write:packages` scopes. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/restore-package-version-for-authenticated-user": {
     responses: {
@@ -106437,9 +97969,9 @@ export interface operations {
         visibility?: "all" | "public" | "private";
         /**
          * @description Comma-separated list of values. Can include:  
-         * \* `owner`: Repositories that are owned by the authenticated user.  
-         * \* `collaborator`: Repositories that the user has been added to as a collaborator.  
-         * \* `organization_member`: Repositories that the user has access to through being a member of an organization. This includes every repository on every team that the user is on.
+         *  * `owner`: Repositories that are owned by the authenticated user.  
+         *  * `collaborator`: Repositories that the user has been added to as a collaborator.  
+         *  * `organization_member`: Repositories that the user has access to through being a member of an organization. This includes every repository on every team that the user is on.
          */
         affiliation?: string;
         /** @description Limit results to repositories of the specified type. Will cause a `422` error if used in the same request as **visibility** or **affiliation**. */
@@ -106672,6 +98204,83 @@ export interface operations {
       403: components["responses"]["forbidden"];
       404: components["responses"]["not_found"];
       409: components["responses"]["conflict"];
+    };
+  };
+  /**
+   * List social accounts for the authenticated user 
+   * @description Lists all of your social accounts.
+   */
+  "users/list-social-accounts-for-authenticated-user": {
+    responses: {
+      /** @description Response */
+      200: {
+        headers: {
+          Link: components["headers"]["link"];
+        };
+        content: {
+          "application/json": (components["schemas"]["social-account"])[];
+        };
+      };
+      304: components["responses"]["not_modified"];
+      401: components["responses"]["requires_authentication"];
+      403: components["responses"]["forbidden"];
+      404: components["responses"]["not_found"];
+    };
+  };
+  /**
+   * Add social accounts for the authenticated user 
+   * @description Add one or more social accounts to the authenticated user's profile. This endpoint is accessible with the `user` scope.
+   */
+  "users/add-social-account-for-authenticated-user": {
+    requestBody: {
+      content: {
+        "application/json": {
+          /**
+           * @description Full URLs for the social media profiles to add. 
+           * @example []
+           */
+          account_urls: (string)[];
+        };
+      };
+    };
+    responses: {
+      /** @description Response */
+      201: {
+        content: {
+          "application/json": (components["schemas"]["social-account"])[];
+        };
+      };
+      304: components["responses"]["not_modified"];
+      401: components["responses"]["requires_authentication"];
+      403: components["responses"]["forbidden"];
+      404: components["responses"]["not_found"];
+      422: components["responses"]["validation_failed"];
+    };
+  };
+  /**
+   * Delete social accounts for the authenticated user 
+   * @description Deletes one or more social accounts from the authenticated user's profile. This endpoint is accessible with the `user` scope.
+   */
+  "users/delete-social-account-for-authenticated-user": {
+    requestBody: {
+      content: {
+        "application/json": {
+          /**
+           * @description Full URLs for the social media profiles to delete. 
+           * @example []
+           */
+          account_urls: (string)[];
+        };
+      };
+    };
+    responses: {
+      /** @description Response */
+      204: never;
+      304: components["responses"]["not_modified"];
+      401: components["responses"]["requires_authentication"];
+      403: components["responses"]["forbidden"];
+      404: components["responses"]["not_found"];
+      422: components["responses"]["validation_failed"];
     };
   };
   /**
@@ -107114,8 +98723,7 @@ export interface operations {
    * List packages for a user 
    * @description Lists all packages in a user's namespace for which the requesting user has access.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-   * If `package_type` is not `container`, your token must also include the `repo` scope.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/list-packages-for-user": {
     parameters: {
@@ -107139,8 +98747,7 @@ export interface operations {
    * Get a package for a user 
    * @description Gets a specific package metadata for a public package owned by a user.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-   * If `package_type` is not `container`, your token must also include the `repo` scope.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/get-package-for-user": {
     responses: {
@@ -107156,9 +98763,9 @@ export interface operations {
    * Delete a package for a user 
    * @description Deletes an entire package for a user. You cannot delete a public package if any version of the package has more than 5,000 downloads. In this scenario, contact GitHub support for further assistance.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` and `packages:delete` scopes. In addition:
-   * - If `package_type` is not `container`, your token must also include the `repo` scope.
-   * - If `package_type` is `container`, you must also have admin permissions to the container you want to delete.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` and `delete:packages` scopes. In addition:
+   * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+   * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package you want to delete. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
    */
   "packages/delete-package-for-user": {
     responses: {
@@ -107177,9 +98784,9 @@ export interface operations {
    *   - The package was deleted within the last 30 days.
    *   - The same package namespace and version is still available and not reused for a new package. If the same package namespace is not available, you will not be able to restore your package. In this scenario, to restore the deleted package, you must delete the new package that uses the deleted package's namespace first.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` and `packages:write` scopes. In addition:
-   * - If `package_type` is not `container`, your token must also include the `repo` scope.
-   * - If `package_type` is `container`, you must also have admin permissions to the container that you want to restore.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` and `write:packages` scopes. In addition:
+   * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+   * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package you want to restore. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
    */
   "packages/restore-package-for-user": {
     parameters: {
@@ -107200,8 +98807,7 @@ export interface operations {
    * List package versions for a package owned by a user 
    * @description Lists package versions for a public package owned by a specified user.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-   * If `package_type` is not `container`, your token must also include the `repo` scope.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/get-all-package-versions-for-package-owned-by-user": {
     responses: {
@@ -107220,8 +98826,7 @@ export interface operations {
    * Get a package version for a user 
    * @description Gets a specific package version for a public package owned by a specified user.
    * 
-   * At this time, to use this endpoint, you must authenticate using an access token with the `packages:read` scope.
-   * If `package_type` is not `container`, your token must also include the `repo` scope.
+   * At this time, to use this endpoint, you must authenticate using an access token with the `read:packages` scope. If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of GitHub Packages registries that only support repository-scoped permissions, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
    */
   "packages/get-package-version-for-user": {
     responses: {
@@ -107237,9 +98842,9 @@ export interface operations {
    * Delete package version for a user 
    * @description Deletes a specific package version for a user. If the package is public and the package version has more than 5,000 downloads, you cannot delete the package version. In this scenario, contact GitHub support for further assistance.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` and `packages:delete` scopes. In addition:
-   * - If `package_type` is not `container`, your token must also include the `repo` scope.
-   * - If `package_type` is `container`, you must also have admin permissions to the container you want to delete.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` and `delete:packages` scopes. In addition:
+   * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+   * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package whose version you want to delete. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
    */
   "packages/delete-package-version-for-user": {
     responses: {
@@ -107258,9 +98863,9 @@ export interface operations {
    *   - The package was deleted within the last 30 days.
    *   - The same package namespace and version is still available and not reused for a new package. If the same package namespace is not available, you will not be able to restore your package. In this scenario, to restore the deleted package, you must delete the new package that uses the deleted package's namespace first.
    * 
-   * To use this endpoint, you must authenticate using an access token with the `packages:read` and `packages:write` scopes. In addition:
-   * - If `package_type` is not `container`, your token must also include the `repo` scope.
-   * - If `package_type` is `container`, you must also have admin permissions to the container that you want to restore.
+   * To use this endpoint, you must authenticate using an access token with the `read:packages` and `write:packages` scopes. In addition:
+   * - If the `package_type` belongs to a GitHub Packages registry that only supports repository-scoped permissions, your token must also include the `repo` scope. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#permissions-for-repository-scoped-packages)."
+   * - If the `package_type` belongs to a GitHub Packages registry that supports granular permissions, you must have admin permissions to the package whose version you want to restore. For the list of these registries, see "[About permissions for GitHub Packages](https://docs.github.com/packages/learn-github-packages/about-permissions-for-github-packages#granular-permissions-for-userorganization-scoped-packages)."
    */
   "packages/restore-package-version-for-user": {
     responses: {
@@ -107399,6 +99004,23 @@ export interface operations {
     };
   };
   /**
+   * List social accounts for a user 
+   * @description Lists social media accounts for a user. This endpoint is accessible by anyone.
+   */
+  "users/list-social-accounts-for-user": {
+    responses: {
+      /** @description Response */
+      200: {
+        headers: {
+          Link: components["headers"]["link"];
+        };
+        content: {
+          "application/json": (components["schemas"]["social-account"])[];
+        };
+      };
+    };
+  };
+  /**
    * List SSH signing keys for a user 
    * @description Lists the SSH signing keys for a user. This operation is accessible by anyone.
    */
@@ -107449,6 +99071,21 @@ export interface operations {
           "application/json": (components["schemas"]["minimal-repository"])[];
         };
       };
+    };
+  };
+  /**
+   * Get all API versions 
+   * @description Get all supported GitHub API versions.
+   */
+  "meta/get-all-versions": {
+    responses: {
+      /** @description Response */
+      200: {
+        content: {
+          "application/json": (string)[];
+        };
+      };
+      404: components["responses"]["not_found"];
     };
   };
   /**
